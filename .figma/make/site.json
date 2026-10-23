@@ -1,0 +1,10 @@
+{
+  "description": "A professional networking platform enabling students to create profiles, connect with institutions, and showcase achievements to advance their careers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
