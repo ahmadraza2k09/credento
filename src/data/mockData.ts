@@ -505,6 +505,8 @@ export const INITIAL_POSTS: Post[] = [
             id: "reply-1",
             authorId: "user-priya",
             authorName: "Priya Sharma",
+            authorHeadline:
+              "Biomedical Engineering Honors Senior @ Stanford | Biodesign Fellow",
             authorAvatar:
               "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
             content:
