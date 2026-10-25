@@ -15,12 +15,12 @@ export function Badge({
   className = "",
 }: BadgeProps) {
   const variantStyles = {
-    evergreen: "bg-[#173a35]/10 text-[#173a35] border-[#173a35]/20",
-    copper: "bg-[#c46b4b]/12 text-[#9f5138] border-[#c46b4b]/25",
-    neutral: "bg-[#eef2ef] text-[#4d5b54] border-[#d8ddd8]",
-    success: "bg-[#1b6b47]/10 text-[#155738] border-[#1b6b47]/20",
-    warning: "bg-[#b45309]/10 text-[#92400e] border-[#b45309]/20",
-    info: "bg-[#0369a1]/10 text-[#075985] border-[#0369a1]/20",
+    evergreen: "bg-[#edf4f1] text-[#173a35] border-[#c0d4c6]",
+    copper: "bg-[#faf0eb] text-[#9f5138] border-[#e8cdc2]",
+    neutral: "bg-[#f0ede6] text-[#242b29] border-[#cbd3ce]",
+    success: "bg-[#edf6f0] text-[#155738] border-[#b8dec4]",
+    warning: "bg-[#fef8ee] text-[#92400e] border-[#f5dfb8]",
+    info: "bg-[#f0f7fb] text-[#075985] border-[#bee0f2]",
   }[variant]
 
   const sizeStyles = {
@@ -30,7 +30,7 @@ export function Badge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 border rounded font-mono ${variantStyles} ${sizeStyles} ${className}`}
+      className={`inline-flex items-center gap-1 border rounded-[2px] font-mono ${variantStyles} ${sizeStyles} ${className}`}
     >
       {children}
     </span>

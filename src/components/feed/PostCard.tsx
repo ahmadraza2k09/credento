@@ -80,7 +80,7 @@ export function PostCard({
   }
 
   return (
-    <article className="bg-white rounded-md border border-[#cbd3ce] shadow-[0_1px_3px_rgba(23,58,53,0.04)] mb-4 overflow-hidden transition-all">
+    <article className="bg-white rounded-[2px] border border-[#cbd3ce] mb-4 overflow-hidden transition-all">
       {/* Header: Author & Options */}
       <div className="p-4 pb-2.5 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
@@ -92,7 +92,7 @@ export function PostCard({
             <img
               src={post.authorAvatar}
               alt={post.authorName}
-              className="w-11 h-11 rounded object-cover border border-[#cbd3ce]"
+              className="w-11 h-11 rounded-[2px] object-cover border border-[#cbd3ce]"
             />
           </button>
           <div className="min-w-0">
@@ -105,7 +105,7 @@ export function PostCard({
                 {post.authorName}
               </button>
               {isAuthor && (
-                <span className="text-[10px] bg-[#dce8df] text-[#173a35] px-1.5 py-0.2 rounded font-mono font-medium">
+                <span className="text-[10px] bg-[#dce8df] text-[#173a35] px-1.5 py-0.2 rounded-[2px] font-mono font-medium border border-[#b8c9bd]">
                   Author
                 </span>
               )}
@@ -126,14 +126,14 @@ export function PostCard({
           <button
             type="button"
             onClick={() => setShowMenu(!showMenu)}
-            className="w-8 h-8 rounded flex items-center justify-center text-[#62736b] hover:text-[#173a35] hover:bg-[#f7f5ef] transition-colors"
+            className="w-8 h-8 rounded-[2px] flex items-center justify-center text-[#62736b] hover:text-[#173a35] hover:bg-[#f7f5ef] transition-colors"
             aria-label="Post options"
           >
             <MoreHorizontal className="w-5 h-5" />
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 mt-1 w-44 bg-white border border-[#cbd3ce] rounded shadow-lg py-1 z-30 text-xs">
+            <div className="absolute right-0 mt-1 w-44 bg-white border-2 border-[#173a35] rounded-[2px] py-1 z-30 text-xs">
               <button
                 type="button"
                 onClick={handleCopyLink}
@@ -211,7 +211,7 @@ export function PostCard({
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               rows={4}
-              className="w-full p-2.5 text-sm border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35]"
+              className="w-full p-2.5 text-sm border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
             />
             <div className="flex justify-end gap-2">
               <button
@@ -224,7 +224,7 @@ export function PostCard({
               <button
                 type="button"
                 onClick={handleSaveEdit}
-                className="px-3 py-1 bg-[#173a35] text-white rounded text-xs font-semibold"
+                className="px-3 py-1 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold"
               >
                 Save
               </button>
@@ -239,12 +239,12 @@ export function PostCard({
 
       {/* Shared Post Quote if this is a repost */}
       {post.sharedPost && (
-        <div className="mx-4 my-2 p-3 bg-[#f7f5ef] border border-[#d8ddd8] rounded text-xs">
+        <div className="mx-4 my-2 p-3 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] text-xs">
           <div className="flex items-center gap-2 mb-1.5">
             <img
               src={post.sharedPost.authorAvatar}
               alt={post.sharedPost.authorName}
-              className="w-5 h-5 rounded object-cover"
+              className="w-5 h-5 rounded-[2px] object-cover"
             />
             <span className="font-semibold text-[#173a35]">
               {post.sharedPost.authorName}
@@ -277,7 +277,7 @@ export function PostCard({
           href={post.linkPreview.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mx-4 my-2.5 block border border-[#cbd3ce] rounded bg-[#f7f5ef] p-3 hover:bg-[#eef2ef] transition-colors group"
+          className="mx-4 my-2.5 block border border-[#cbd3ce] rounded-[2px] bg-[#f7f5ef] p-3 hover:bg-[#eef2ef] transition-colors group"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] uppercase tracking-wider font-semibold text-[#c46b4b]">
@@ -299,7 +299,7 @@ export function PostCard({
       {/* Engagement Stats Bar */}
       <div className="px-4 py-2 border-b border-[#eef2ef] flex items-center justify-between text-xs text-[#62736b]">
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded-full bg-[#173a35] flex items-center justify-center text-white text-[9px]">
+          <div className="w-4 h-4 rounded-[2px] bg-[#173a35] flex items-center justify-center text-white text-[9px]">
             👍
           </div>
           <span>
@@ -324,9 +324,9 @@ export function PostCard({
         <button
           type="button"
           onClick={() => onToggleLike(post.id)}
-          className={`flex items-center justify-center gap-2 h-11 rounded transition-colors text-xs font-semibold focus:outline-none ${
+          className={`flex items-center justify-center gap-2 h-11 rounded-[2px] transition-colors text-xs font-semibold focus:outline-none ${
             hasLiked
-              ? "text-[#c46b4b] bg-[#c46b4b]/8 font-bold"
+              ? "text-[#c46b4b] bg-[#faf0eb] border border-[#e8cdc2] font-bold"
               : "text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35]"
           }`}
         >
@@ -337,7 +337,7 @@ export function PostCard({
         <button
           type="button"
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center justify-center gap-2 h-11 rounded text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35] transition-colors text-xs font-semibold focus:outline-none"
+          className="flex items-center justify-center gap-2 h-11 rounded-[2px] text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35] transition-colors text-xs font-semibold focus:outline-none"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Comment</span>
@@ -346,7 +346,7 @@ export function PostCard({
         <button
           type="button"
           onClick={() => setShowShareModal(true)}
-          className="flex items-center justify-center gap-2 h-11 rounded text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35] transition-colors text-xs font-semibold focus:outline-none"
+          className="flex items-center justify-center gap-2 h-11 rounded-[2px] text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35] transition-colors text-xs font-semibold focus:outline-none"
         >
           <Share2 className="w-4 h-4" />
           <span>Share</span>
@@ -369,8 +369,8 @@ export function PostCard({
 
       {/* Share / Repost Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#102d29]/60 backdrop-blur-[1px]">
-          <div className="bg-white rounded-md border border-[#cbd3ce] p-5 max-w-md w-full shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#102d29]/75">
+          <div className="bg-white rounded-[2px] border-2 border-[#173a35] p-5 max-w-md w-full">
             <h4 className="font-bold text-sm text-[#173a35] mb-2">
               Share to your Credento Network
             </h4>
@@ -379,9 +379,9 @@ export function PostCard({
               value={shareThoughts}
               onChange={(e) => setShareThoughts(e.target.value)}
               rows={3}
-              className="w-full text-xs p-2.5 border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35] mb-3"
+              className="w-full text-xs p-2.5 border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35] mb-3"
             />
-            <div className="p-2.5 bg-[#f7f5ef] rounded border border-[#d8ddd8] text-xs text-[#62736b] mb-4">
+            <div className="p-2.5 bg-[#f7f5ef] rounded-[2px] border border-[#d8ddd8] text-xs text-[#62736b] mb-4">
               <strong>{post.authorName}</strong>: "{post.content.slice(0, 110)}
               ..."
             </div>
@@ -396,7 +396,7 @@ export function PostCard({
               <button
                 type="button"
                 onClick={handleShareSubmit}
-                className="px-4 py-1.5 bg-[#173a35] text-white rounded text-xs font-semibold flex items-center gap-1.5"
+                className="px-4 py-1.5 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold flex items-center gap-1.5"
               >
                 <Repeat className="w-3.5 h-3.5" />
                 <span>Repost with Attribution</span>

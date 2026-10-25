@@ -65,10 +65,10 @@ export function MessagesView({
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 py-5 sm:py-8">
-      <div className="bg-white rounded-md border border-[#cbd3ce] shadow-[0_1px_3px_rgba(23,58,53,0.04)] overflow-hidden h-[75vh] min-h-[520px] flex">
+      <div className="bg-white rounded-[2px] border border-[#cbd3ce] overflow-hidden h-[75vh] min-h-[520px] flex">
         {/* LEFT COLUMN: CONVERSATION LIST */}
         <aside
-          className={`w-full md:w-80 border-r border-[#cbd3ce] flex flex-col bg-[#f7f5ef]/40 ${
+          className={`w-full md:w-80 border-r border-[#cbd3ce] flex flex-col bg-[#f7f5ef] ${
             activeConversationId ? "hidden md:flex" : "flex"
           }`}
         >
@@ -76,7 +76,7 @@ export function MessagesView({
           <div className="p-3.5 border-b border-[#cbd3ce] bg-white">
             <h2 className="font-bold text-sm text-[#173a35] tracking-tight mb-2.5 flex items-center justify-between">
               <span>Peer Messaging</span>
-              <span className="text-[10px] font-mono font-medium px-2 py-0.5 bg-[#dce8df] text-[#173a35] rounded">
+              <span className="text-[10px] font-mono font-medium px-2 py-0.5 bg-[#dce8df] text-[#173a35] rounded-[2px] border border-[#b8c9bd]">
                 Verified
               </span>
             </h2>
@@ -87,7 +87,7 @@ export function MessagesView({
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35] text-[#242b29]"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35] text-[#242b29]"
               />
             </div>
           </div>
@@ -109,17 +109,17 @@ export function MessagesView({
                     className={`w-full p-3 text-left flex items-start gap-3 transition-colors ${
                       isSelected
                         ? "bg-white border-l-3 border-[#173a35]"
-                        : "hover:bg-white/80"
+                        : "hover:bg-white"
                     }`}
                   >
                     <div className="relative shrink-0">
                       <img
                         src={conv.otherUser.avatar}
                         alt={conv.otherUser.name}
-                        className="w-10 h-10 rounded object-cover border border-[#cbd3ce]"
+                        className="w-10 h-10 rounded-[2px] object-cover border border-[#cbd3ce]"
                       />
                       {conv.otherUser.isOnline && (
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#1b6b47] rounded-full ring-2 ring-white" />
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#1b6b47] rounded-[2px] ring-2 ring-white" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -143,7 +143,7 @@ export function MessagesView({
                       </span>
                     </div>
                     {conv.unreadCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-[#c46b4b] shrink-0 mt-2" />
+                      <span className="w-2 h-2 rounded-[2px] bg-[#c46b4b] shrink-0 mt-2" />
                     )}
                   </button>
                 )
@@ -167,7 +167,7 @@ export function MessagesView({
                   <button
                     type="button"
                     onClick={() => setActiveConversationId(null)}
-                    className="md:hidden p-1.5 rounded text-[#173a35] hover:bg-[#e8ece9]"
+                    className="md:hidden p-1.5 rounded-[2px] text-[#173a35] hover:bg-[#e8ece9]"
                     aria-label="Back to messages list"
                   >
                     <ArrowLeft className="w-5 h-5" />
@@ -183,7 +183,7 @@ export function MessagesView({
                     <img
                       src={activeConversation.otherUser.avatar}
                       alt={activeConversation.otherUser.name}
-                      className="w-9 h-9 rounded object-cover border border-[#cbd3ce]"
+                      className="w-9 h-9 rounded-[2px] object-cover border border-[#cbd3ce]"
                     />
                   </button>
                   <div className="min-w-0">
@@ -207,14 +207,14 @@ export function MessagesView({
                   onClick={() =>
                     onSelectStudentProfile(activeConversation.otherUser.id)
                   }
-                  className="px-2.5 py-1 text-xs border border-[#cbd3ce] rounded text-[#173a35] hover:bg-white transition-colors shrink-0"
+                  className="px-2.5 py-1 text-xs border border-[#cbd3ce] rounded-[2px] text-[#173a35] hover:bg-white transition-colors shrink-0"
                 >
                   View Profile
                 </button>
               </div>
 
               {/* Chat Messages Body */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#f7f5ef]/20">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fbfaf7]">
                 {activeConversation.messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-xs text-[#62736b]">
                     <ShieldCheck className="w-8 h-8 text-[#173a35] mb-2" />
@@ -238,10 +238,10 @@ export function MessagesView({
                         }`}
                       >
                         <div
-                          className={`max-w-[85%] sm:max-w-md p-3 rounded-md text-xs leading-relaxed shadow-xs ${
+                          className={`max-w-[85%] sm:max-w-md p-3 rounded-[2px] text-xs leading-relaxed ${
                             isMe
-                              ? "bg-[#173a35] text-white rounded-br-none"
-                              : "bg-white border border-[#cbd3ce] text-[#242b29] rounded-bl-none"
+                              ? "bg-[#173a35] text-white"
+                              : "bg-white border border-[#cbd3ce] text-[#242b29]"
                           }`}
                         >
                           <p className="whitespace-pre-line">{msg.text}</p>
@@ -269,12 +269,12 @@ export function MessagesView({
                   placeholder="Type an academic message..."
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
-                  className="flex-1 py-2 px-3 text-xs border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35] text-[#242b29]"
+                  className="flex-1 py-2 px-3 text-xs border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35] text-[#242b29]"
                 />
                 <button
                   type="submit"
                   disabled={!messageInput.trim()}
-                  className="px-4 py-2 bg-[#173a35] text-white rounded text-xs font-semibold hover:bg-[#0e2f2a] disabled:opacity-40 transition-colors flex items-center gap-1.5 shrink-0"
+                  className="px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] disabled:opacity-40 transition-colors flex items-center gap-1.5 shrink-0"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Send</span>

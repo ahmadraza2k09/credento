@@ -51,9 +51,9 @@ export function OpportunityDetailModal({
             <button
               type="button"
               onClick={() => onToggleSave(opportunity.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 border rounded text-xs font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-2 border rounded-[2px] text-xs font-semibold transition-colors ${
                 isSaved
-                  ? "bg-[#c46b4b]/10 text-[#9f5138] border-[#c46b4b]/30"
+                  ? "bg-[#faf0eb] text-[#9f5138] border-[#e8cdc2]"
                   : "bg-white text-[#242b29] border-[#cbd3ce] hover:bg-[#f7f5ef]"
               }`}
             >
@@ -66,7 +66,7 @@ export function OpportunityDetailModal({
             <button
               type="button"
               onClick={handleCopy}
-              className="p-2 border border-[#cbd3ce] rounded text-[#62736b] hover:text-[#173a35] hover:bg-[#f7f5ef] transition-colors"
+              className="p-2 border border-[#cbd3ce] rounded-[2px] text-[#62736b] hover:text-[#173a35] hover:bg-[#f7f5ef] transition-colors"
               title="Copy official link"
             >
               {copiedLink ? (
@@ -81,7 +81,7 @@ export function OpportunityDetailModal({
             href={opportunity.applicationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-2 bg-[#173a35] text-white rounded text-xs font-semibold hover:bg-[#0e2f2a] transition-colors shadow-xs"
+            className="flex items-center gap-2 px-5 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] transition-colors"
           >
             <span>Apply via Official Portal</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -93,11 +93,11 @@ export function OpportunityDetailModal({
         {/* Meta badges row */}
         <div className="flex flex-wrap items-center gap-2.5 pb-3 border-b border-[#eef2ef]">
           <OpportunityCategoryBadge category={opportunity.category} />
-          <span className="text-[11px] font-mono px-2 py-0.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded text-[#4d5b54]">
+          <span className="text-[11px] font-mono px-2 py-0.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] text-[#4d5b54]">
             {opportunity.mode}
           </span>
           {opportunity.compensation && (
-            <span className="text-[11px] font-semibold px-2 py-0.5 bg-[#1b6b47]/10 text-[#155738] border border-[#1b6b47]/20 rounded">
+            <span className="text-[11px] font-semibold px-2 py-0.5 bg-[#edf6f0] text-[#155738] border border-[#b8dec4] rounded-[2px]">
               {opportunity.compensation}
             </span>
           )}
@@ -107,7 +107,7 @@ export function OpportunityDetailModal({
         </div>
 
         {/* Overview attributes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-[#f7f5ef] rounded border border-[#d8ddd8]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-[#f7f5ef] rounded-[2px] border border-[#d8ddd8]">
           <div className="flex items-center gap-2">
             <Building className="w-4 h-4 text-[#173a35] shrink-0" />
             <div>
@@ -162,7 +162,7 @@ export function OpportunityDetailModal({
         )}
 
         {/* Academic integrity disclaimer */}
-        <div className="p-3 bg-[#eef2ef]/60 rounded border border-[#d8ddd8] text-[11px] text-[#62736b]">
+        <div className="p-3 bg-[#f0ede6] rounded-[2px] border border-[#cbd3ce] text-[11px] text-[#62736b]">
           <strong className="text-[#173a35]">
             Credento Verification Note:
           </strong>{" "}

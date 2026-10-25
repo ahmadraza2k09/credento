@@ -39,15 +39,15 @@ export function CommentSection({
   }
 
   return (
-    <div className="pt-3 border-t border-[#e8ece9] space-y-3">
+    <div className="pt-3 border-t border-[#cbd3ce] space-y-3">
       {/* Add new comment */}
       <form onSubmit={handleCommentSubmit} className="flex gap-2.5 items-start">
         <img
           src={currentUser.avatar}
           alt={currentUser.name}
-          className="w-7 h-7 rounded object-cover border border-[#cbd3ce] shrink-0 mt-0.5"
+          className="w-7 h-7 rounded-[2px] object-cover border border-[#cbd3ce] shrink-0 mt-0.5"
         />
-        <div className="flex-1 flex items-center bg-[#f7f5ef] border border-[#cbd3ce] rounded-md focus-within:border-[#173a35] focus-within:bg-white transition-colors">
+        <div className="flex-1 flex items-center bg-[#f7f5ef] border border-[#cbd3ce] rounded-[2px] focus-within:border-[#173a35] focus-within:bg-white transition-colors">
           <input
             type="text"
             placeholder="Add an academic insight or question..."
@@ -79,10 +79,10 @@ export function CommentSection({
                   <img
                     src={comment.authorAvatar}
                     alt={comment.authorName}
-                    className="w-7 h-7 rounded object-cover border border-[#cbd3ce]"
+                    className="w-7 h-7 rounded-[2px] object-cover border border-[#cbd3ce]"
                   />
                 </button>
-                <div className="flex-1 bg-[#f7f5ef] rounded p-2.5 border border-[#e2e8e3]">
+                <div className="flex-1 bg-[#f7f5ef] rounded-[2px] p-2.5 border border-[#d8ddd8]">
                   <div className="flex items-baseline justify-between mb-1">
                     <button
                       type="button"
@@ -104,7 +104,7 @@ export function CommentSection({
                     {comment.content}
                   </p>
 
-                  <div className="flex items-center gap-4 mt-2 pt-1 border-t border-[#e2e8e3]/60 text-[11px] text-[#62736b]">
+                  <div className="flex items-center gap-4 mt-2 pt-1 border-t border-[#cbd3ce] text-[11px] text-[#62736b]">
                     <button
                       type="button"
                       onClick={() =>
@@ -135,10 +135,10 @@ export function CommentSection({
                         <img
                           src={reply.authorAvatar}
                           alt={reply.authorName}
-                          className="w-6 h-6 rounded object-cover border border-[#cbd3ce]"
+                          className="w-6 h-6 rounded-[2px] object-cover border border-[#cbd3ce]"
                         />
                       </button>
-                      <div className="flex-1 bg-[#ffffff] rounded p-2 border border-[#d8ddd8]">
+                      <div className="flex-1 bg-[#ffffff] rounded-[2px] p-2 border border-[#d8ddd8]">
                         <div className="flex items-baseline justify-between mb-0.5">
                           <button
                             type="button"
@@ -173,13 +173,13 @@ export function CommentSection({
                     placeholder={`Reply to ${comment.authorName}...`}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="flex-1 text-xs py-1.5 px-2.5 bg-white border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35]"
+                    className="flex-1 text-xs py-1.5 px-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
                     autoFocus
                   />
                   <button
                     type="submit"
                     disabled={!replyText.trim()}
-                    className="px-2.5 py-1.5 bg-[#173a35] text-white rounded text-[11px] font-semibold disabled:opacity-40"
+                    className="px-2.5 py-1.5 bg-[#173a35] text-white rounded-[2px] text-[11px] font-semibold disabled:opacity-40"
                   >
                     Reply
                   </button>

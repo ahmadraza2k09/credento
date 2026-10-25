@@ -113,7 +113,7 @@ export function Navbar({
   return (
     <>
       {/* DESKTOP & MOBILE TOP HEADER */}
-      <header className="sticky top-0 z-40 bg-[#f7f5ef] border-b border-[#cbd3ce] shadow-[0_1px_3px_rgba(23,58,53,0.05)]">
+      <header className="sticky top-0 z-40 bg-[#f7f5ef] border-b border-[#cbd3ce]">
         <div className="max-w-7xl mx-auto px-3 sm:px-5">
           <div className="flex items-center justify-between h-15 gap-2 sm:gap-4">
             {/* Left: Brand & Search */}
@@ -127,7 +127,7 @@ export function Navbar({
               {/* Desktop Global Search Field */}
               <form
                 onSubmit={handleSearchSubmit}
-                className="hidden md:flex items-center flex-1 max-w-md bg-white border border-[#cbd3ce] rounded-md focus-within:border-[#173a35] focus-within:ring-1 focus-within:ring-[#173a35] transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]"
+                className="hidden md:flex items-center flex-1 max-w-md bg-white border border-[#cbd3ce] rounded-[2px] focus-within:border-[#173a35] focus-within:ring-1 focus-within:ring-[#173a35] transition-all"
               >
                 <div className="pl-3 pr-1 text-[#62736b]">
                   <Search className="w-4 h-4" />
@@ -142,7 +142,7 @@ export function Navbar({
                 <select
                   value={searchCategory}
                   onChange={(e) => setSearchCategory(e.target.value as any)}
-                  className="text-[11px] font-medium text-[#62736b] bg-[#f7f5ef] border-l border-[#d8ddd8] px-2 py-1.5 rounded-r-md focus:outline-none hover:text-[#173a35] cursor-pointer"
+                  className="text-[11px] font-medium text-[#62736b] bg-[#f7f5ef] border-l border-[#d8ddd8] px-2 py-1.5 rounded-r-[2px] focus:outline-none hover:text-[#173a35] cursor-pointer"
                   aria-label="Search filter category"
                 >
                   <option value="all">All</option>
@@ -166,10 +166,10 @@ export function Navbar({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectTab(item.id)}
-                    className={`relative flex flex-col items-center justify-center min-w-[72px] h-14 px-2 text-center rounded-sm transition-colors ${
+                    className={`relative flex flex-col items-center justify-center min-w-[72px] h-14 px-2 text-center rounded-[2px] transition-colors ${
                       isActive
-                        ? "text-[#173a35] font-semibold"
-                        : "text-[#62736b] hover:text-[#173a35] hover:bg-[#e8ece9]/50"
+                        ? "text-[#173a35] font-semibold bg-[#e8ede9]"
+                        : "text-[#62736b] hover:text-[#173a35] hover:bg-[#e8ede9]/60"
                     }`}
                   >
                     <div className="relative">
@@ -178,7 +178,7 @@ export function Navbar({
                         strokeWidth={isActive ? 2.2 : 1.8}
                       />
                       {item.badge > 0 && (
-                        <span className="absolute -top-1.5 -right-2.5 bg-[#c46b4b] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[17px] text-center shadow-xs">
+                        <span className="absolute -top-1.5 -right-2.5 bg-[#c46b4b] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-[2px] min-w-[17px] text-center border border-[#9f5138]">
                           {item.badge > 9 ? "9+" : item.badge}
                         </span>
                       )}
@@ -187,7 +187,7 @@ export function Navbar({
                       {item.label}
                     </span>
                     {isActive && (
-                      <span className="absolute bottom-0 left-2 right-2 h-[2.5px] bg-[#173a35] rounded-t-sm" />
+                      <span className="absolute bottom-0 left-2 right-2 h-[2.5px] bg-[#173a35] rounded-t-[2px]" />
                     )}
                   </button>
                 )
@@ -200,7 +200,7 @@ export function Navbar({
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-                className="md:hidden w-10 h-10 rounded flex items-center justify-center text-[#242b29] hover:bg-[#e2e8e3] transition-colors focus:outline-none"
+                className="md:hidden w-10 h-10 rounded-[2px] flex items-center justify-center text-[#242b29] hover:bg-[#e2e8e3] transition-colors focus:outline-none"
                 aria-label="Toggle search"
               >
                 <Search className="w-5 h-5" />
@@ -210,7 +210,7 @@ export function Navbar({
               <button
                 type="button"
                 onClick={() => onSelectTab("notifications")}
-                className="lg:hidden relative w-10 h-10 rounded flex items-center justify-center text-[#242b29] hover:bg-[#e2e8e3] transition-colors focus:outline-none"
+                className="lg:hidden relative w-10 h-10 rounded-[2px] flex items-center justify-center text-[#242b29] hover:bg-[#e2e8e3] transition-colors focus:outline-none"
                 aria-label={`Notifications ${
                   unreadNotificationsCount > 0
                     ? `(${unreadNotificationsCount} unread)`
@@ -219,7 +219,7 @@ export function Navbar({
               >
                 <Bell className="w-5 h-5" />
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#c46b4b] rounded-full ring-2 ring-[#f7f5ef]" />
+                  <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#c46b4b] rounded-[2px] ring-2 ring-[#f7f5ef]" />
                 )}
               </button>
 
@@ -228,7 +228,7 @@ export function Navbar({
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-1.5 p-1 rounded-md hover:bg-[#e8ece9] transition-colors focus:outline-none focus:ring-2 focus:ring-[#173a35]"
+                  className="flex items-center gap-1.5 p-1 rounded-[2px] hover:bg-[#e8ece9] transition-colors focus:outline-none focus:ring-1 focus:ring-[#173a35]"
                   aria-expanded={profileDropdownOpen}
                   aria-haspopup="true"
                   aria-label="User account menu"
@@ -236,7 +236,7 @@ export function Navbar({
                   <img
                     src={currentUser.avatar}
                     alt={currentUser.name}
-                    className="w-8 h-8 rounded border border-[#cbd3ce] object-cover bg-[#dce8df]"
+                    className="w-8 h-8 rounded-[2px] border border-[#cbd3ce] object-cover bg-[#dce8df]"
                   />
                   <div className="hidden xl:flex flex-col text-left">
                     <span className="text-xs font-semibold text-[#173a35] max-w-[90px] truncate leading-tight">
@@ -250,14 +250,14 @@ export function Navbar({
                 </button>
 
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-72 bg-white rounded-md border border-[#cbd3ce] shadow-xl py-2 z-50 text-xs animate-in fade-in-50 zoom-in-95 duration-100">
+                  <div className="absolute right-0 mt-2 w-72 bg-white rounded-[2px] border-2 border-[#173a35] py-2 z-50 text-xs animate-in fade-in-50 zoom-in-95 duration-100">
                     {/* User summary card in dropdown */}
-                    <div className="px-4 py-3 border-b border-[#eef2ef] bg-[#f7f5ef]/60">
+                    <div className="px-4 py-3 border-b border-[#cbd3ce] bg-[#f0ede6]">
                       <div className="flex items-center gap-2.5">
                         <img
                           src={currentUser.avatar}
                           alt={currentUser.name}
-                          className="w-10 h-10 rounded border border-[#cbd3ce] object-cover"
+                          className="w-10 h-10 rounded-[2px] border border-[#cbd3ce] object-cover"
                         />
                         <div className="min-w-0">
                           <p className="font-bold text-sm text-[#173a35] truncate">
@@ -274,14 +274,14 @@ export function Navbar({
                           onSelectTab("profile")
                           setProfileDropdownOpen(false)
                         }}
-                        className="mt-3 w-full py-1.5 px-3 text-center font-medium text-[#173a35] bg-white border border-[#173a35] rounded hover:bg-[#173a35] hover:text-white transition-colors"
+                        className="mt-3 w-full py-1.5 px-3 text-center font-medium text-[#173a35] bg-white border border-[#173a35] rounded-[2px] hover:bg-[#173a35] hover:text-white transition-colors"
                       >
                         View Full Profile
                       </button>
                     </div>
 
                     {/* Quick Demo Student Switcher */}
-                    <div className="px-3 py-2 border-b border-[#eef2ef]">
+                    <div className="px-3 py-2 border-b border-[#cbd3ce]">
                       <div className="flex items-center justify-between text-[11px] font-semibold text-[#4d5b54] px-1 mb-1.5 uppercase tracking-wider">
                         <span>Switch Perspective</span>
                         <UserCheck className="w-3.5 h-3.5 text-[#c46b4b]" />
@@ -298,7 +298,7 @@ export function Navbar({
                               onSwitchUser(user.id)
                               setProfileDropdownOpen(false)
                             }}
-                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-left transition-colors ${
+                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded-[2px] text-left transition-colors ${
                               user.id === currentUser.id
                                 ? "bg-[#dce8df] text-[#173a35] font-semibold"
                                 : "text-[#242b29] hover:bg-[#f7f5ef]"
@@ -308,7 +308,7 @@ export function Navbar({
                               <img
                                 src={user.avatar}
                                 alt={user.name}
-                                className="w-5 h-5 rounded-full object-cover shrink-0"
+                                className="w-5 h-5 rounded-[2px] object-cover shrink-0"
                               />
                               <span className="truncate">{user.name}</span>
                             </div>
@@ -358,7 +358,7 @@ export function Navbar({
                 onSubmit={handleSearchSubmit}
                 className="flex flex-col gap-2"
               >
-                <div className="flex items-center bg-white border border-[#cbd3ce] rounded-md px-3 py-2 shadow-xs">
+                <div className="flex items-center bg-white border border-[#cbd3ce] rounded-[2px] px-3 py-2">
                   <Search className="w-4 h-4 text-[#62736b] mr-2 shrink-0" />
                   <input
                     type="text"
@@ -390,7 +390,7 @@ export function Navbar({
                         key={cat}
                         type="button"
                         onClick={() => setSearchCategory(cat)}
-                        className={`text-[11px] capitalize px-2.5 py-1 rounded border transition-colors whitespace-nowrap ${
+                        className={`text-[11px] capitalize px-2.5 py-1 rounded-[2px] border transition-colors whitespace-nowrap ${
                           searchCategory === cat
                             ? "bg-[#173a35] text-white border-[#173a35]"
                             : "bg-white text-[#62736b] border-[#cbd3ce]"
@@ -402,7 +402,7 @@ export function Navbar({
                   </div>
                   <button
                     type="submit"
-                    className="px-3 py-1 bg-[#173a35] text-white rounded text-xs font-semibold shrink-0"
+                    className="px-3 py-1 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold shrink-0"
                   >
                     Search
                   </button>
@@ -415,7 +415,7 @@ export function Navbar({
 
       {/* MOBILE BOTTOM NAVIGATION BAR (FIXED, 48px+ touch targets, thumb-friendly) */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#cbd3ce] shadow-[0_-2px_6px_rgba(0,0,0,0.04)] pb-[env(safe-area-inset-bottom)]"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#cbd3ce] pb-[env(safe-area-inset-bottom)]"
         aria-label="Mobile Navigation"
       >
         <div className="grid grid-cols-5 h-14">
@@ -437,7 +437,7 @@ export function Navbar({
                     strokeWidth={isActive ? 2.3 : 1.8}
                   />
                   {item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#c46b4b] text-white text-[9px] font-bold px-1 rounded-full min-w-[15px] h-[15px] flex items-center justify-center leading-none">
+                    <span className="absolute -top-1.5 -right-2 bg-[#c46b4b] text-white text-[9px] font-bold px-1 rounded-[2px] min-w-[15px] h-[15px] flex items-center justify-center leading-none">
                       {item.badge > 9 ? "9+" : item.badge}
                     </span>
                   )}

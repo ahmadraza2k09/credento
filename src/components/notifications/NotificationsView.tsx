@@ -61,7 +61,7 @@ export function NotificationsView({
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-5">
       {/* Top Header Card */}
-      <div className="bg-white rounded-md border border-[#cbd3ce] p-5 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+      <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-[#173a35] tracking-tight">
@@ -77,7 +77,7 @@ export function NotificationsView({
               <button
                 type="button"
                 onClick={onMarkAllAsRead}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f7f5ef] border border-[#cbd3ce] text-[#173a35] rounded text-xs font-semibold hover:bg-[#e8ece9] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f7f5ef] border border-[#cbd3ce] text-[#173a35] rounded-[2px] text-xs font-semibold hover:bg-[#e8ece9] transition-colors"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 <span>Mark All as Read</span>
@@ -91,7 +91,7 @@ export function NotificationsView({
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className={`text-xs px-3 py-1 rounded font-semibold transition-colors ${
+            className={`text-xs px-3 py-1 rounded-[2px] font-semibold transition-colors ${
               filter === "all"
                 ? "bg-[#173a35] text-white"
                 : "bg-[#f7f5ef] text-[#62736b] hover:text-[#173a35]"
@@ -102,7 +102,7 @@ export function NotificationsView({
           <button
             type="button"
             onClick={() => setFilter("unread")}
-            className={`text-xs px-3 py-1 rounded font-semibold transition-colors ${
+            className={`text-xs px-3 py-1 rounded-[2px] font-semibold transition-colors ${
               filter === "unread"
                 ? "bg-[#173a35] text-white"
                 : "bg-[#f7f5ef] text-[#62736b] hover:text-[#173a35]"
@@ -114,7 +114,7 @@ export function NotificationsView({
       </div>
 
       {/* Notifications List */}
-      <div className="bg-white rounded-md border border-[#cbd3ce] shadow-[0_1px_3px_rgba(23,58,53,0.04)] divide-y divide-[#eef2ef] overflow-hidden">
+      <div className="bg-white rounded-[2px] border border-[#cbd3ce] divide-y divide-[#eef2ef] overflow-hidden">
         {filteredNotifications.length === 0 ? (
           <div className="p-10 text-center text-xs text-[#62736b]">
             <Bell className="w-8 h-8 text-[#87978f] mx-auto mb-2 opacity-50" />
@@ -132,10 +132,10 @@ export function NotificationsView({
             <div
               key={notif.id}
               className={`p-4 flex items-start gap-3.5 transition-colors ${
-                !notif.isRead ? "bg-[#f7f5ef]/80" : "hover:bg-[#f7f5ef]/30"
+                !notif.isRead ? "bg-[#f0ede6]" : "bg-white hover:bg-[#fbfaf7]"
               }`}
             >
-              <div className="w-9 h-9 rounded bg-white border border-[#cbd3ce] flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-9 h-9 rounded-[2px] bg-white border border-[#cbd3ce] flex items-center justify-center shrink-0 mt-0.5">
                 {getNotificationIcon(notif.type)}
               </div>
 
@@ -162,7 +162,7 @@ export function NotificationsView({
                         onAcceptConnection(notif.actorId!)
                         onMarkAsRead(notif.id)
                       }}
-                      className="px-3 py-1 bg-[#173a35] text-white rounded text-xs font-semibold hover:bg-[#0e2f2a] flex items-center gap-1"
+                      className="px-3 py-1 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] flex items-center gap-1"
                     >
                       <Check className="w-3 h-3" />
                       <span>Accept</span>
@@ -173,7 +173,7 @@ export function NotificationsView({
                         onDeclineConnection(notif.actorId!)
                         onMarkAsRead(notif.id)
                       }}
-                      className="px-3 py-1 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] rounded text-xs font-medium"
+                      className="px-3 py-1 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] rounded-[2px] text-xs font-medium"
                     >
                       Decline
                     </button>
@@ -212,7 +212,7 @@ export function NotificationsView({
                 <button
                   type="button"
                   onClick={() => onMarkAsRead(notif.id)}
-                  className="w-2.5 h-2.5 rounded-full bg-[#c46b4b] shrink-0 mt-2"
+                  className="w-2.5 h-2.5 rounded-[2px] bg-[#c46b4b] shrink-0 mt-2"
                   title="Mark as read"
                 />
               )}

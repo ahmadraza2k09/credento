@@ -124,7 +124,7 @@ export function NetworkView({
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
       {/* Top Banner / Summary */}
-      <div className="bg-white rounded-md border border-[#cbd3ce] p-5 sm:p-6 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+      <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-[#173a35] tracking-tight">
@@ -136,7 +136,7 @@ export function NetworkView({
             </p>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono">
-            <div className="px-3 py-1.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded text-center">
+            <div className="px-3 py-1.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] text-center">
               <span className="block font-bold text-[#173a35] text-sm">
                 {connectedStudents.length}
               </span>
@@ -144,7 +144,7 @@ export function NetworkView({
                 Connections
               </span>
             </div>
-            <div className="px-3 py-1.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded text-center">
+            <div className="px-3 py-1.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] text-center">
               <span className="block font-bold text-[#c46b4b] text-sm">
                 {followingStudents.length}
               </span>
@@ -152,7 +152,7 @@ export function NetworkView({
                 Following
               </span>
             </div>
-            <div className="px-3 py-1.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded text-center">
+            <div className="px-3 py-1.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] text-center">
               <span className="block font-bold text-[#173a35] text-sm">
                 {pendingReceived.length}
               </span>
@@ -168,7 +168,7 @@ export function NetworkView({
           <button
             type="button"
             onClick={() => setActiveTab("suggestions")}
-            className={`text-xs px-3.5 py-2 rounded border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`text-xs px-3.5 py-2 rounded-[2px] border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "suggestions"
                 ? "bg-[#173a35] text-white border-[#173a35]"
                 : "bg-white text-[#62736b] border-[#cbd3ce] hover:bg-[#f7f5ef]"
@@ -181,7 +181,7 @@ export function NetworkView({
           <button
             type="button"
             onClick={() => setActiveTab("pending")}
-            className={`text-xs px-3.5 py-2 rounded border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`text-xs px-3.5 py-2 rounded-[2px] border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "pending"
                 ? "bg-[#173a35] text-white border-[#173a35]"
                 : "bg-white text-[#62736b] border-[#cbd3ce] hover:bg-[#f7f5ef]"
@@ -197,7 +197,7 @@ export function NetworkView({
           <button
             type="button"
             onClick={() => setActiveTab("connections")}
-            className={`text-xs px-3.5 py-2 rounded border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`text-xs px-3.5 py-2 rounded-[2px] border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "connections"
                 ? "bg-[#173a35] text-white border-[#173a35]"
                 : "bg-white text-[#62736b] border-[#cbd3ce] hover:bg-[#f7f5ef]"
@@ -210,7 +210,7 @@ export function NetworkView({
           <button
             type="button"
             onClick={() => setActiveTab("following")}
-            className={`text-xs px-3.5 py-2 rounded border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+            className={`text-xs px-3.5 py-2 rounded-[2px] border font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "following"
                 ? "bg-[#173a35] text-white border-[#173a35]"
                 : "bg-white text-[#62736b] border-[#cbd3ce] hover:bg-[#f7f5ef]"
@@ -223,7 +223,7 @@ export function NetworkView({
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-white rounded-md border border-[#cbd3ce] p-3 flex flex-col sm:flex-row items-center gap-3">
+      <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-3 flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-[#728078] absolute left-3 top-2.5" />
           <input
@@ -231,7 +231,7 @@ export function NetworkView({
             placeholder="Search by student name, major, skill (e.g. PyTorch), or location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35] focus:bg-white text-[#242b29]"
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35] focus:bg-white text-[#242b29]"
           />
         </div>
 
@@ -240,7 +240,7 @@ export function NetworkView({
           <select
             value={selectedInstitution}
             onChange={(e) => setSelectedInstitution(e.target.value)}
-            className="text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded px-2.5 py-1.5 text-[#242b29] focus:outline-none cursor-pointer w-full sm:w-auto"
+            className="text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded-[2px] px-2.5 py-1.5 text-[#242b29] focus:outline-none cursor-pointer w-full sm:w-auto"
           >
             <option value="all">All Universities</option>
             {institutions.map((inst) => (
@@ -254,7 +254,7 @@ export function NetworkView({
 
       {/* STUDENT CARDS GRID */}
       {currentList.length === 0 ? (
-        <div className="bg-white rounded-md border border-[#cbd3ce] p-10 text-center text-[#62736b]">
+        <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-10 text-center text-[#62736b]">
           <Users className="w-8 h-8 text-[#87978f] mx-auto mb-2" />
           <p className="font-bold text-sm text-[#173a35]">
             No students found in this view.
@@ -273,11 +273,11 @@ export function NetworkView({
             return (
               <div
                 key={student.id}
-                className="bg-white rounded-md border border-[#cbd3ce] shadow-[0_1px_3px_rgba(23,58,53,0.04)] overflow-hidden flex flex-col justify-between"
+                className="bg-white rounded-[2px] border border-[#cbd3ce] overflow-hidden flex flex-col justify-between"
               >
                 {/* Mini header */}
                 <div>
-                  <div className="h-16 bg-[#173a35]/15 relative">
+                  <div className="h-16 bg-[#e2e8e3] relative">
                     {student.coverImage && (
                       <img
                         src={student.coverImage}
@@ -295,7 +295,7 @@ export function NetworkView({
                       <img
                         src={student.avatar}
                         alt={student.name}
-                        className="w-16 h-16 rounded-md object-cover border-2 border-white shadow-xs bg-white"
+                        className="w-16 h-16 rounded-[2px] object-cover border-2 border-white bg-white"
                       />
                     </button>
 
@@ -309,7 +309,7 @@ export function NetworkView({
                           {student.name}
                         </button>
                         {isConn && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#dce8df] text-[#173a35] rounded font-semibold">
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#dce8df] text-[#173a35] rounded-[2px] font-semibold border border-[#b8c9bd]">
                             Connected
                           </span>
                         )}
@@ -337,7 +337,7 @@ export function NetworkView({
                           {student.skills.slice(0, 3).map((sk, idx) => (
                             <span
                               key={idx}
-                              className="text-[10px] px-1.5 py-0.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded text-[#4d5b54]"
+                              className="text-[10px] px-1.5 py-0.5 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] text-[#4d5b54]"
                             >
                               {sk}
                             </span>
@@ -349,13 +349,13 @@ export function NetworkView({
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="p-3 bg-[#f7f5ef]/60 border-t border-[#eef2ef] flex items-center justify-between gap-2">
+                <div className="p-3 bg-[#f0ede6] border-t border-[#cbd3ce] flex items-center justify-between gap-2">
                   {isReceived ? (
                     <div className="flex items-center gap-1.5 w-full">
                       <button
                         type="button"
                         onClick={() => onAcceptConnection(student.id)}
-                        className="flex-1 py-1.5 px-2 bg-[#173a35] text-white rounded text-xs font-semibold hover:bg-[#0e2f2a] flex items-center justify-center gap-1"
+                        className="flex-1 py-1.5 px-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] flex items-center justify-center gap-1"
                       >
                         <Check className="w-3.5 h-3.5" />
                         <span>Accept</span>
@@ -363,7 +363,7 @@ export function NetworkView({
                       <button
                         type="button"
                         onClick={() => onDeclineConnection(student.id)}
-                        className="py-1.5 px-2 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] rounded text-xs"
+                        className="py-1.5 px-2 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] rounded-[2px] text-xs"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -372,7 +372,7 @@ export function NetworkView({
                     <button
                       type="button"
                       onClick={() => onWithdrawConnection(student.id)}
-                      className="w-full py-1.5 px-3 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] hover:border-[#a33e32] rounded text-xs font-medium transition-colors"
+                      className="w-full py-1.5 px-3 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] hover:border-[#a33e32] rounded-[2px] text-xs font-medium transition-colors"
                     >
                       Withdraw Request
                     </button>
@@ -381,7 +381,7 @@ export function NetworkView({
                       <button
                         type="button"
                         onClick={() => onStartMessage(student.id)}
-                        className="flex-1 py-1.5 px-3 bg-[#173a35] text-white rounded text-xs font-semibold hover:bg-[#0e2f2a] flex items-center justify-center gap-1.5"
+                        className="flex-1 py-1.5 px-3 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] flex items-center justify-center gap-1.5"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
                         <span>Message</span>
@@ -389,7 +389,7 @@ export function NetworkView({
                       <button
                         type="button"
                         onClick={() => onToggleFollow(student.id)}
-                        className={`px-2.5 py-1.5 border rounded text-xs font-medium transition-colors ${
+                        className={`px-2.5 py-1.5 border rounded-[2px] text-xs font-medium transition-colors ${
                           student.isFollowing
                             ? "bg-[#dce8df] text-[#173a35] border-[#173a35]"
                             : "bg-white text-[#62736b] border-[#cbd3ce]"
@@ -403,7 +403,7 @@ export function NetworkView({
                       <button
                         type="button"
                         onClick={() => onConnect(student.id)}
-                        className="flex-1 py-1.5 px-3 bg-[#173a35] text-white rounded text-xs font-semibold hover:bg-[#0e2f2a] flex items-center justify-center gap-1.5"
+                        className="flex-1 py-1.5 px-3 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] flex items-center justify-center gap-1.5"
                       >
                         <UserPlus className="w-3.5 h-3.5" />
                         <span>Connect</span>
@@ -411,7 +411,7 @@ export function NetworkView({
                       <button
                         type="button"
                         onClick={() => onToggleFollow(student.id)}
-                        className={`px-2.5 py-1.5 border rounded text-xs font-medium transition-colors ${
+                        className={`px-2.5 py-1.5 border rounded-[2px] text-xs font-medium transition-colors ${
                           student.isFollowing
                             ? "bg-[#dce8df] text-[#173a35] border-[#173a35]"
                             : "bg-white text-[#62736b] border-[#cbd3ce]"

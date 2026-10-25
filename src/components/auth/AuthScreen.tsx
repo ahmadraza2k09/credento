@@ -125,7 +125,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                   key={s.id}
                   src={s.avatar}
                   alt={s.name}
-                  className="w-7 h-7 rounded-full border-2 border-[#173a35] object-cover"
+                  className="w-7 h-7 rounded-[2px] border-2 border-[#173a35] object-cover"
                 />
               ))}
             </div>
@@ -176,7 +176,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                   setName(e.target.value)
                   if (errors.name) setErrors({ ...errors, name: "" })
                 }}
-                className={`w-full h-12 px-3.5 text-sm bg-white border rounded focus:outline-none focus:border-[#173a35] transition-colors ${
+                className={`w-full h-12 px-3.5 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
                   errors.name ? "border-[#a33e32]" : "border-[#cbd3ce]"
                 }`}
               />
@@ -201,7 +201,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                       if (errors.institution)
                         setErrors({ ...errors, institution: "" })
                     }}
-                    className={`w-full h-12 px-3.5 text-sm bg-white border rounded focus:outline-none focus:border-[#173a35] transition-colors ${
+                    className={`w-full h-12 px-3.5 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
                       errors.institution
                         ? "border-[#a33e32]"
                         : "border-[#cbd3ce]"
@@ -226,7 +226,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                       setEmail(e.target.value)
                       if (errors.email) setErrors({ ...errors, email: "" })
                     }}
-                    className={`w-full h-12 px-3.5 text-sm bg-white border rounded focus:outline-none focus:border-[#173a35] transition-colors ${
+                    className={`w-full h-12 px-3.5 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
                       errors.email ? "border-[#a33e32]" : "border-[#cbd3ce]"
                     }`}
                   />
@@ -264,7 +264,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                     setPassword(e.target.value)
                     if (errors.password) setErrors({ ...errors, password: "" })
                   }}
-                  className={`w-full h-12 pl-3.5 pr-11 text-sm bg-white border rounded focus:outline-none focus:border-[#173a35] transition-colors ${
+                  className={`w-full h-12 pl-3.5 pr-11 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
                     errors.password ? "border-[#a33e32]" : "border-[#cbd3ce]"
                   }`}
                 />
@@ -292,7 +292,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-12 mt-2 bg-[#173a35] text-white rounded text-sm font-semibold hover:bg-[#0e2f2a] transition-all flex items-center justify-center gap-2 shadow-[0_2px_4px_rgba(23,58,53,0.15)] disabled:opacity-75"
+              className="w-full h-12 mt-2 bg-[#173a35] text-white rounded-[2px] text-sm font-semibold hover:bg-[#0e2f2a] transition-all flex items-center justify-center gap-2 disabled:opacity-75"
             >
               {isSubmitting ? (
                 <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -356,12 +356,12 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                   onClick={() =>
                     handleSelectQuickStudent(student.id, student.name)
                   }
-                  className="flex items-center gap-2 p-2 rounded bg-white border border-[#cbd3ce] hover:border-[#173a35] text-left transition-colors text-xs group"
+                  className="flex items-center gap-2 p-2 rounded-[2px] bg-white border border-[#cbd3ce] hover:border-[#173a35] text-left transition-colors text-xs group"
                 >
                   <img
                     src={student.avatar}
                     alt={student.name}
-                    className="w-7 h-7 rounded object-cover"
+                    className="w-7 h-7 rounded-[2px] object-cover"
                   />
                   <div className="min-w-0">
                     <span className="font-semibold text-[#173a35] block truncate group-hover:underline">
@@ -395,7 +395,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
               type="button"
               onClick={handleForgotSubmit}
               disabled={!recoveryEmail.trim()}
-              className="px-4 py-2 bg-[#173a35] text-white rounded text-xs font-semibold disabled:opacity-40"
+              className="px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold disabled:opacity-40"
             >
               Send Recovery Link
             </button>
@@ -421,7 +421,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                 placeholder="name@university.edu"
                 value={recoveryEmail}
                 onChange={(e) => setRecoveryEmail(e.target.value)}
-                className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35]"
+                className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
                 required
                 autoFocus
               />

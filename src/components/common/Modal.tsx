@@ -54,7 +54,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#102d29]/65 backdrop-blur-[2px] transition-opacity animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#102d29]/75 transition-opacity animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -63,10 +63,10 @@ export function Modal({
 
       <div
         ref={modalRef}
-        className={`relative w-full ${maxWidthClass} bg-white rounded-md border border-[#cbd3ce] shadow-xl overflow-hidden z-10 flex flex-col max-h-[90vh]`}
+        className={`relative w-full ${maxWidthClass} bg-white rounded-[2px] border-2 border-[#173a35] overflow-hidden z-10 flex flex-col max-h-[90vh]`}
       >
-        {/* Header - WordPress editorial styled */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8e3] bg-[#f7f5ef]/70">
+        {/* Header - Solid archival document styled */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#cbd3ce] bg-[#f0ede6]">
           <div>
             <h3
               id="modal-title"
@@ -81,7 +81,7 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded flex items-center justify-center text-[#62736b] hover:text-[#173a35] hover:bg-[#e2e8e3] transition-colors focus:outline-none focus:ring-2 focus:ring-[#c46b4b]"
+            className="w-8 h-8 rounded-[2px] flex items-center justify-center text-[#62736b] hover:text-[#173a35] hover:bg-[#e2e8e3] transition-colors focus:outline-none focus:ring-1 focus:ring-[#173a35]"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -95,7 +95,7 @@ export function Modal({
 
         {/* Optional Footer */}
         {footer && (
-          <div className="px-5 py-3.5 border-t border-[#e2e8e3] bg-[#f7f5ef]/50 flex items-center justify-end gap-2.5">
+          <div className="px-5 py-3 border-t border-[#cbd3ce] bg-[#f0ede6] flex items-center justify-end gap-2.5">
             {footer}
           </div>
         )}

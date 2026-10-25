@@ -97,9 +97,9 @@ export function FeedView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* LEFT COLUMN: Student Identity Summary & Quick Access */}
         <aside className="lg:col-span-3 space-y-4">
-          <div className="bg-white rounded-md border border-[#cbd3ce] shadow-[0_1px_3px_rgba(23,58,53,0.04)] overflow-hidden">
-            {/* Mini Cover & Avatar */}
-            <div className="h-16 bg-gradient-to-r from-[#173a35] to-[#214b45] relative">
+          <div className="bg-white rounded-[2px] border border-[#cbd3ce] overflow-hidden">
+            {/* Mini Cover & Avatar - Solid Evergreen Document Header */}
+            <div className="h-16 bg-[#173a35] relative">
               {currentUser.coverImage && (
                 <img
                   src={currentUser.coverImage}
@@ -117,7 +117,7 @@ export function FeedView({
                 <img
                   src={currentUser.avatar}
                   alt={currentUser.name}
-                  className="w-16 h-16 rounded-md object-cover border-2 border-white shadow-sm mx-auto bg-white"
+                  className="w-16 h-16 rounded-[2px] object-cover border-2 border-white mx-auto bg-white"
                 />
               </button>
               <h2 className="font-bold text-[#173a35] text-sm mt-1 leading-snug">
@@ -144,9 +144,9 @@ export function FeedView({
                     {completeness.percentage}%
                   </span>
                 </div>
-                <div className="w-full bg-[#e8ece9] rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-[#e8ece9] rounded-[2px] h-1.5 overflow-hidden">
                   <div
-                    className="bg-[#c46b4b] h-1.5 rounded-full transition-all duration-300"
+                    className="bg-[#c46b4b] h-1.5 rounded-[2px] transition-all duration-300"
                     style={{ width: `${completeness.percentage}%` }}
                   />
                 </div>
@@ -184,7 +184,7 @@ export function FeedView({
           </div>
 
           {/* Quick Academic Hub Links */}
-          <div className="hidden lg:block bg-white rounded-md border border-[#cbd3ce] p-3.5 text-xs text-[#242b29] space-y-2 shadow-xs">
+          <div className="hidden lg:block bg-white rounded-[2px] border border-[#cbd3ce] p-3.5 text-xs text-[#242b29] space-y-2">
             <p className="font-bold text-[11px] uppercase tracking-wider text-[#173a35]">
               Student Pathways
             </p>
@@ -194,7 +194,7 @@ export function FeedView({
                 onClick={() => onNavigateToTab("opportunities")}
                 className="w-full text-left hover:text-[#173a35] flex items-center gap-1.5 py-0.5"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#c46b4b]" />
+                <span className="w-1.5 h-1.5 rounded-[2px] bg-[#c46b4b]" />
                 <span>Fellowships & Grants</span>
               </button>
               <button
@@ -202,7 +202,7 @@ export function FeedView({
                 onClick={() => onNavigateToTab("opportunities")}
                 className="w-full text-left hover:text-[#173a35] flex items-center gap-1.5 py-0.5"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#173a35]" />
+                <span className="w-1.5 h-1.5 rounded-[2px] bg-[#173a35]" />
                 <span>Summer Lab Research</span>
               </button>
               <button
@@ -210,7 +210,7 @@ export function FeedView({
                 onClick={() => onNavigateToTab("network")}
                 className="w-full text-left hover:text-[#173a35] flex items-center gap-1.5 py-0.5"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#87978f]" />
+                <span className="w-1.5 h-1.5 rounded-[2px] bg-[#87978f]" />
                 <span>Find Peer Study Partners</span>
               </button>
             </div>
@@ -229,13 +229,13 @@ export function FeedView({
                 Feed Stream
               </span>
             </div>
-            <div className="flex items-center gap-1 bg-[#eef2ef] p-0.5 rounded text-xs">
+            <div className="flex items-center gap-1 bg-[#eef2ef] p-0.5 rounded-[2px] text-xs">
               <button
                 type="button"
                 onClick={() => setFeedSort("latest")}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded transition-colors text-[11px] font-semibold ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-[2px] transition-colors text-[11px] font-semibold ${
                   feedSort === "latest"
-                    ? "bg-white text-[#173a35] shadow-xs"
+                    ? "bg-white text-[#173a35] border border-[#cbd3ce]"
                     : "text-[#62736b] hover:text-[#173a35]"
                 }`}
               >
@@ -245,9 +245,9 @@ export function FeedView({
               <button
                 type="button"
                 onClick={() => setFeedSort("top")}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded transition-colors text-[11px] font-semibold ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-[2px] transition-colors text-[11px] font-semibold ${
                   feedSort === "top"
-                    ? "bg-white text-[#173a35] shadow-xs"
+                    ? "bg-white text-[#173a35] border border-[#cbd3ce]"
                     : "text-[#62736b] hover:text-[#173a35]"
                 }`}
               >
@@ -259,7 +259,7 @@ export function FeedView({
 
           {/* Post list */}
           {sortedPosts.length === 0 ? (
-            <div className="bg-white rounded-md border border-[#cbd3ce] p-8 text-center text-[#62736b]">
+            <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-8 text-center text-[#62736b]">
               <p className="font-semibold text-sm text-[#173a35]">
                 No posts in your feed yet.
               </p>
@@ -290,7 +290,7 @@ export function FeedView({
         {/* RIGHT COLUMN: Network Suggestions & Upcoming Deadlines */}
         <aside className="lg:col-span-3 space-y-4">
           {/* Recommended Students */}
-          <div className="bg-white rounded-md border border-[#cbd3ce] p-4 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+          <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-[#173a35]">
                 Students You May Know
@@ -318,7 +318,7 @@ export function FeedView({
                     <img
                       src={student.avatar}
                       alt={student.name}
-                      className="w-9 h-9 rounded object-cover border border-[#cbd3ce]"
+                      className="w-9 h-9 rounded-[2px] object-cover border border-[#cbd3ce]"
                     />
                   </button>
                   <div className="min-w-0 flex-1">
@@ -336,7 +336,7 @@ export function FeedView({
                     <button
                       type="button"
                       onClick={() => onConnectStudent(student.id)}
-                      className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 border border-[#173a35] text-[#173a35] hover:bg-[#173a35] hover:text-white rounded text-[11px] font-semibold transition-colors"
+                      className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 border border-[#173a35] text-[#173a35] hover:bg-[#173a35] hover:text-white rounded-[2px] text-[11px] font-semibold transition-colors"
                     >
                       <span>Connect</span>
                     </button>
@@ -347,7 +347,7 @@ export function FeedView({
           </div>
 
           {/* Upcoming Opportunities */}
-          <div className="bg-white rounded-md border border-[#cbd3ce] p-4 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+          <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-[#173a35]">
                 Upcoming Deadlines
@@ -366,7 +366,7 @@ export function FeedView({
                 <div
                   key={opp.id}
                   onClick={() => onSelectOpportunity(opp)}
-                  className="p-2.5 rounded bg-[#f7f5ef] border border-[#e2e8e3] hover:border-[#173a35] cursor-pointer transition-colors"
+                  className="p-2.5 rounded-[2px] bg-[#f7f5ef] border border-[#e2e8e3] hover:border-[#173a35] cursor-pointer transition-colors"
                 >
                   <p className="font-bold text-[#173a35] text-[11px] line-clamp-1">
                     {opp.title}
@@ -389,7 +389,7 @@ export function FeedView({
           </div>
 
           {/* Credento Values Footer Note */}
-          <div className="p-3 bg-[#eef2ef]/60 rounded border border-[#d8ddd8] text-[10px] text-[#62736b] leading-relaxed">
+          <div className="p-3 bg-[#eef2ef] rounded-[2px] border border-[#d8ddd8] text-[10px] text-[#62736b] leading-relaxed">
             <p className="font-bold text-[#173a35] mb-0.5">
               Credento Academic Oath
             </p>

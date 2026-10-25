@@ -92,7 +92,7 @@ export function GlobalSearchView({
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
       {/* Search Header */}
-      <div className="bg-white rounded-md border border-[#cbd3ce] p-5 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+      <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
         <h1 className="text-xl font-bold text-[#173a35] tracking-tight mb-3">
           Global Academic Search
         </h1>
@@ -105,7 +105,7 @@ export function GlobalSearchView({
               placeholder="Search across students, research papers, and opportunities..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded focus:outline-none focus:border-[#173a35] text-[#242b29]"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-[#f7f5ef] border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35] text-[#242b29]"
             />
           </div>
 
@@ -116,7 +116,7 @@ export function GlobalSearchView({
                   key={cat}
                   type="button"
                   onClick={() => setCategory(cat)}
-                  className={`text-xs capitalize px-3 py-2 rounded border font-medium transition-colors whitespace-nowrap ${
+                  className={`text-xs capitalize px-3 py-2 rounded-[2px] border font-medium transition-colors whitespace-nowrap ${
                     category === cat
                       ? "bg-[#173a35] text-white border-[#173a35]"
                       : "bg-[#f7f5ef] text-[#62736b] border-[#cbd3ce] hover:text-[#173a35]"
@@ -138,7 +138,7 @@ export function GlobalSearchView({
       </div>
 
       {totalResults === 0 ? (
-        <div className="bg-white rounded-md border border-[#cbd3ce] p-10 text-center text-[#62736b]">
+        <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-10 text-center text-[#62736b]">
           <Search className="w-8 h-8 text-[#87978f] mx-auto mb-2 opacity-50" />
           <p className="font-bold text-sm text-[#173a35]">
             No matching items found
@@ -153,7 +153,7 @@ export function GlobalSearchView({
           {/* Students section */}
           {(category === "all" || category === "students") &&
             matchingStudents.length > 0 && (
-              <div className="bg-white rounded-md border border-[#cbd3ce] p-5 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+              <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
                 <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3 flex items-center justify-between">
                   <span>Students ({matchingStudents.length})</span>
                   {category === "all" && (
@@ -174,12 +174,12 @@ export function GlobalSearchView({
                       <div
                         key={student.id}
                         onClick={() => onSelectStudentProfile(student.id)}
-                        className="p-3 bg-[#f7f5ef]/60 rounded border border-[#e2e8e3] hover:border-[#173a35] cursor-pointer transition-colors flex items-start gap-3"
+                        className="p-3 bg-[#f7f5ef] rounded-[2px] border border-[#e2e8e3] hover:border-[#173a35] cursor-pointer transition-colors flex items-start gap-3"
                       >
                         <img
                           src={student.avatar}
                           alt={student.name}
-                          className="w-10 h-10 rounded object-cover border border-[#cbd3ce] shrink-0"
+                          className="w-10 h-10 rounded-[2px] object-cover border border-[#cbd3ce] shrink-0"
                         />
                         <div className="min-w-0 flex-1">
                           <p className="font-bold text-xs text-[#173a35] truncate">
@@ -201,7 +201,7 @@ export function GlobalSearchView({
           {/* Opportunities section */}
           {(category === "all" || category === "opportunities") &&
             matchingOpportunities.length > 0 && (
-              <div className="bg-white rounded-md border border-[#cbd3ce] p-5 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+              <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
                 <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3 flex items-center justify-between">
                   <span>Opportunities ({matchingOpportunities.length})</span>
                   {category === "all" && (
@@ -222,7 +222,7 @@ export function GlobalSearchView({
                       <div
                         key={opp.id}
                         onClick={() => onSelectOpportunity(opp)}
-                        className="p-3.5 bg-[#f7f5ef]/60 rounded border border-[#e2e8e3] hover:border-[#173a35] cursor-pointer transition-colors"
+                        className="p-3.5 bg-[#f7f5ef] rounded-[2px] border border-[#e2e8e3] hover:border-[#173a35] cursor-pointer transition-colors"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -261,7 +261,7 @@ export function GlobalSearchView({
           {/* Posts section */}
           {(category === "all" || category === "posts") &&
             matchingPosts.length > 0 && (
-              <div className="bg-white rounded-md border border-[#cbd3ce] p-5 shadow-[0_1px_3px_rgba(23,58,53,0.04)]">
+              <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
                 <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3 flex items-center justify-between">
                   <span>Posts & Discussions ({matchingPosts.length})</span>
                   {category === "all" && (
@@ -281,13 +281,13 @@ export function GlobalSearchView({
                     .map((post) => (
                       <div
                         key={post.id}
-                        className="p-3.5 bg-[#f7f5ef]/60 rounded border border-[#e2e8e3]"
+                        className="p-3.5 bg-[#f7f5ef] rounded-[2px] border border-[#e2e8e3]"
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <img
                             src={post.authorAvatar}
                             alt={post.authorName}
-                            className="w-6 h-6 rounded object-cover"
+                            className="w-6 h-6 rounded-[2px] object-cover"
                           />
                           <span className="font-semibold text-xs text-[#173a35]">
                             {post.authorName}
