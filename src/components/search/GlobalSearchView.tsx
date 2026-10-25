@@ -314,6 +314,5 @@ export function GlobalSearchView({
         </div>
       )}
     </div>
-    </div>
   )
 }

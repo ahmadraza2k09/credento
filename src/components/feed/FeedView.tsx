@@ -384,22 +384,9 @@ export function FeedView({
               ))}
             </div>
           </div>
-        </aside>
-      </div>
-    </div>
-  )
-                    <span className="font-semibold text-[#173a35] flex items-center gap-0.5">
-                      <span>View</span>
-                      <ArrowRight className="w-2.5 h-2.5" />
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Credento Values Footer Note */}
-          <div className="p-3 bg-[#eef2ef] rounded-[2px] border border-[#d8ddd8] text-[10px] text-[#62736b] leading-relaxed">
+          <div className="p-3.5 bg-[#f7f5ef] rounded-2xl border border-[#d8ddd8]/60 text-[10px] text-[#62736b] leading-relaxed shadow-2xs">
             <p className="font-bold text-[#173a35] mb-0.5">
               Credento Academic Oath
             </p>

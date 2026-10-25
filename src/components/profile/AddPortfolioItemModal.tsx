@@ -79,7 +79,7 @@ export function AddPortfolioItemModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs text-[#62736b] hover:text-[#242b29]"
+            className="px-4 py-2 text-xs text-[#62736b] hover:text-[#242b29] rounded-xl hover:bg-black/5 cursor-pointer font-medium"
           >
             Cancel
           </button>
@@ -87,7 +87,7 @@ export function AddPortfolioItemModal({
             type="button"
             onClick={handleSubmit}
             disabled={!title.trim() || !description.trim()}
-            className="px-5 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] disabled:opacity-40"
+            className="btn-3d-primary px-5 py-2 text-xs font-semibold disabled:opacity-40 cursor-pointer"
           >
             Add to Portfolio
           </button>
@@ -102,7 +102,7 @@ export function AddPortfolioItemModal({
           <select
             value={type}
             onChange={(e) => setType(e.target.value as PortfolioType)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-xs cursor-pointer"
           >
             {typeOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -121,7 +121,7 @@ export function AddPortfolioItemModal({
             placeholder="e.g. SparseAttention CUDA Kernel or 1st Place MIT Climate Hack"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             required
           />
         </div>
@@ -136,7 +136,7 @@ export function AddPortfolioItemModal({
               placeholder="e.g. MIT CSAIL or IEEE Student Chapter"
               value={organization}
               onChange={(e) => setOrganization(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
           <div>
@@ -148,7 +148,7 @@ export function AddPortfolioItemModal({
               placeholder="e.g. Fall 2025 or June 2024"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
         </div>
@@ -162,7 +162,7 @@ export function AddPortfolioItemModal({
             placeholder="Summarize your methodology, outcomes, key responsibilities, or quantitative metrics..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             required
           />
         </div>
@@ -177,7 +177,7 @@ export function AddPortfolioItemModal({
               placeholder="https://github.com/... or doi link"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
           <div>
@@ -189,7 +189,7 @@ export function AddPortfolioItemModal({
               placeholder="e.g. IEEE-2025-0123"
               value={credentialId}
               onChange={(e) => setCredentialId(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
         </div>
@@ -203,7 +203,7 @@ export function AddPortfolioItemModal({
             placeholder="e.g. Python, PyTorch, Econometrics"
             value={skillsString}
             onChange={(e) => setSkillsString(e.target.value)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
         </div>
       </form>
