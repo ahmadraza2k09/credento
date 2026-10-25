@@ -8,8 +8,9 @@ import {
   CheckCircle,
   Share2,
   Check,
+  ClipboardCheck,
 } from "lucide-react"
-import { Opportunity } from "../../types"
+import { ApplicationStatus, Opportunity } from "../../types"
 import { Modal } from "../common/Modal"
 import { OpportunityCategoryBadge } from "../common/Badge"
 
@@ -19,6 +20,11 @@ interface OpportunityDetailModalProps {
   opportunity: Opportunity | null
   isSaved: boolean
   onToggleSave: (oppId: string) => void
+  onUpdateStatus?: (
+    oppId: string,
+    status: ApplicationStatus,
+    notes?: string,
+  ) => void
 }
 
 export function OpportunityDetailModal({
@@ -27,6 +33,7 @@ export function OpportunityDetailModal({
   opportunity,
   isSaved,
   onToggleSave,
+  onUpdateStatus,
 }: OpportunityDetailModalProps) {
   const [copiedLink, setCopiedLink] = useState(false)
 
@@ -158,6 +165,60 @@ export function OpportunityDetailModal({
             </ul>
           </div>
         )}
+
+        {/* Application Tracker Section */}
+        <div className="p-4 bg-[#f4f6f5] rounded-2xl border border-black/[0.06] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ClipboardCheck className="w-4 h-4 text-[#173a35]" />
+              <span className="font-bold text-xs text-[#173a35]">
+                My Application Tracking Status
+              </span>
+            </div>
+            {opportunity.applicationStatus && (
+              <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-white text-[#173a35] shadow-2xs capitalize">
+                {opportunity.applicationStatus.replace("_", " ")}
+              </span>
+            )}
+          </div>
+
+          <p className="text-[11px] text-[#62736b]">
+            Track your candidate status privately across your semester deadlines:
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {(
+              [
+                "submitted",
+                "under_review",
+                "interviewing",
+                "offered",
+                "withdrawn",
+              ] as ApplicationStatus[]
+            ).map((st) => (
+              <button
+                key={st}
+                type="button"
+                onClick={() => onUpdateStatus?.(opportunity.id, st)}
+                className={`text-[11px] px-3 py-1 rounded-full font-medium capitalize transition-colors cursor-pointer ${
+                  opportunity.applicationStatus === st
+                    ? "bg-[#173a35] text-white font-semibold"
+                    : "bg-white text-[#62736b] hover:text-[#173a35] hover:bg-[#edf2ee]"
+                }`}
+              >
+                {st.replace("_", " ")}
+              </button>
+            ))}
+          </div>
+
+          {opportunity.appliedDate && (
+            <p className="text-[10px] text-[#728078] font-mono pt-1">
+              Recorded on: {opportunity.appliedDate}
+              {opportunity.applicationNotes &&
+                ` • Notes: ${opportunity.applicationNotes}`}
+            </p>
+          )}
+        </div>
 
         {/* Academic integrity disclaimer */}
         <div className="p-3.5 bg-[#f8faf9] rounded-2xl border border-black/[0.04] text-[11px] text-[#62736b]">

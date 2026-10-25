@@ -13,11 +13,20 @@ import {
   ChevronDown,
   X,
   ExternalLink,
+  BookOpen,
 } from "lucide-react"
 import { BrandLogo } from "./BrandLogo"
 import { StudentProfile } from "../../types"
 
-export type NavTab = "feed" | "network" | "opportunities" | "messages" | "notifications" | "profile" | "search"
+export type NavTab =
+  | "feed"
+  | "network"
+  | "opportunities"
+  | "groups"
+  | "messages"
+  | "notifications"
+  | "profile"
+  | "search"
 
 interface NavbarProps {
   currentTab: NavTab
@@ -94,6 +103,12 @@ export function Navbar({
       id: "opportunities" as NavTab,
       label: "Opportunities",
       icon: Briefcase,
+      badge: 0,
+    },
+    {
+      id: "groups" as NavTab,
+      label: "Communities",
+      icon: BookOpen,
       badge: 0,
     },
     {
@@ -418,7 +433,7 @@ export function Navbar({
         className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-black/[0.06] shadow-[0_-2px_12px_rgba(0,0,0,0.04)] pb-[env(safe-area-inset-bottom)]"
         aria-label="Mobile Navigation"
       >
-        <div className="grid grid-cols-5 h-14">
+        <div className="grid grid-cols-6 h-14">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = currentTab === item.id
@@ -451,7 +466,9 @@ export function Navbar({
                     ? "Network"
                     : item.label === "Opportunities"
                       ? "Jobs"
-                      : item.label}
+                      : item.label === "Communities"
+                        ? "Circles"
+                        : item.label}
                 </span>
                 {isActive && (
                   <span className="absolute top-0 left-4 right-4 h-[2px] bg-[#173a35] rounded-full" />

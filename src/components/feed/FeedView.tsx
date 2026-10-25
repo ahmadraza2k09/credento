@@ -37,6 +37,8 @@ interface FeedViewProps {
   onNavigateToTab: (tab: any) => void
   onReport: (type: "post", targetId: string) => void
   onBlockUser: (userId: string) => void
+  onVotePoll?: (postId: string, optionId: string) => void
+  onToggleSavePost?: (postId: string) => void
 }
 
 export function FeedView({
@@ -57,8 +59,11 @@ export function FeedView({
   onNavigateToTab,
   onReport,
   onBlockUser,
+  onVotePoll,
+  onToggleSavePost,
 }: FeedViewProps) {
   const [feedSort, setFeedSort] = useState<"latest" | "top">("latest")
+  const [selectedTopic, setSelectedTopic] = useState<string>("all")
 
   // Calculate completeness for current user
   const completeness = useMemo(
@@ -83,14 +88,20 @@ export function FeedView({
     return opportunities.slice(0, 3)
   }, [opportunities])
 
-  // Sorted posts
-  const sortedPosts = useMemo(() => {
-    const list = [...posts]
+  // Sorted & Filtered posts
+  const filteredAndSortedPosts = useMemo(() => {
+    let list = [...posts]
+    if (selectedTopic === "saved") {
+      list = list.filter((p) => p.isSaved)
+    } else if (selectedTopic !== "all") {
+      list = list.filter((p) => p.topic === selectedTopic)
+    }
+
     if (feedSort === "top") {
       return list.sort((a, b) => b.likes.length - a.likes.length)
     }
-    return list // already newest first
-  }, [posts, feedSort])
+    return list
+  }, [posts, selectedTopic, feedSort])
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-5 py-5 sm:py-7">
@@ -222,14 +233,37 @@ export function FeedView({
           {/* Post Composer */}
           <PostCreator currentUser={currentUser} onCreatePost={onCreatePost} />
 
-          {/* Sort bar */}
-          <div className="flex items-center justify-between pb-1 px-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#728078]">
-                Feed Stream
-              </span>
+          {/* Sort bar & Topic Filters */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 px-1">
+            {/* Feed Topic Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+              {[
+                { id: "all", label: "All Topics" },
+                { id: "Research", label: "Research & Labs" },
+                { id: "Projects", label: "Projects" },
+                { id: "Career", label: "Career & Grants" },
+                { id: "Campus Life", label: "Campus" },
+                {
+                  id: "saved",
+                  label: `Saved (${posts.filter((p) => p.isSaved).length})`,
+                },
+              ].map((topic) => (
+                <button
+                  key={topic.id}
+                  type="button"
+                  onClick={() => setSelectedTopic(topic.id)}
+                  className={`text-xs px-3 py-1 rounded-full font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                    selectedTopic === topic.id
+                      ? "btn-3d-primary text-white"
+                      : "bg-white text-[#62736b] hover:bg-[#edf2ee] hover:text-[#173a35] shadow-2xs"
+                  }`}
+                >
+                  {topic.label}
+                </button>
+              ))}
             </div>
-            <div className="flex items-center gap-1 bg-[#e8ecea] p-1 rounded-full text-xs shadow-inner">
+
+            <div className="flex items-center gap-1 bg-[#e8ecea] p-1 rounded-full text-xs shadow-inner self-end sm:self-auto shrink-0">
               <button
                 type="button"
                 onClick={() => setFeedSort("latest")}
@@ -258,17 +292,21 @@ export function FeedView({
           </div>
 
           {/* Post list */}
-          {sortedPosts.length === 0 ? (
+          {filteredAndSortedPosts.length === 0 ? (
             <div className="card-linkedin p-8 text-center text-[#62736b]">
               <p className="font-semibold text-sm text-[#173a35]">
-                No posts in your feed yet.
+                {selectedTopic === "saved"
+                  ? "No saved posts yet."
+                  : "No posts match this topic filter."}
               </p>
               <p className="text-xs mt-1">
-                Share your first research note or project update above!
+                {selectedTopic === "saved"
+                  ? "Click the bookmark icon on any post to save it for later review."
+                  : "Switch to 'All Topics' to see all updates from your university peers."}
               </p>
             </div>
           ) : (
-            sortedPosts.map((post) => (
+            filteredAndSortedPosts.map((post) => (
               <PostCard
                 key={post.id}
                 post={post}
@@ -282,6 +320,8 @@ export function FeedView({
                 onReport={onReport}
                 onBlockUser={onBlockUser}
                 onSelectStudentProfile={onSelectStudentProfile}
+                onVotePoll={onVotePoll}
+                onToggleSavePost={onToggleSavePost}
               />
             ))
           )}

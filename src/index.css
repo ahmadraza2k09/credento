@@ -30,70 +30,74 @@
   transform: translateY(-2px);
 }
 
-/* Tactile 3D Primary Button */
+/* Simple Clean Primary Button */
 .btn-3d-primary {
-  background: linear-gradient(180deg, #1f4f48 0%, #13342f 100%) !important;
-  border: 1px solid #0e2925 !important;
-  border-radius: 0.875rem !important; /* 14px curvy */
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 3px 6px -1px rgba(17, 47, 43, 0.4), 0 1px 2px rgba(17, 47, 43, 0.25) !important;
+  background-color: #173a35 !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
   color: #ffffff !important;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
 }
 
 .btn-3d-primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #245c54 0%, #173d37 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 5px 12px -2px rgba(17, 47, 43, 0.45), 0 1px 3px rgba(17, 47, 43, 0.25) !important;
-  transform: translateY(-1px);
+  background-color: #0f2824 !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .btn-3d-primary:active:not(:disabled) {
-  transform: translateY(1.5px) !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(17, 47, 43, 0.2) !important;
+  background-color: #0c201d !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-/* Tactile 3D Secondary Button */
+/* Simple Clean Secondary Button */
 .btn-3d-secondary {
-  background: linear-gradient(180deg, #ffffff 0%, #f6f8f7 100%) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  border-radius: 0.875rem !important;
-  box-shadow: inset 0 1px 0 #ffffff, 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+  background-color: #eef2ef !important;
+  border: 1px solid #dce4df !important;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
   color: #173a35 !important;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-3d-secondary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #fbfcfb 0%, #edf1ee 100%) !important;
-  box-shadow: inset 0 1px 0 #ffffff, 0 4px 10px rgba(0, 0, 0, 0.08) !important;
-  transform: translateY(-1px);
+  background-color: #e2e8e3 !important;
+  border-color: #cbd3ce !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .btn-3d-secondary:active:not(:disabled) {
-  transform: translateY(1px) !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+  background-color: #d6ded7 !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-/* Tactile 3D Copper Button */
+/* Simple Clean Copper Button */
 .btn-3d-copper {
-  background: linear-gradient(180deg, #d37554 0%, #ad5234 100%) !important;
-  border: 1px solid #94442a !important;
-  border-radius: 0.875rem !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 3px 6px -1px rgba(196, 107, 75, 0.4), 0 1px 2px rgba(196, 107, 75, 0.25) !important;
+  background-color: #c46b4b !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
   color: #ffffff !important;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .btn-3d-copper:hover:not(:disabled) {
-  background: linear-gradient(180deg, #df805e 0%, #bb5c3c 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 5px 12px -2px rgba(196, 107, 75, 0.45) !important;
-  transform: translateY(-1px);
+  background-color: #ad5234 !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .btn-3d-copper:active:not(:disabled) {
-  transform: translateY(1.5px) !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+  background-color: #94442a !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Inset 3D Form Control */

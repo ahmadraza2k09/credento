@@ -32,9 +32,18 @@ export function ProfileEditModal({
   const [interestsString, setInterestsString] = useState(
     profile.interests ? profile.interests.join(", ") : "",
   )
+  const [openToBadges, setOpenToBadges] = useState<string[]>(
+    profile.openToBadges || ["research"],
+  )
   const [isPublic, setIsPublic] = useState(profile.isPublic ?? true)
   const [coverImage, setCoverImage] = useState(profile.coverImage || "")
   const [avatar, setAvatar] = useState(profile.avatar || "")
+
+  const toggleBadge = (badge: string) => {
+    setOpenToBadges((prev) =>
+      prev.includes(badge) ? prev.filter((b) => b !== badge) : [...prev, badge],
+    )
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,6 +68,7 @@ export function ProfileEditModal({
       location: location.trim(),
       skills,
       interests,
+      openToBadges,
       isPublic,
       coverImage: coverImage.trim() || undefined,
       avatar: avatar.trim() || profile.avatar,
@@ -220,6 +230,42 @@ export function ProfileEditModal({
             placeholder="e.g. AI Ethics, Clean Tech, Synthetic Biology"
             className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
+        </div>
+
+        {/* Open To Status Badges */}
+        <div className="p-3.5 bg-[#f8faf9] border border-black/[0.04] rounded-2xl space-y-2">
+          <label className="block font-semibold text-[#173a35]">
+            Opportunities & Collaboration Status
+          </label>
+          <div className="space-y-2 pt-1">
+            <label className="flex items-center gap-2 cursor-pointer text-[#242b29]">
+              <input
+                type="checkbox"
+                checked={openToBadges.includes("research")}
+                onChange={() => toggleBadge("research")}
+                className="rounded text-[#173a35] focus:ring-[#173a35]"
+              />
+              <span>Open to Research Collaboration & Lab Projects</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-[#242b29]">
+              <input
+                type="checkbox"
+                checked={openToBadges.includes("internships")}
+                onChange={() => toggleBadge("internships")}
+                className="rounded text-[#173a35] focus:ring-[#173a35]"
+              />
+              <span>Seeking Summer / Fall Internships & Fellowships</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-[#242b29]">
+              <input
+                type="checkbox"
+                checked={openToBadges.includes("tutoring")}
+                onChange={() => toggleBadge("tutoring")}
+                className="rounded text-[#173a35] focus:ring-[#173a35]"
+              />
+              <span>Available for Peer Tutoring & Course Mentorship</span>
+            </label>
+          </div>
         </div>
 
         {/* Visibility Controls */}

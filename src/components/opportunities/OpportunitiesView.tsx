@@ -13,7 +13,12 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react"
-import { Opportunity, OpportunityCategory, StudentProfile } from "../../types"
+import {
+  ApplicationStatus,
+  Opportunity,
+  OpportunityCategory,
+  StudentProfile,
+} from "../../types"
 import { OpportunityCategoryBadge } from "../common/Badge"
 import { OpportunityDetailModal } from "./OpportunityDetailModal"
 import { PostOpportunityModal } from "./PostOpportunityModal"
@@ -23,6 +28,11 @@ interface OpportunitiesViewProps {
   currentUser: StudentProfile
   onToggleSave: (oppId: string) => void
   onAddOpportunity: (opp: Omit<Opportunity, "id" | "createdAt">) => void
+  onUpdateApplicationStatus?: (
+    oppId: string,
+    status: ApplicationStatus,
+    notes?: string,
+  ) => void
 }
 
 export function OpportunitiesView({
@@ -30,9 +40,10 @@ export function OpportunitiesView({
   currentUser,
   onToggleSave,
   onAddOpportunity,
+  onUpdateApplicationStatus,
 }: OpportunitiesViewProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"all" | "saved">("all")
+  const [activeTab, setActiveTab] = useState<"all" | "saved" | "applied">("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedMode, setSelectedMode] = useState<string>("all")
   const [closingSoonOnly, setClosingSoonOnly] = useState(false)
@@ -59,6 +70,9 @@ export function OpportunitiesView({
     return opportunities.filter((opp) => {
       // Saved filter
       if (activeTab === "saved" && !opp.isSaved) return false
+
+      // Applied filter
+      if (activeTab === "applied" && !opp.applicationStatus) return false
 
       // Category filter
       if (selectedCategory !== "all" && opp.category !== selectedCategory)
@@ -105,6 +119,9 @@ export function OpportunitiesView({
   ])
 
   const savedCount = opportunities.filter((o) => o.isSaved).length
+  const appliedCount = opportunities.filter((o) =>
+    Boolean(o.applicationStatus),
+  ).length
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
@@ -154,6 +171,18 @@ export function OpportunitiesView({
           >
             <Bookmark className="w-3.5 h-3.5" />
             <span>Saved Bookmarks ({savedCount})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("applied")}
+            className={`text-xs px-4 py-2 rounded-full font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+              activeTab === "applied"
+                ? "btn-3d-primary text-white"
+                : "bg-[#f4f6f5] text-[#62736b] hover:bg-white hover:shadow-sm"
+            }`}
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span>My Applications ({appliedCount})</span>
           </button>
         </div>
 
@@ -262,6 +291,11 @@ export function OpportunitiesView({
                         {opp.compensation}
                       </span>
                     )}
+                    {opp.applicationStatus && (
+                      <span className="text-[10px] font-semibold px-2.5 py-0.5 bg-[#173a35] text-white rounded-full shadow-2xs capitalize">
+                        {opp.applicationStatus.replace("_", " ")}
+                      </span>
+                    )}
                   </div>
 
                   <button
@@ -355,6 +389,7 @@ export function OpportunitiesView({
         opportunity={selectedOpp}
         isSaved={Boolean(selectedOpp?.isSaved)}
         onToggleSave={onToggleSave}
+        onUpdateStatus={onUpdateApplicationStatus}
       />
 
       {/* Post Opportunity Modal */}

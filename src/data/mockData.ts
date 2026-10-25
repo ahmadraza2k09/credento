@@ -4,6 +4,7 @@ import {
   Opportunity,
   Post,
   StudentProfile,
+  StudyGroup,
 } from "../types"
 
 export const INITIAL_STUDENTS: StudentProfile[] = [
@@ -26,6 +27,13 @@ export const INITIAL_STUDENTS: StudentProfile[] = [
     about:
       "I am a third-year computer science student at MIT fascinated by efficient machine learning architectures, sparse attention mechanisms, and ethical algorithmic governance. When not in the lab or benchmarking neural networks, I organize peer-led seminars on research reproducibility and mentor high school coders in Greater Boston.",
     isPublic: true,
+    openToBadges: ["research", "internships"],
+    skillEndorsements: {
+      PyTorch: ["user-priya", "user-jordan", "user-david"],
+      "Distributed Systems": ["user-jordan", "user-elena"],
+      "AI Ethics": ["user-elena"],
+      Python: ["user-priya", "user-david"],
+    },
     skills: [
       "PyTorch",
       "Python",
@@ -543,6 +551,27 @@ export const INITIAL_POSTS: Post[] = [
     content: `Quick reflection on undergraduate research: It is tempting to spend all semester chasing complex model architectures, but 80% of our breakthrough last week on sparse attention came from cleaning our dataset and rewriting the baseline memory profiler from scratch.\n\nNever underestimate the power of clean fundamentals, deep instrumentation, and good old-fashioned benchmark profiling before adding complexity. What is one lesson you learned the hard way in your labs this semester?`,
     imageUrl:
       "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=1000&q=80",
+    topic: "Research",
+    poll: {
+      question: "What is your team's biggest bottleneck in university research projects?",
+      options: [
+        {
+          id: "opt-1",
+          text: "Reproducibility & dataset hygiene",
+          votes: ["user-priya", "user-jordan", "user-david"],
+        },
+        {
+          id: "opt-2",
+          text: "Compute cluster / GPU queuing time",
+          votes: ["user-elena"],
+        },
+        {
+          id: "opt-3",
+          text: "Finding cross-faculty student collaborators",
+          votes: ["user-amara"],
+        },
+      ],
+    },
     createdAt: "5 hours ago",
     likes: ["user-jordan", "user-amara", "user-priya"],
     sharesCount: 8,
@@ -903,5 +932,102 @@ export const INITIAL_NOTIFICATIONS: AppNotification[] = [
       "Publish your independent or lab research to be featured in the inter-university digest.",
     createdAt: "3 days ago",
     isRead: true,
+  },
+]
+
+export const INITIAL_GROUPS: StudyGroup[] = [
+  {
+    id: "grp-1",
+    name: "MIT CSAIL Autonomous Systems & Robotics",
+    category: "Research Lab",
+    description:
+      "Undergraduate and graduate research working group focused on multi-agent perception, embodied intelligence, and low-latency robotics kernels.",
+    institution: "Massachusetts Institute of Technology",
+    memberCount: 38,
+    avatar:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=200&q=80",
+    coverImage:
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+    tags: ["Robotics", "Reinforcement Learning", "CUDA", "ROS2"],
+    isJoined: true,
+    recentDiscussion:
+      "Benchmarking micro-SLAM algorithms on Jetson Orin Nano hardware",
+    meetingSchedule: "Wednesdays @ 5:30 PM (Stata Center 32-D463)",
+    leadName: "Marcus Vance",
+  },
+  {
+    id: "grp-2",
+    name: "Collegiate AI Ethics & Governance Forum",
+    category: "Student Chapter",
+    description:
+      "Inter-collegiate association of students analyzing generative model biases, fair-use datasets, and AI accountability policies.",
+    institution: "Inter-University Consortium",
+    memberCount: 94,
+    avatar:
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=200&q=80",
+    coverImage:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+    tags: ["Policy", "Ethics", "Algorithmic Justice", "Public Interest Tech"],
+    isJoined: false,
+    recentDiscussion:
+      "Drafting student submission to the US Copyright Office on academic pre-training",
+    meetingSchedule: "Bi-weekly Thursdays @ 7:00 PM EST (Virtual)",
+    leadName: "Elena Rostova",
+  },
+  {
+    id: "grp-3",
+    name: "Stanford BioDesign & Health Innovation Circle",
+    category: "Study Circle",
+    description:
+      "Collaborative incubator for biomedical device design, point-of-care microfluidics, and translational medicine hackathons.",
+    institution: "Stanford University",
+    memberCount: 52,
+    avatar:
+      "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=200&q=80",
+    coverImage:
+      "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1200&q=80",
+    tags: ["MedTech", "Biomaterials", "Clinical Trials", "Diagnostics"],
+    isJoined: false,
+    recentDiscussion:
+      "Testing lateral flow strip sensitivity with ambient phone cameras",
+    meetingSchedule: "Mondays @ 6:00 PM (Clark Center S360)",
+    leadName: "Priya Sharma",
+  },
+  {
+    id: "grp-4",
+    name: "Quantum Computing & Quantum Information Syndicate",
+    category: "Research Lab",
+    description:
+      "Student group researching noisy intermediate-scale quantum (NISQ) algorithms, error mitigation, and quantum chemistry simulations.",
+    institution: "Harvard & MIT Joint Chapter",
+    memberCount: 29,
+    avatar:
+      "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=200&q=80",
+    coverImage:
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+    tags: ["Qiskit", "Quantum Algorithms", "Linear Algebra", "Physics"],
+    isJoined: false,
+    recentDiscussion: "VQE optimization landscapes with parameterized ansatzes",
+    meetingSchedule: "Fridays @ 4:00 PM (Jefferson Physical Lab)",
+    leadName: "David Chen",
+  },
+  {
+    id: "grp-5",
+    name: "Collegiate Solar Car & Clean Energy Team",
+    category: "Competition Team",
+    description:
+      "Designing, building, and racing high-efficiency solar vehicles for the American Solar Challenge.",
+    institution: "UC Berkeley & Stanford",
+    memberCount: 67,
+    avatar:
+      "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=200&q=80",
+    coverImage:
+      "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80",
+    tags: ["Clean Energy", "Embedded Systems", "Aerodynamics", "Battery Tech"],
+    isJoined: true,
+    recentDiscussion:
+      "Maximizing regenerative braking telemetry using CAN bus packet sniffing",
+    meetingSchedule: "Saturdays @ 11:00 AM (Etcheverry Machine Shop)",
+    leadName: "Jordan Lee",
   },
 ]

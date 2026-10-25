@@ -51,6 +51,21 @@ export interface StudentProfile {
   connectionStatus?: ConnectionStatus
   isFollowing?: boolean
   isBlocked?: boolean
+  openToBadges?: string[]
+  skillEndorsements?: { [skillName: string]: string[] }
+}
+
+export type PostTopic = "Research" | "Career" | "Projects" | "Campus Life" | "General"
+
+export interface PollOption {
+  id: string
+  text: string
+  votes: string[]
+}
+
+export interface PostPoll {
+  question: string
+  options: PollOption[]
 }
 
 export interface CommentReply {
@@ -96,6 +111,9 @@ export interface Post {
   likes: string[] // list of userIds
   sharesCount: number
   comments: Comment[]
+  topic?: PostTopic
+  isSaved?: boolean
+  poll?: PostPoll
   sharedPost?: {
     id: string
     authorName: string
@@ -105,6 +123,8 @@ export interface Post {
     createdAt: string
   }
 }
+
+export type ApplicationStatus = "submitted" | "under_review" | "interviewing" | "offered" | "withdrawn"
 
 export interface Opportunity {
   id: string
@@ -121,7 +141,28 @@ export interface Opportunity {
   compensation?: string
   postedBy: string
   isSaved?: boolean
+  applicationStatus?: ApplicationStatus
+  applicationNotes?: string
+  appliedDate?: string
   createdAt: string
+}
+
+export type GroupCategory = "Research Lab" | "Student Chapter" | "Study Circle" | "Competition Team" | "Club"
+
+export interface StudyGroup {
+  id: string
+  name: string
+  category: GroupCategory
+  description: string
+  institution: string
+  memberCount: number
+  avatar: string
+  coverImage?: string
+  tags: string[]
+  isJoined?: boolean
+  recentDiscussion?: string
+  meetingSchedule?: string
+  leadName?: string
 }
 
 export interface ChatMessage {

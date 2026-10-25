@@ -23,10 +23,14 @@ import {
   Flag,
   UserX,
   Trash2,
+  FileText,
+  ThumbsUp,
+  Sparkles,
 } from "lucide-react"
 import { PortfolioItem, PortfolioType, StudentProfile } from "../../types"
 import { ProfileEditModal } from "./ProfileEditModal"
 import { AddPortfolioItemModal } from "./AddPortfolioItemModal"
+import { ExportCvModal } from "./ExportCvModal"
 import { calculateProfileCompleteness } from "../../services/storage"
 
 interface ProfileViewProps {
@@ -41,6 +45,7 @@ interface ProfileViewProps {
   onStartMessage: (userId: string) => void
   onReport: (type: "user", targetId: string) => void
   onBlockUser: (userId: string) => void
+  onEndorseSkill?: (userId: string, skill: string) => void
 }
 
 export function ProfileView({
@@ -55,9 +60,11 @@ export function ProfileView({
   onStartMessage,
   onReport,
   onBlockUser,
+  onEndorseSkill,
 }: ProfileViewProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddPortfolioOpen, setIsAddPortfolioOpen] = useState(false)
+  const [isExportCvOpen, setIsExportCvOpen] = useState(false)
   const [activePortfolioTab, setActivePortfolioTab] = useState<string>("all")
   const [copiedLink, setCopiedLink] = useState(false)
 
@@ -219,6 +226,15 @@ export function ProfileView({
                   </button>
                   <button
                     type="button"
+                    onClick={() => setIsExportCvOpen(true)}
+                    className="btn-3d-secondary flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold cursor-pointer"
+                    title="Export Academic CV"
+                  >
+                    <FileText className="w-4 h-4 text-[#173a35]" />
+                    <span>Export CV</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleCopyLink}
                     className="btn-3d-secondary flex items-center gap-1.5 px-3 py-2 text-xs cursor-pointer"
                     title="Share profile"
@@ -289,6 +305,17 @@ export function ProfileView({
                     </button>
                   )}
 
+                  {/* Export CV button for peers */}
+                  <button
+                    type="button"
+                    onClick={() => setIsExportCvOpen(true)}
+                    className="btn-3d-secondary flex items-center gap-1.5 px-3 py-2 text-xs font-semibold cursor-pointer"
+                    title="View Academic CV"
+                  >
+                    <FileText className="w-4 h-4 text-[#173a35]" />
+                    <span>CV</span>
+                  </button>
+
                   {/* Report / Block options */}
                   <button
                     type="button"
@@ -317,6 +344,30 @@ export function ProfileView({
             <p className="text-xs sm:text-sm text-[#242b29] font-medium mt-1 leading-snug">
               {profile.headline}
             </p>
+
+            {/* Open To Badges */}
+            {profile.openToBadges && profile.openToBadges.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                {profile.openToBadges.includes("research") && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#edf6f0] text-[#155738] border border-[#b8dec4] text-[11px] font-semibold rounded-full shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-[#1b6b47] animate-pulse" />
+                    <span>Open to Research Collaboration</span>
+                  </span>
+                )}
+                {profile.openToBadges.includes("internships") && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#fef3eb] text-[#9f5138] border border-[#fbd3bc] text-[11px] font-semibold rounded-full shadow-2xs">
+                    <Briefcase className="w-3 h-3 text-[#c46b4b]" />
+                    <span>Seeking Summer / Fall Internships</span>
+                  </span>
+                )}
+                {profile.openToBadges.includes("tutoring") && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#f0f4fe] text-[#2563eb] border border-[#c7d9fe] text-[11px] font-semibold rounded-full shadow-2xs">
+                    <BookOpen className="w-3 h-3 text-[#2563eb]" />
+                    <span>Available for Peer Tutoring</span>
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Academic Institution & Location Meta */}
             <div className="flex flex-wrap items-center gap-y-1.5 gap-x-4 text-xs text-[#62736b] mt-3">
@@ -638,19 +689,51 @@ export function ProfileView({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Skills */}
             <div className="card-linkedin p-6">
-              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5">
-                Skills & Endorsements ({profile.skills?.length || 0})
+              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5 flex items-center justify-between">
+                <span>Skills & Endorsements ({profile.skills?.length || 0})</span>
+                <span className="text-[10px] text-[#728078] font-normal normal-case">
+                  Peer verified
+                </span>
               </h2>
               <div className="flex flex-wrap gap-2">
                 {profile.skills && profile.skills.length > 0 ? (
-                  profile.skills.map((skill, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 bg-[#f4f6f5] rounded-full text-xs text-[#242b29] font-medium shadow-2xs"
-                    >
-                      {skill}
-                    </span>
-                  ))
+                  profile.skills.map((skill, i) => {
+                    const endorsements =
+                      profile.skillEndorsements?.[skill] || []
+                    const isEndorsedByMe = endorsements.includes(currentUser.id)
+
+                    return (
+                      <div
+                        key={i}
+                        className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1 bg-[#f4f6f5] rounded-full text-xs text-[#242b29] font-medium shadow-2xs border border-black/[0.04]"
+                      >
+                        <span>{skill}</span>
+                        {endorsements.length > 0 && (
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-white rounded-full text-[#173a35] font-bold shadow-2xs">
+                            {endorsements.length}
+                          </span>
+                        )}
+                        {!isSelf && onEndorseSkill && (
+                          <button
+                            type="button"
+                            onClick={() => onEndorseSkill(profile.id, skill)}
+                            className={`text-[10px] px-2 py-0.5 rounded-full font-semibold transition-colors cursor-pointer ml-0.5 ${
+                              isEndorsedByMe
+                                ? "bg-[#173a35] text-white"
+                                : "bg-white text-[#62736b] hover:text-[#173a35] hover:bg-[#edf2ee]"
+                            }`}
+                            title={
+                              isEndorsedByMe
+                                ? "Remove endorsement"
+                                : "Endorse skill"
+                            }
+                          >
+                            {isEndorsedByMe ? "✓ Endorsed" : "+ Endorse"}
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })
                 ) : (
                   <p className="text-xs text-[#62736b]">No skills added.</p>
                 )}
@@ -693,6 +776,12 @@ export function ProfileView({
         isOpen={isAddPortfolioOpen}
         onClose={() => setIsAddPortfolioOpen(false)}
         onAdd={onAddPortfolioItem}
+      />
+
+      <ExportCvModal
+        isOpen={isExportCvOpen}
+        onClose={() => setIsExportCvOpen(false)}
+        profile={profile}
       />
     </div>
   )

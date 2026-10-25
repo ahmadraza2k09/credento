@@ -11,6 +11,7 @@ import {
   UserX,
   Repeat,
   Check,
+  Bookmark,
 } from "lucide-react"
 import { Post, StudentProfile } from "../../types"
 import { CommentSection } from "./CommentSection"
@@ -27,6 +28,8 @@ interface PostCardProps {
   onReport: (type: "post", targetId: string) => void
   onBlockUser: (userId: string) => void
   onSelectStudentProfile?: (studentId: string) => void
+  onVotePoll?: (postId: string, optionId: string) => void
+  onToggleSavePost?: (postId: string) => void
 }
 
 export function PostCard({
@@ -41,6 +44,8 @@ export function PostCard({
   onReport,
   onBlockUser,
   onSelectStudentProfile,
+  onVotePoll,
+  onToggleSavePost,
 }: PostCardProps) {
   const [showComments, setShowComments] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
@@ -237,6 +242,92 @@ export function PostCard({
         )}
       </div>
 
+      {/* Interactive Poll */}
+      {post.poll && (
+        <div className="mx-4 sm:mx-5 my-3 p-4 bg-[#f8faf9] border border-black/[0.06] rounded-2xl text-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-[#173a35] text-xs sm:text-sm">
+              {post.poll.question}
+            </span>
+            <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-[#edf6f0] text-[#173a35] rounded-full font-semibold">
+              Academic Poll
+            </span>
+          </div>
+
+          {(() => {
+            const totalVotes = post.poll.options.reduce(
+              (acc, opt) => acc + opt.votes.length,
+              0,
+            )
+            const hasVotedAny = post.poll.options.some((opt) =>
+              opt.votes.includes(currentUser.id),
+            )
+
+            return (
+              <div className="space-y-2">
+                {post.poll.options.map((opt) => {
+                  const hasVotedThis = opt.votes.includes(currentUser.id)
+                  const percentage =
+                    totalVotes > 0
+                      ? Math.round((opt.votes.length / totalVotes) * 100)
+                      : 0
+
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => onVotePoll?.(post.id, opt.id)}
+                      className={`w-full text-left p-3 rounded-xl border transition-all relative overflow-hidden cursor-pointer ${
+                        hasVotedThis
+                          ? "border-[#173a35] bg-[#edf6f0]/40 font-semibold"
+                          : "border-black/10 bg-white hover:border-[#173a35]/40"
+                      }`}
+                    >
+                      {/* Vote percentage bar fill */}
+                      <div
+                        className={`absolute left-0 top-0 bottom-0 opacity-15 transition-all duration-500 ${
+                          hasVotedThis ? "bg-[#173a35]" : "bg-black/20"
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      />
+
+                      <div className="relative flex items-center justify-between text-xs z-10">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                              hasVotedThis
+                                ? "border-[#173a35] bg-[#173a35] text-white"
+                                : "border-[#87978f]"
+                            }`}
+                          >
+                            {hasVotedThis && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                            )}
+                          </span>
+                          <span className="text-[#242b29]">{opt.text}</span>
+                        </div>
+                        {hasVotedAny && (
+                          <span className="font-mono text-[11px] text-[#62736b]">
+                            {percentage}%
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+
+                <div className="text-[10px] text-[#728078] font-mono flex items-center justify-between pt-1">
+                  <span>{totalVotes} total votes</span>
+                  <span>
+                    {hasVotedAny ? "Vote recorded" : "Click option to vote"}
+                  </span>
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+      )}
+
       {/* Shared Post Quote if this is a repost */}
       {post.sharedPost && (
         <div className="mx-4 sm:mx-5 my-2.5 p-3.5 bg-[#f8faf9] border border-black/[0.06] rounded-2xl text-xs shadow-xs">
@@ -319,37 +410,53 @@ export function PostCard({
         </div>
       </div>
 
-      {/* Interaction Buttons - Curvy with tactile touch */}
-      <div className="px-3 py-1.5 grid grid-cols-3 gap-1.5">
+      {/* Interaction Buttons - Simple & Clean */}
+      <div className="px-3 py-1.5 grid grid-cols-4 gap-1">
         <button
           type="button"
           onClick={() => onToggleLike(post.id)}
-          className={`flex items-center justify-center gap-2 h-11 rounded-xl transition-all text-xs font-semibold focus:outline-none cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 h-10 rounded-xl transition-colors text-xs font-semibold focus:outline-none cursor-pointer ${
             hasLiked
-              ? "text-[#c46b4b] bg-[#faf0eb] shadow-[inset_0_1px_2px_rgba(196,107,75,0.15)] font-bold"
+              ? "text-[#c46b4b] bg-[#faf0eb]"
               : "text-[#62736b] hover:bg-black/5 hover:text-[#173a35]"
           }`}
         >
           <Heart className={`w-4 h-4 ${hasLiked ? "fill-current" : ""}`} />
-          <span>{hasLiked ? "Liked" : "Like"}</span>
+          <span className="hidden sm:inline">{hasLiked ? "Liked" : "Like"}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center justify-center gap-2 h-11 rounded-xl text-[#62736b] hover:bg-black/5 hover:text-[#173a35] transition-all text-xs font-semibold focus:outline-none cursor-pointer"
+          className="flex items-center justify-center gap-1.5 h-10 rounded-xl text-[#62736b] hover:bg-black/5 hover:text-[#173a35] transition-colors text-xs font-semibold focus:outline-none cursor-pointer"
         >
           <MessageSquare className="w-4 h-4" />
-          <span>Comment</span>
+          <span className="hidden sm:inline">Comment</span>
         </button>
 
         <button
           type="button"
           onClick={() => setShowShareModal(true)}
-          className="flex items-center justify-center gap-2 h-11 rounded-xl text-[#62736b] hover:bg-black/5 hover:text-[#173a35] transition-all text-xs font-semibold focus:outline-none cursor-pointer"
+          className="flex items-center justify-center gap-1.5 h-10 rounded-xl text-[#62736b] hover:bg-black/5 hover:text-[#173a35] transition-colors text-xs font-semibold focus:outline-none cursor-pointer"
         >
           <Share2 className="w-4 h-4" />
-          <span>Share</span>
+          <span className="hidden sm:inline">Share</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onToggleSavePost?.(post.id)}
+          className={`flex items-center justify-center gap-1.5 h-10 rounded-xl transition-colors text-xs font-semibold focus:outline-none cursor-pointer ${
+            post.isSaved
+              ? "text-[#c46b4b] bg-[#faf0eb]"
+              : "text-[#62736b] hover:bg-black/5 hover:text-[#173a35]"
+          }`}
+          title={post.isSaved ? "Saved to Bookmarks" : "Save post"}
+        >
+          <Bookmark
+            className={`w-4 h-4 ${post.isSaved ? "fill-current text-[#c46b4b]" : ""}`}
+          />
+          <span className="hidden sm:inline">{post.isSaved ? "Saved" : "Save"}</span>
         </button>
       </div>
 

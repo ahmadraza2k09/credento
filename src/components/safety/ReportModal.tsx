@@ -61,7 +61,7 @@ export function ReportModal({
             <button
               type="button"
               onClick={handleSubmit}
-              className="px-5 py-2.5 bg-gradient-to-b from-[#b84a3d] to-[#913227] text-white rounded-xl text-xs font-semibold shadow-[0_2px_4px_rgba(163,62,50,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:from-[#a33e32] hover:to-[#802a20] active:translate-y-px transition-all"
+              className="px-5 py-2.5 bg-[#a33e32] text-white rounded-xl text-xs font-semibold hover:bg-[#882d23] transition-colors"
             >
               Submit Report
             </button>

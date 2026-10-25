@@ -1,5 +1,6 @@
 import {
   AppNotification,
+  ApplicationStatus,
   Comment,
   Conversation,
   Opportunity,
@@ -8,9 +9,11 @@ import {
   Post,
   ReportItem,
   StudentProfile,
+  StudyGroup,
 } from "../types"
 import {
   INITIAL_CONVERSATIONS,
+  INITIAL_GROUPS,
   INITIAL_NOTIFICATIONS,
   INITIAL_OPPORTUNITIES,
   INITIAL_POSTS,
@@ -23,6 +26,9 @@ const STORAGE_KEYS = {
   POSTS: "credento_posts",
   OPPORTUNITIES: "credento_opportunities",
   SAVED_OPPORTUNITIES: "credento_saved_opportunities",
+  SAVED_POSTS: "credento_saved_posts",
+  APPLICATIONS: "credento_applications",
+  GROUPS: "credento_groups",
   CONVERSATIONS: "credento_conversations",
   NOTIFICATIONS: "credento_notifications",
   BLOCKED_USERS: "credento_blocked_users",
@@ -114,6 +120,24 @@ export function initializeStorage() {
   }
   if (!localStorage.getItem(STORAGE_KEYS.REPORTS)) {
     localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify([]))
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.GROUPS)) {
+    localStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(INITIAL_GROUPS))
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.SAVED_POSTS)) {
+    localStorage.setItem(STORAGE_KEYS.SAVED_POSTS, JSON.stringify(["post-1"]))
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.APPLICATIONS)) {
+    localStorage.setItem(
+      STORAGE_KEYS.APPLICATIONS,
+      JSON.stringify({
+        "opp-4": {
+          status: "interviewing",
+          appliedDate: "2026-02-14",
+          notes: "Round 2 technical coding interview scheduled for next week",
+        },
+      }),
+    )
   }
 }
 
@@ -213,6 +237,23 @@ export function calculateProfileCompleteness(
   else missing.push("At least 1 project, publication, or award")
 
   return { percentage: Math.min(score, 100), missingFields: missing }
+}
+
+export function endorseSkill(targetUserId: string, skillName: string): void {
+  const current = getCurrentUser()
+  const users = getAllUsers()
+  const updatedUsers = users.map((u) => {
+    if (u.id !== targetUserId) return u
+    const endorsements = u.skillEndorsements ? { ...u.skillEndorsements } : {}
+    const existingVotes = endorsements[skillName] || []
+    if (existingVotes.includes(current.id)) {
+      endorsements[skillName] = existingVotes.filter((id) => id !== current.id)
+    } else {
+      endorsements[skillName] = [...existingVotes, current.id]
+    }
+    return { ...u, skillEndorsements: endorsements }
+  })
+  setItem(STORAGE_KEYS.USERS, updatedUsers)
 }
 
 // --- NETWORKING & CONNECTIONS API ---
@@ -354,9 +395,45 @@ export function toggleFollowUser(targetUserId: string): void {
 
 // --- POSTS & FEED API ---
 
+export function getSavedPostIds(): string[] {
+  return getItem<string[]>(STORAGE_KEYS.SAVED_POSTS, ["post-1"])
+}
+
+export function toggleSavePost(postId: string): boolean {
+  const saved = getSavedPostIds()
+  const exists = saved.includes(postId)
+  const updated = exists
+    ? saved.filter((id) => id !== postId)
+    : [...saved, postId]
+  setItem(STORAGE_KEYS.SAVED_POSTS, updated)
+  return !exists
+}
+
+export function votePostPoll(postId: string, optionId: string): void {
+  const current = getCurrentUser()
+  const posts = getItem<Post[]>(STORAGE_KEYS.POSTS, INITIAL_POSTS)
+  const updated = posts.map((post) => {
+    if (post.id !== postId || !post.poll) return post
+    const updatedOptions = post.poll.options.map((opt) => {
+      const cleanVotes = opt.votes.filter((id) => id !== current.id)
+      if (opt.id === optionId) {
+        return { ...opt, votes: [...cleanVotes, current.id] }
+      }
+      return { ...opt, votes: cleanVotes }
+    })
+    return { ...post, poll: { ...post.poll, options: updatedOptions } }
+  })
+  setItem(STORAGE_KEYS.POSTS, updated)
+}
+
 export function getPosts(): Post[] {
   initializeStorage()
-  return getItem<Post[]>(STORAGE_KEYS.POSTS, INITIAL_POSTS)
+  const posts = getItem<Post[]>(STORAGE_KEYS.POSTS, INITIAL_POSTS)
+  const savedIds = getSavedPostIds()
+  return posts.map((p) => ({
+    ...p,
+    isSaved: savedIds.includes(p.id),
+  }))
 }
 
 export function createPost(params: {
@@ -523,7 +600,38 @@ export function addCommentReply(
   setItem(STORAGE_KEYS.POSTS, updatedPosts)
 }
 
-// --- OPPORTUNITIES API ---
+// --- OPPORTUNITIES & APPLICATION TRACKING API ---
+
+export function getAllApplications(): {
+  [oppId: string]: {
+    status: ApplicationStatus
+    notes?: string
+    appliedDate?: string
+  }
+} {
+  return getItem(STORAGE_KEYS.APPLICATIONS, {})
+}
+
+export function updateApplicationStatus(
+  oppId: string,
+  status: ApplicationStatus,
+  notes?: string,
+): void {
+  const apps = getAllApplications()
+  apps[oppId] = {
+    status,
+    notes: notes !== undefined ? notes : apps[oppId]?.notes ?? "",
+    appliedDate:
+      apps[oppId]?.appliedDate ?? new Date().toISOString().split("T")[0],
+  }
+  setItem(STORAGE_KEYS.APPLICATIONS, apps)
+}
+
+export function removeApplication(oppId: string): void {
+  const apps = getAllApplications()
+  delete apps[oppId]
+  setItem(STORAGE_KEYS.APPLICATIONS, apps)
+}
 
 export function getOpportunities(): Opportunity[] {
   initializeStorage()
@@ -532,9 +640,13 @@ export function getOpportunities(): Opportunity[] {
     INITIAL_OPPORTUNITIES,
   )
   const savedIds = getSavedOpportunityIds()
+  const applications = getAllApplications()
   return opps.map((o) => ({
     ...o,
     isSaved: savedIds.includes(o.id),
+    applicationStatus: applications[o.id]?.status,
+    applicationNotes: applications[o.id]?.notes,
+    appliedDate: applications[o.id]?.appliedDate,
   }))
 }
 
@@ -732,4 +844,44 @@ export function registerStudent(
   setItem(STORAGE_KEYS.USERS, updatedUsers)
   setCurrentUserId(newId)
   return newStudent
+}
+
+// --- STUDY GROUPS & COMMUNITIES API ---
+
+export function getGroups(): StudyGroup[] {
+  initializeStorage()
+  return getItem<StudyGroup[]>(STORAGE_KEYS.GROUPS, INITIAL_GROUPS)
+}
+
+export function toggleJoinGroup(groupId: string): void {
+  const groups = getGroups()
+  const updated = groups.map((g) => {
+    if (g.id === groupId) {
+      const isNowJoined = !g.isJoined
+      return {
+        ...g,
+        isJoined: isNowJoined,
+        memberCount: isNowJoined
+          ? g.memberCount + 1
+          : Math.max(1, g.memberCount - 1),
+      }
+    }
+    return g
+  })
+  setItem(STORAGE_KEYS.GROUPS, updated)
+}
+
+export function createGroup(
+  group: Omit<StudyGroup, "id" | "memberCount" | "isJoined">,
+): StudyGroup {
+  const groups = getGroups()
+  const newGroup: StudyGroup = {
+    ...group,
+    id: `grp-${Date.now()}`,
+    memberCount: 1,
+    isJoined: true,
+  }
+  const updated = [newGroup, ...groups]
+  setItem(STORAGE_KEYS.GROUPS, updated)
+  return newGroup
 }

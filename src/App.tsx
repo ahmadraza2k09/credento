@@ -4,6 +4,7 @@ import { AuthScreen } from "./components/auth/AuthScreen"
 import { FeedView } from "./components/feed/FeedView"
 import { NetworkView } from "./components/network/NetworkView"
 import { OpportunitiesView } from "./components/opportunities/OpportunitiesView"
+import { GroupsView } from "./components/groups/GroupsView"
 import { MessagesView } from "./components/messages/MessagesView"
 import { NotificationsView } from "./components/notifications/NotificationsView"
 import { ProfileView } from "./components/profile/ProfileView"
@@ -17,15 +18,18 @@ import {
   addCommentReply,
   addPortfolioItem,
   blockUser,
+  createGroup,
   createOpportunity,
   createPost,
   declineConnectionRequest,
   deletePost,
   editPost,
+  endorseSkill,
   getAllUsers,
   getBlockedUserIds,
   getConversations,
   getCurrentUser,
+  getGroups,
   getNotifications,
   getOpportunities,
   getOrCreateConversation,
@@ -44,10 +48,14 @@ import {
   submitReport,
   subscribeToStore,
   toggleFollowUser,
+  toggleJoinGroup,
   togglePostLike,
   toggleSaveOpportunity,
+  toggleSavePost,
   unblockUser,
+  updateApplicationStatus,
   updateCurrentUserProfile,
+  votePostPoll,
   withdrawConnectionRequest,
 } from "./services/storage"
 
@@ -107,6 +115,12 @@ export default function App() {
         "_" +
         localStorage.getItem("credento_saved_opportunities") +
         "_" +
+        localStorage.getItem("credento_saved_posts") +
+        "_" +
+        localStorage.getItem("credento_applications") +
+        "_" +
+        localStorage.getItem("credento_groups")?.length +
+        "_" +
         localStorage.getItem("credento_conversations")?.length +
         "_" +
         localStorage.getItem("credento_notifications")?.length +
@@ -122,6 +136,7 @@ export default function App() {
   const allUsers = getAllUsers()
   const posts = getPosts()
   const opportunities = getOpportunities()
+  const groups = getGroups()
   const conversations = getConversations()
   const notifications = getNotifications()
   const blockedUserIds = getBlockedUserIds()
@@ -262,6 +277,8 @@ export default function App() {
               setReportState({ isOpen: true, targetType: type, targetId })
             }
             onBlockUser={blockUser}
+            onVotePoll={votePostPoll}
+            onToggleSavePost={toggleSavePost}
           />
         )}
 
@@ -285,6 +302,16 @@ export default function App() {
             currentUser={currentUser}
             onToggleSave={toggleSaveOpportunity}
             onAddOpportunity={createOpportunity}
+            onUpdateApplicationStatus={updateApplicationStatus}
+          />
+        )}
+
+        {currentTab === "groups" && (
+          <GroupsView
+            groups={groups}
+            currentUser={currentUser}
+            onToggleJoinGroup={toggleJoinGroup}
+            onCreateGroup={createGroup}
           />
         )}
 
@@ -329,6 +356,7 @@ export default function App() {
               setReportState({ isOpen: true, targetType: type, targetId })
             }
             onBlockUser={blockUser}
+            onEndorseSkill={endorseSkill}
           />
         )}
 
@@ -400,6 +428,13 @@ export default function App() {
               className="hover:text-[#173a35]"
             >
               Scholarships & Grants
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentTab("groups")}
+              className="hover:text-[#173a35]"
+            >
+              Campus Communities
             </button>
             <button
               type="button"
