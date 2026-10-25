@@ -41,7 +41,7 @@ export function BrandLogo({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-2.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c46b4b] rounded-[2px] transition-opacity hover:opacity-90 ${className}`}
+      className={`inline-flex items-center gap-2.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c46b4b] rounded-xl transition-all hover:opacity-90 cursor-pointer ${className}`}
       aria-label="Credento Home"
     >
       <LogoMark className={compact ? "w-8 h-8" : "w-9 h-9"} />

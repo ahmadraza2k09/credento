@@ -93,19 +93,19 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
   }
 
   return (
-    <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-4 mb-4">
-      <div className="flex gap-3">
+    <div className="card-linkedin p-4 sm:p-5">
+      <div className="flex gap-3.5">
         <img
           src={currentUser.avatar}
           alt={currentUser.name}
-          className="w-10 h-10 rounded-[2px] object-cover border border-[#cbd3ce] shrink-0"
+          className="w-11 h-11 rounded-full object-cover shadow-sm ring-1 ring-black/5 shrink-0"
         />
         <div className="flex-1">
           {!isExpanded ? (
             <button
               type="button"
               onClick={() => setIsExpanded(true)}
-              className="w-full text-left py-2.5 px-3.5 bg-[#f7f5ef] hover:bg-[#eef2ef] border border-[#d8ddd8] rounded-[2px] text-xs text-[#62736b] transition-colors"
+              className="w-full text-left py-3 px-4 bg-[#f4f6f5] hover:bg-[#ebf0ee] border border-black/[0.06] rounded-full text-xs text-[#62736b] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.03)] hover:text-[#173a35] transition-all cursor-pointer"
             >
               Share an academic update, lab breakthrough, or conference
               reflection...
@@ -117,19 +117,19 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="What are you researching or learning today? Share with fellow students..."
                 rows={4}
-                className="w-full p-3 text-sm text-[#242b29] placeholder-[#87978f] border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35] focus:ring-1 focus:ring-[#173a35] resize-y min-h-[90px]"
+                className="w-full p-3.5 text-sm text-[#242b29] placeholder-[#87978f] border border-black/10 rounded-2xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.03)] resize-y min-h-[90px] transition-all"
                 autoFocus
               />
 
               {/* Image Input Drawer */}
               {showImageInput && (
-                <div className="p-3 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] space-y-2">
+                <div className="p-3.5 bg-[#f8faf9] border border-black/[0.06] rounded-2xl space-y-2.5 shadow-sm">
                   <div className="flex items-center justify-between text-xs font-semibold text-[#173a35]">
                     <span>Attach Supporting Image URL</span>
                     <button
                       type="button"
                       onClick={() => setShowImageInput(false)}
-                      className="text-[#62736b] hover:text-[#173a35]"
+                      className="text-[#62736b] hover:text-[#173a35] cursor-pointer"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -139,10 +139,10 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                     placeholder="https://images.unsplash.com/... or paste image link"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full text-xs p-2 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+                    className="w-full text-xs p-2.5 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
                   />
                   <div className="pt-1">
-                    <span className="text-[10px] text-[#728078] block mb-1">
+                    <span className="text-[10px] text-[#728078] block mb-1.5">
                       Or pick a sample student photo:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -151,7 +151,7 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                           key={idx}
                           type="button"
                           onClick={() => setImageUrl(s.url)}
-                          className="text-[10px] px-2 py-0.5 bg-white border border-[#cbd3ce] rounded-[2px] hover:border-[#173a35] text-[#173a35]"
+                          className="text-[10px] px-2.5 py-1 bg-white border border-black/10 rounded-full hover:border-[#173a35] hover:text-[#173a35] text-[#62736b] shadow-xs cursor-pointer transition-all"
                         >
                           {s.label}
                         </button>
@@ -159,7 +159,7 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                     </div>
                   </div>
                   {imageUrl && (
-                    <div className="relative mt-2 max-h-36 overflow-hidden rounded-[2px] border border-[#cbd3ce]">
+                    <div className="relative mt-2 max-h-36 overflow-hidden rounded-xl border border-black/10 shadow-sm">
                       <img
                         src={imageUrl}
                         alt="Preview"
@@ -173,13 +173,13 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
 
               {/* Link Input Drawer */}
               {showLinkInput && (
-                <div className="p-3 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px] space-y-2">
+                <div className="p-3.5 bg-[#f8faf9] border border-black/[0.06] rounded-2xl space-y-2.5 shadow-sm">
                   <div className="flex items-center justify-between text-xs font-semibold text-[#173a35]">
                     <span>Attach Paper, Github or Opportunity Link</span>
                     <button
                       type="button"
                       onClick={() => setShowLinkInput(false)}
-                      className="text-[#62736b] hover:text-[#173a35]"
+                      className="text-[#62736b] hover:text-[#173a35] cursor-pointer"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -189,20 +189,20 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                     placeholder="Link Title (e.g., SparseAttention Paper Preprint)"
                     value={linkTitle}
                     onChange={(e) => setLinkTitle(e.target.value)}
-                    className="w-full text-xs p-2 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none"
+                    className="w-full text-xs p-2.5 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
                   />
                   <input
                     type="url"
                     placeholder="https://..."
                     value={linkUrl}
                     onChange={(e) => setLinkUrl(e.target.value)}
-                    className="w-full text-xs p-2 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none"
+                    className="w-full text-xs p-2.5 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
                   />
                 </div>
               )}
 
               {/* Bottom action controls */}
-              <div className="flex items-center justify-between pt-2 border-t border-[#eef2ef]">
+              <div className="flex items-center justify-between pt-2 border-t border-black/[0.04]">
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
@@ -210,10 +210,10 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                       setShowImageInput(!showImageInput)
                       setShowLinkInput(false)
                     }}
-                    className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-[2px] transition-colors ${
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                       showImageInput || imageUrl
-                        ? "bg-[#dce8df] text-[#173a35] font-semibold border border-[#b8c9bd]"
-                        : "text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35]"
+                        ? "bg-[#dce8df] text-[#173a35] font-semibold shadow-xs"
+                        : "text-[#62736b] hover:bg-black/5 hover:text-[#173a35]"
                     }`}
                   >
                     <ImageIcon className="w-4 h-4" />
@@ -226,10 +226,10 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                       setShowLinkInput(!showLinkInput)
                       setShowImageInput(false)
                     }}
-                    className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-[2px] transition-colors ${
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                       showLinkInput || linkUrl
-                        ? "bg-[#dce8df] text-[#173a35] font-semibold border border-[#b8c9bd]"
-                        : "text-[#62736b] hover:bg-[#f7f5ef] hover:text-[#173a35]"
+                        ? "bg-[#dce8df] text-[#173a35] font-semibold shadow-xs"
+                        : "text-[#62736b] hover:bg-black/5 hover:text-[#173a35]"
                     }`}
                   >
                     <LinkIcon className="w-4 h-4" />
@@ -246,14 +246,14 @@ export function PostCreator({ currentUser, onCreatePost }: PostCreatorProps) {
                       setImageUrl("")
                       setLinkUrl("")
                     }}
-                    className="px-3 py-1.5 text-xs text-[#62736b] hover:text-[#242b29] transition-colors"
+                    className="px-3.5 py-1.5 text-xs text-[#62736b] hover:text-[#242b29] rounded-xl hover:bg-black/5 transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!content.trim()}
-                    className="flex items-center gap-1.5 px-4 py-1.5 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] disabled:opacity-40 transition-colors"
+                    className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-1.5 text-xs font-semibold disabled:opacity-40 cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>Post</span>

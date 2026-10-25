@@ -59,15 +59,15 @@ export function NotificationsView({
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-5">
+    <div className="max-w-4xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
       {/* Top Header Card */}
-      <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="card-linkedin p-6 sm:p-7">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-[#173a35] tracking-tight">
+            <h1 className="text-2xl font-bold text-[#173a35] tracking-tight">
               Notification Center
             </h1>
-            <p className="text-xs text-[#62736b] mt-0.5">
+            <p className="text-xs sm:text-sm text-[#62736b] mt-1">
               Updates on student requests, research discussions, and deadlines
             </p>
           </div>
@@ -77,7 +77,7 @@ export function NotificationsView({
               <button
                 type="button"
                 onClick={onMarkAllAsRead}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f7f5ef] border border-[#cbd3ce] text-[#173a35] rounded-[2px] text-xs font-semibold hover:bg-[#e8ece9] transition-colors"
+                className="btn-3d-secondary flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold cursor-pointer"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 <span>Mark All as Read</span>
@@ -87,14 +87,14 @@ export function NotificationsView({
         </div>
 
         {/* Filter Toggle */}
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[#eef2ef]">
+        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-black/[0.05]">
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className={`text-xs px-3 py-1 rounded-[2px] font-semibold transition-colors ${
+            className={`text-xs px-4 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
               filter === "all"
-                ? "bg-[#173a35] text-white"
-                : "bg-[#f7f5ef] text-[#62736b] hover:text-[#173a35]"
+                ? "btn-3d-primary text-white"
+                : "bg-[#f4f6f5] text-[#62736b] hover:bg-white hover:shadow-xs"
             }`}
           >
             All Activity ({notifications.length})
@@ -102,10 +102,10 @@ export function NotificationsView({
           <button
             type="button"
             onClick={() => setFilter("unread")}
-            className={`text-xs px-3 py-1 rounded-[2px] font-semibold transition-colors ${
+            className={`text-xs px-4 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
               filter === "unread"
-                ? "bg-[#173a35] text-white"
-                : "bg-[#f7f5ef] text-[#62736b] hover:text-[#173a35]"
+                ? "btn-3d-primary text-white"
+                : "bg-[#f4f6f5] text-[#62736b] hover:bg-white hover:shadow-xs"
             }`}
           >
             Unread ({unreadCount})
@@ -114,14 +114,14 @@ export function NotificationsView({
       </div>
 
       {/* Notifications List */}
-      <div className="bg-white rounded-[2px] border border-[#cbd3ce] divide-y divide-[#eef2ef] overflow-hidden">
+      <div className="card-linkedin divide-y divide-black/[0.04] overflow-hidden">
         {filteredNotifications.length === 0 ? (
-          <div className="p-10 text-center text-xs text-[#62736b]">
-            <Bell className="w-8 h-8 text-[#87978f] mx-auto mb-2 opacity-50" />
-            <p className="font-bold text-sm text-[#173a35]">
+          <div className="p-12 text-center text-xs text-[#62736b]">
+            <Bell className="w-10 h-10 text-[#87978f] mx-auto mb-2.5 opacity-40" />
+            <p className="font-bold text-base text-[#173a35]">
               No notifications at this moment
             </p>
-            <p className="mt-1">
+            <p className="mt-1 text-xs">
               {filter === "unread"
                 ? "You are all caught up on your unread updates."
                 : "Activity from your connections and deadlines will appear here."}
@@ -131,11 +131,11 @@ export function NotificationsView({
           filteredNotifications.map((notif) => (
             <div
               key={notif.id}
-              className={`p-4 flex items-start gap-3.5 transition-colors ${
-                !notif.isRead ? "bg-[#f0ede6]" : "bg-white hover:bg-[#fbfaf7]"
+              className={`p-4 sm:p-5 flex items-start gap-4 transition-colors ${
+                !notif.isRead ? "bg-[#f4f7f5]" : "bg-white hover:bg-[#fbfcfb]"
               }`}
             >
-              <div className="w-9 h-9 rounded-[2px] bg-white border border-[#cbd3ce] flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-10 h-10 rounded-2xl bg-white border border-black/[0.06] shadow-xs flex items-center justify-center shrink-0 mt-0.5">
                 {getNotificationIcon(notif.type)}
               </div>
 
@@ -155,14 +155,14 @@ export function NotificationsView({
 
                 {/* Inline Action for Connection Requests */}
                 {notif.type === "connection_request" && notif.actorId && (
-                  <div className="flex items-center gap-2 mt-2.5">
+                  <div className="flex items-center gap-2 mt-3">
                     <button
                       type="button"
                       onClick={() => {
                         onAcceptConnection(notif.actorId!)
                         onMarkAsRead(notif.id)
                       }}
-                      className="px-3 py-1 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] flex items-center gap-1"
+                      className="btn-3d-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1 cursor-pointer"
                     >
                       <Check className="w-3 h-3" />
                       <span>Accept</span>
@@ -173,14 +173,14 @@ export function NotificationsView({
                         onDeclineConnection(notif.actorId!)
                         onMarkAsRead(notif.id)
                       }}
-                      className="px-3 py-1 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#a33e32] rounded-[2px] text-xs font-medium"
+                      className="btn-3d-secondary px-3.5 py-1.5 text-[#62736b] hover:text-[#a33e32] text-xs font-medium cursor-pointer"
                     >
                       Decline
                     </button>
                     <button
                       type="button"
                       onClick={() => onSelectStudentProfile(notif.actorId!)}
-                      className="text-xs text-[#c46b4b] hover:underline ml-2"
+                      className="text-xs text-[#c46b4b] hover:underline ml-2 cursor-pointer font-medium"
                     >
                       View Profile
                     </button>
@@ -189,7 +189,7 @@ export function NotificationsView({
 
                 {/* Inline Action for Post Comments & Opportunities */}
                 {notif.targetId && notif.type !== "connection_request" && (
-                  <div className="mt-2">
+                  <div className="mt-2.5">
                     <button
                       type="button"
                       onClick={() => {
@@ -200,7 +200,7 @@ export function NotificationsView({
                           onNavigateToTab("feed")
                         }
                       }}
-                      className="text-xs text-[#173a35] font-semibold hover:underline"
+                      className="text-xs text-[#173a35] font-semibold hover:underline cursor-pointer"
                     >
                       View Update →
                     </button>
@@ -212,7 +212,7 @@ export function NotificationsView({
                 <button
                   type="button"
                   onClick={() => onMarkAsRead(notif.id)}
-                  className="w-2.5 h-2.5 rounded-[2px] bg-[#c46b4b] shrink-0 mt-2"
+                  className="w-2.5 h-2.5 rounded-full bg-[#c46b4b] shrink-0 mt-2 shadow-xs cursor-pointer"
                   title="Mark as read"
                 />
               )}

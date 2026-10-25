@@ -91,7 +91,7 @@ export function PostOpportunityModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs text-[#62736b] hover:text-[#242b29]"
+            className="px-4 py-2 text-xs text-[#62736b] hover:text-[#242b29] rounded-xl hover:bg-black/5 cursor-pointer"
           >
             Cancel
           </button>
@@ -101,7 +101,7 @@ export function PostOpportunityModal({
             disabled={
               !title.trim() || !provider.trim() || !applicationUrl.trim()
             }
-            className="px-5 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] disabled:opacity-40"
+            className="btn-3d-primary px-5 py-2 text-xs font-semibold disabled:opacity-40 cursor-pointer"
           >
             Publish Opportunity
           </button>
@@ -118,7 +118,7 @@ export function PostOpportunityModal({
             placeholder="e.g. Knight-Hennessy Scholars Program 2027"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             required
           />
         </div>
@@ -133,7 +133,7 @@ export function PostOpportunityModal({
               placeholder="e.g. Stanford University or NSF"
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
               required
             />
           </div>
@@ -146,7 +146,7 @@ export function PostOpportunityModal({
               onChange={(e) =>
                 setCategory(e.target.value as OpportunityCategory)
               }
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-xs cursor-pointer"
             >
               {categoryOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -166,7 +166,7 @@ export function PostOpportunityModal({
             placeholder="Overview of the program, mission, and scope..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             required
           />
         </div>
@@ -180,7 +180,7 @@ export function PostOpportunityModal({
             placeholder="Must be enrolled undergraduate&#10;GPA 3.5 or above&#10;Open to all international applicants"
             value={eligibilityString}
             onChange={(e) => setEligibilityString(e.target.value)}
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
         </div>
 
@@ -194,7 +194,7 @@ export function PostOpportunityModal({
               placeholder="e.g. Remote or Boston, MA"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
           <div>
@@ -204,7 +204,7 @@ export function PostOpportunityModal({
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value as any)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-xs cursor-pointer"
             >
               <option value="Remote">Remote</option>
               <option value="Hybrid">Hybrid</option>
@@ -219,7 +219,7 @@ export function PostOpportunityModal({
               type="date"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
               required
             />
           </div>
@@ -235,7 +235,7 @@ export function PostOpportunityModal({
               placeholder="https://..."
               value={applicationUrl}
               onChange={(e) => setApplicationUrl(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
               required
             />
           </div>
@@ -248,7 +248,7 @@ export function PostOpportunityModal({
               placeholder="e.g. $10,000 Grant or Fully Funded"
               value={compensation}
               onChange={(e) => setCompensation(e.target.value)}
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
         </div>

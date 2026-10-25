@@ -1,43 +1,18 @@
-import React, { useState, useId } from "react"
+import React, { useState } from "react"
 import {
   Eye,
   EyeOff,
-  KeyRound,
   UserCheck,
   ShieldCheck,
   ArrowRight,
 } from "lucide-react"
-import { BrandLogo, LogoMark } from "../common/BrandLogo"
+import { BrandLogo } from "../common/BrandLogo"
 import { INITIAL_STUDENTS } from "../../data/mockData"
 import { Modal } from "../common/Modal"
 
 interface AuthScreenProps {
   onLogin: (name: string, userId?: string) => void
   onRegister: (name: string, institution: string, email: string) => void
-}
-
-function CredentialArtwork() {
-  return (
-    <div className="credential-art" aria-hidden="true">
-      <div className="credential-art__orbit credential-art__orbit--one" />
-      <div className="credential-art__orbit credential-art__orbit--two" />
-      <div className="credential-card credential-card--back">
-        <span />
-        <span />
-      </div>
-      <div className="credential-card credential-card--front">
-        <div className="credential-card__seal">
-          <LogoMark className="w-8 h-8" />
-        </div>
-        <div className="credential-card__lines">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="credential-card__notch" />
-      </div>
-    </div>
-  )
 }
 
 export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
@@ -103,59 +78,35 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
 
   return (
     <main className="login-page">
-      {/* Brand panel with rich visual styling */}
+      {/* Brand panel with clean, focused messaging */}
       <section className="brand-panel" aria-labelledby="brand-heading">
         <div className="brand-panel__top">
           <BrandLogo inverse />
         </div>
         <div className="brand-panel__content">
-          <p className="eyebrow">
-            The Student Credential & Networking Platform
-          </p>
-          <h1 id="brand-heading">Stand Out in the Student World.</h1>
-          <p className="brand-panel__support">
-            Build your scholarly identity, share verified lab research, connect
-            with peers, and discover premier opportunities.
-          </p>
-
-          <div className="mt-8 flex items-center gap-3 text-xs text-[#b9c9c0]">
-            <div className="flex -space-x-2">
-              {INITIAL_STUDENTS.slice(0, 4).map((s) => (
-                <img
-                  key={s.id}
-                  src={s.avatar}
-                  alt={s.name}
-                  className="w-7 h-7 rounded-[2px] border-2 border-[#173a35] object-cover"
-                />
-              ))}
-            </div>
-            <span>Connecting 500+ university scholars worldwide</span>
-          </div>
+          <h1 id="brand-heading">
+            Stand out in the student world with your credento profile.
+          </h1>
         </div>
-
-        <CredentialArtwork />
-        <p className="brand-panel__footnote">
-          WordPress editorial clarity meets LinkedIn functional depth.
-        </p>
       </section>
 
       {/* Login / Registration form panel */}
       <section className="login-panel" aria-labelledby="login-heading">
-        <div className="login-panel__mobile-logo">
+        <div className="login-panel__mobile-logo mb-6">
           <BrandLogo />
         </div>
 
-        <div className="login-card">
-          <div className="login-card__heading">
-            <p className="eyebrow eyebrow--copper">
+        <div className="login-card bg-white rounded-3xl p-6 sm:p-9 shadow-[0_2px_4px_rgba(0,0,0,0.03),0_12px_28px_-6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] border border-black/[0.04]">
+          <div className="login-card__heading mb-6">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[#c46b4b] mb-1.5">
               {mode === "login" ? "Student access" : "New scholar enrollment"}
             </p>
-            <h2 id="login-heading">
+            <h2 id="login-heading" className="text-2xl sm:text-3xl font-bold text-[#173a35] tracking-tight">
               {mode === "login"
                 ? "Welcome to Credento"
                 : "Create your Student Identity"}
             </h2>
-            <p>
+            <p className="text-xs sm:text-sm text-[#62736b] mt-1.5">
               {mode === "login"
                 ? "Enter your credentials or choose a sample student below."
                 : "Join peers from top universities on Credento."}
@@ -176,8 +127,8 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                   setName(e.target.value)
                   if (errors.name) setErrors({ ...errors, name: "" })
                 }}
-                className={`w-full h-12 px-3.5 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
-                  errors.name ? "border-[#a33e32]" : "border-[#cbd3ce]"
+                className={`w-full h-12 px-4 text-sm bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
+                  errors.name ? "border-[#a33e32]" : "border-black/10"
                 }`}
               />
               {errors.name && (
@@ -201,10 +152,10 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                       if (errors.institution)
                         setErrors({ ...errors, institution: "" })
                     }}
-                    className={`w-full h-12 px-3.5 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
+                    className={`w-full h-12 px-4 text-sm bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
                       errors.institution
                         ? "border-[#a33e32]"
-                        : "border-[#cbd3ce]"
+                        : "border-black/10"
                     }`}
                   />
                   {errors.institution && (
@@ -226,8 +177,8 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                       setEmail(e.target.value)
                       if (errors.email) setErrors({ ...errors, email: "" })
                     }}
-                    className={`w-full h-12 px-3.5 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
-                      errors.email ? "border-[#a33e32]" : "border-[#cbd3ce]"
+                    className={`w-full h-12 px-4 text-sm bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
+                      errors.email ? "border-[#a33e32]" : "border-black/10"
                     }`}
                   />
                   {errors.email && (
@@ -249,7 +200,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                   <button
                     type="button"
                     onClick={() => setShowForgotModal(true)}
-                    className="text-[11px] text-[#c46b4b] hover:underline"
+                    className="text-[11px] text-[#c46b4b] hover:underline font-medium"
                   >
                     Forgot password?
                   </button>
@@ -264,14 +215,14 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                     setPassword(e.target.value)
                     if (errors.password) setErrors({ ...errors, password: "" })
                   }}
-                  className={`w-full h-12 pl-3.5 pr-11 text-sm bg-white border rounded-[2px] focus:outline-none focus:border-[#173a35] transition-colors ${
-                    errors.password ? "border-[#a33e32]" : "border-[#cbd3ce]"
+                  className={`w-full h-12 pl-4 pr-11 text-sm bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
+                    errors.password ? "border-[#a33e32]" : "border-black/10"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-[#62736b] hover:text-[#173a35]"
+                  className="absolute right-3.5 top-3.5 text-[#62736b] hover:text-[#173a35] transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -292,7 +243,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-12 mt-2 bg-[#173a35] text-white rounded-[2px] text-sm font-semibold hover:bg-[#0e2f2a] transition-all flex items-center justify-center gap-2 disabled:opacity-75"
+              className="btn-3d-primary w-full h-12 mt-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
             >
               {isSubmitting ? (
                 <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -343,12 +294,12 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
           </div>
 
           {/* Instant Student Profile Switcher Pills */}
-          <div className="mt-6 pt-5 border-t border-[#d8ddd8]">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#173a35] mb-2 flex items-center gap-1">
+          <div className="mt-6 pt-5 border-t border-black/[0.06]">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[#173a35] mb-2.5 flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-[#c46b4b]" />
               <span>Or sign in instantly as a demo scholar:</span>
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {INITIAL_STUDENTS.slice(0, 4).map((student) => (
                 <button
                   key={student.id}
@@ -356,15 +307,15 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                   onClick={() =>
                     handleSelectQuickStudent(student.id, student.name)
                   }
-                  className="flex items-center gap-2 p-2 rounded-[2px] bg-white border border-[#cbd3ce] hover:border-[#173a35] text-left transition-colors text-xs group"
+                  className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#f8faf9] hover:bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 border border-black/[0.04] text-left transition-all text-xs group cursor-pointer"
                 >
                   <img
                     src={student.avatar}
                     alt={student.name}
-                    className="w-7 h-7 rounded-[2px] object-cover"
+                    className="w-8 h-8 rounded-full object-cover shadow-sm shrink-0"
                   />
                   <div className="min-w-0">
-                    <span className="font-semibold text-[#173a35] block truncate group-hover:underline">
+                    <span className="font-semibold text-[#173a35] block truncate group-hover:text-[#c46b4b] transition-colors">
                       {student.name.split(" ")[0]}
                     </span>
                     <span className="text-[10px] text-[#728078] block truncate">
@@ -377,7 +328,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
           </div>
         </div>
 
-        <p className="login-panel__footer">
+        <p className="login-panel__footer mt-6 text-center text-xs text-[#8b9891]">
           Credento · The Scholarly Network for University Students
         </p>
       </section>
@@ -395,7 +346,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
               type="button"
               onClick={handleForgotSubmit}
               disabled={!recoveryEmail.trim()}
-              className="px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold disabled:opacity-40"
+              className="btn-3d-primary px-4 py-2 text-xs font-semibold rounded-xl disabled:opacity-40"
             >
               Send Recovery Link
             </button>
@@ -421,7 +372,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
                 placeholder="name@university.edu"
                 value={recoveryEmail}
                 onChange={(e) => setRecoveryEmail(e.target.value)}
-                className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+                className="w-full p-3 bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border border-black/10"
                 required
                 autoFocus
               />
@@ -436,3 +387,4 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
     </main>
   )
 }
+

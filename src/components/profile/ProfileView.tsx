@@ -153,11 +153,11 @@ export function ProfileView({
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-5">
+    <div className="max-w-5xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
       {/* 1. PROFILE HEADER CARD */}
-      <div className="bg-white rounded-[2px] border border-[#cbd3ce] overflow-hidden">
+      <div className="card-linkedin overflow-hidden">
         {/* Banner Cover Image - Solid Archival Evergreen Cover */}
-        <div className="h-44 sm:h-56 bg-[#173a35] relative">
+        <div className="h-44 sm:h-60 bg-gradient-to-r from-[#173a35] to-[#102d29] relative">
           {profile.coverImage && (
             <img
               src={profile.coverImage}
@@ -165,14 +165,14 @@ export function ProfileView({
               className="w-full h-full object-cover opacity-75"
             />
           )}
-          <div className="absolute top-3 right-3 flex items-center gap-2">
+          <div className="absolute top-4 right-4 flex items-center gap-2">
             {profile.isPublic ? (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-[#173a35] text-[11px] font-semibold rounded-[2px] border border-[#cbd3ce]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-xs text-[#173a35] text-[11px] font-semibold rounded-full shadow-sm">
                 <Globe className="w-3 h-3 text-[#173a35]" />
                 <span>Public Profile</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-[#9f5138] text-[11px] font-semibold rounded-[2px] border border-[#cbd3ce]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-xs text-[#9f5138] text-[11px] font-semibold rounded-full shadow-sm">
                 <Lock className="w-3 h-3 text-[#9f5138]" />
                 <span>Connections Only</span>
               </span>
@@ -181,30 +181,30 @@ export function ProfileView({
         </div>
 
         {/* Avatar & Main Credentials Header */}
-        <div className="px-5 sm:px-8 pb-6 pt-0 relative">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-16 sm:-mt-20 mb-4">
+        <div className="px-6 sm:px-9 pb-7 pt-0 relative">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-16 sm:-mt-22 mb-4">
             <div className="relative inline-block">
               <img
                 src={profile.avatar}
                 alt={profile.name}
-                className="w-28 sm:w-36 h-28 sm:h-36 rounded-[2px] object-cover border-2 border-white bg-white"
+                className="w-28 sm:w-36 h-28 sm:h-36 rounded-full object-cover border-4 border-white shadow-xl bg-white"
               />
               <span
-                className="absolute bottom-1 right-1 w-6 h-6 bg-[#173a35] text-white rounded-[2px] flex items-center justify-center border border-white"
+                className="absolute bottom-1.5 right-1.5 w-7 h-7 bg-[#173a35] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm"
                 title="Verified University Student"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-[#dce8df]" />
+                <ShieldCheck className="w-4 h-4 text-[#dce8df]" />
               </span>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               {isSelf ? (
                 <>
                   <button
                     type="button"
                     onClick={() => setIsEditModalOpen(true)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] transition-colors"
+                    className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold cursor-pointer"
                   >
                     <Edit3 className="w-4 h-4" />
                     <span>Edit Profile</span>
@@ -212,7 +212,7 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => setIsAddPortfolioOpen(true)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#cbd3ce] text-[#173a35] hover:bg-[#f7f5ef] rounded-[2px] text-xs font-semibold transition-colors"
+                    className="btn-3d-secondary flex items-center gap-1.5 px-4 py-2 text-xs font-semibold cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add Project</span>
@@ -220,13 +220,13 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={handleCopyLink}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#cbd3ce] text-[#62736b] hover:text-[#173a35] rounded-[2px] text-xs transition-colors"
+                    className="btn-3d-secondary flex items-center gap-1.5 px-3 py-2 text-xs cursor-pointer"
                     title="Share profile"
                   >
                     {copiedLink ? (
                       <Check className="w-4 h-4 text-[#173a35]" />
                     ) : (
-                      <Share2 className="w-4 h-4" />
+                      <Share2 className="w-4 h-4 text-[#62736b]" />
                     )}
                   </button>
                 </>
@@ -236,13 +236,13 @@ export function ProfileView({
                     <button
                       type="button"
                       onClick={() => onStartMessage(profile.id)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] transition-colors"
+                      className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold cursor-pointer"
                     >
                       <MessageSquare className="w-4 h-4" />
                       <span>Message</span>
                     </button>
                   ) : isPendingSent ? (
-                    <span className="flex items-center gap-1.5 px-3.5 py-2 bg-[#eef2ef] text-[#62736b] rounded-[2px] text-xs font-semibold border border-[#d8ddd8]">
+                    <span className="flex items-center gap-1.5 px-4 py-2 bg-[#f4f6f5] text-[#62736b] rounded-xl text-xs font-semibold shadow-xs">
                       <Clock className="w-4 h-4" />
                       <span>Request Sent</span>
                     </span>
@@ -250,7 +250,7 @@ export function ProfileView({
                     <button
                       type="button"
                       onClick={() => onConnect(profile.id)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] transition-colors"
+                      className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold cursor-pointer"
                     >
                       <UserCheck className="w-4 h-4" />
                       <span>Accept Request</span>
@@ -259,7 +259,7 @@ export function ProfileView({
                     <button
                       type="button"
                       onClick={() => onConnect(profile.id)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] transition-colors"
+                      className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold cursor-pointer"
                     >
                       <UserPlus className="w-4 h-4" />
                       <span>Connect</span>
@@ -270,10 +270,8 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => onFollow(profile.id)}
-                    className={`flex items-center gap-1.5 px-3.5 py-2 border rounded-[2px] text-xs font-semibold transition-colors ${
-                      profile.isFollowing
-                        ? "bg-[#dce8df] text-[#173a35] border-[#173a35]"
-                        : "bg-white text-[#242b29] border-[#cbd3ce] hover:bg-[#f7f5ef]"
+                    className={`btn-3d-secondary flex items-center gap-1.5 px-4 py-2 text-xs font-semibold cursor-pointer ${
+                      profile.isFollowing ? "text-[#173a35] font-bold" : ""
                     }`}
                   >
                     <span>{profile.isFollowing ? "Following" : "Follow"}</span>
@@ -284,10 +282,10 @@ export function ProfileView({
                     <button
                       type="button"
                       onClick={() => onStartMessage(profile.id)}
-                      className="p-2 border border-[#cbd3ce] rounded-[2px] text-[#62736b] hover:text-[#173a35] hover:bg-[#f7f5ef]"
+                      className="btn-3d-secondary p-2.5 text-xs cursor-pointer"
                       title="Send message"
                     >
-                      <MessageSquare className="w-4 h-4" />
+                      <MessageSquare className="w-4 h-4 text-[#62736b]" />
                     </button>
                   )}
 
@@ -295,7 +293,7 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => onReport("user", profile.id)}
-                    className="p-2 border border-[#cbd3ce] rounded-[2px] text-[#62736b] hover:text-[#a33e32] hover:bg-[#fdf2f2]"
+                    className="btn-3d-secondary p-2.5 text-xs cursor-pointer hover:text-[#a33e32]"
                     title="Report profile"
                   >
                     <Flag className="w-4 h-4" />
@@ -307,11 +305,11 @@ export function ProfileView({
 
           {/* Name & Headline */}
           <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold text-[#173a35] tracking-tight">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#173a35] tracking-tight">
                 {profile.name}
               </h1>
-              <span className="text-xs bg-[#eef2ef] text-[#4d5b54] px-2 py-0.5 rounded-[2px] font-mono border border-[#d8ddd8]">
+              <span className="text-xs bg-[#f4f6f5] text-[#4d5b54] px-2.5 py-0.5 rounded-full font-mono font-medium shadow-2xs">
                 Class of {profile.graduationYear}
               </span>
             </div>
@@ -343,7 +341,7 @@ export function ProfileView({
             </div>
 
             {/* Connections & Followers count */}
-            <div className="flex items-center gap-4 text-xs text-[#62736b] mt-3 pt-3 border-t border-[#eef2ef]">
+            <div className="flex items-center gap-4 text-xs text-[#62736b] mt-3.5 pt-3.5 border-t border-black/[0.04]">
               <div>
                 <strong className="text-[#173a35] font-mono">
                   {profile.connectionsCount}
@@ -361,7 +359,7 @@ export function ProfileView({
 
           {/* Profile Completeness Recommendation Bar (Self only) */}
           {isSelf && completeness.percentage < 100 && (
-            <div className="mt-5 p-4 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px]">
+            <div className="mt-5 p-4 sm:p-5 bg-[#f8faf9] border border-black/[0.04] rounded-2xl shadow-xs">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="font-bold text-xs text-[#173a35]">
                   Profile Completeness Indicator
@@ -370,9 +368,9 @@ export function ProfileView({
                   {completeness.percentage}%
                 </span>
               </div>
-              <div className="w-full bg-[#d8ddd8] rounded-[2px] h-2 overflow-hidden mb-2">
+              <div className="w-full bg-[#d8ddd8] rounded-full h-2 overflow-hidden mb-2.5 shadow-inner">
                 <div
-                  className="bg-[#c46b4b] h-2 rounded-[2px] transition-all duration-300"
+                  className="bg-gradient-to-r from-[#c46b4b] to-[#df805e] h-2 rounded-full transition-all duration-300"
                   style={{ width: `${completeness.percentage}%` }}
                 />
               </div>
@@ -384,7 +382,7 @@ export function ProfileView({
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
-                  className="text-xs text-[#c46b4b] font-bold hover:underline"
+                  className="text-xs text-[#c46b4b] font-bold hover:underline cursor-pointer"
                 >
                   Complete Now →
                 </button>
@@ -396,9 +394,9 @@ export function ProfileView({
 
       {/* RESTRICTED PROFILE NOTICE (If private and not connected) */}
       {isRestricted ? (
-        <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-8 text-center">
-          <Lock className="w-8 h-8 text-[#9f5138] mx-auto mb-2" />
-          <h3 className="font-bold text-sm text-[#173a35]">
+        <div className="card-linkedin p-10 text-center">
+          <Lock className="w-10 h-10 text-[#9f5138] mx-auto mb-2.5" />
+          <h3 className="font-bold text-base text-[#173a35]">
             This Student Profile is Private
           </h3>
           <p className="text-xs text-[#62736b] max-w-md mx-auto mt-1 mb-4 leading-relaxed">
@@ -409,7 +407,7 @@ export function ProfileView({
           <button
             type="button"
             onClick={() => onConnect(profile.id)}
-            className="px-4 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a]"
+            className="btn-3d-primary px-5 py-2.5 text-xs font-semibold cursor-pointer"
           >
             Connect to View Full Profile
           </button>
@@ -417,18 +415,18 @@ export function ProfileView({
       ) : (
         <>
           {/* 2. ABOUT SECTION */}
-          <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5 sm:p-6">
-            <div className="flex items-center justify-between mb-3 border-b border-[#eef2ef] pb-2">
-              <h2 className="font-bold text-sm text-[#173a35] uppercase tracking-wider">
+          <div className="card-linkedin p-6 sm:p-7">
+            <div className="flex items-center justify-between mb-3.5 border-b border-black/[0.04] pb-2.5">
+              <h2 className="font-bold text-xs text-[#173a35] uppercase tracking-wider">
                 About & Research Focus
               </h2>
               {isSelf && (
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
-                  className="text-xs text-[#62736b] hover:text-[#173a35]"
+                  className="text-xs text-[#62736b] hover:text-[#173a35] p-1 rounded-full hover:bg-black/5 cursor-pointer"
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
+                  <Edit3 className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -438,9 +436,9 @@ export function ProfileView({
           </div>
 
           {/* 3. EDUCATION & ACADEMIC CREDENTIALS */}
-          <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5 sm:p-6">
-            <div className="flex items-center justify-between mb-4 border-b border-[#eef2ef] pb-2">
-              <h2 className="font-bold text-sm text-[#173a35] uppercase tracking-wider">
+          <div className="card-linkedin p-6 sm:p-7">
+            <div className="flex items-center justify-between mb-4 border-b border-black/[0.04] pb-2.5">
+              <h2 className="font-bold text-xs text-[#173a35] uppercase tracking-wider">
                 Education & Qualifications
               </h2>
             </div>
@@ -450,13 +448,13 @@ export function ProfileView({
                 profile.education.map((edu) => (
                   <div
                     key={edu.id}
-                    className="flex items-start gap-3.5 pb-4 border-b border-[#eef2ef] last:border-0 last:pb-0"
+                    className="flex items-start gap-4 pb-4 border-b border-black/[0.04] last:border-0 last:pb-0"
                   >
-                    <div className="w-10 h-10 rounded-[2px] bg-[#dce8df] text-[#173a35] flex items-center justify-center shrink-0 border border-[#cbd3ce]">
+                    <div className="w-11 h-11 rounded-2xl bg-[#dce8df] text-[#173a35] flex items-center justify-center shrink-0 shadow-xs">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-sm text-[#173a35]">
+                      <h3 className="font-bold text-sm sm:text-base text-[#173a35]">
                         {edu.institution}
                       </h3>
                       <p className="text-xs font-semibold text-[#242b29] mt-0.5">
@@ -467,7 +465,7 @@ export function ProfileView({
                         {edu.gradeOrGpa ? `• ${edu.gradeOrGpa}` : ""}
                       </p>
                       {edu.activities && (
-                        <p className="text-xs text-[#4d5b54] mt-2 leading-relaxed bg-[#f7f5ef] p-2.5 rounded-[2px] border border-[#e2e8e3]">
+                        <p className="text-xs text-[#4d5b54] mt-2.5 leading-relaxed bg-[#f8faf9] p-3 rounded-2xl border border-black/[0.04]">
                           <strong className="text-[#173a35]">
                             Activities & Societies:
                           </strong>{" "}
@@ -484,10 +482,10 @@ export function ProfileView({
           </div>
 
           {/* 4. STUDENT PORTFOLIO, PROJECTS & ACCOMPLISHMENTS */}
-          <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5 sm:p-6">
-            <div className="flex items-center justify-between mb-4 border-b border-[#eef2ef] pb-2">
+          <div className="card-linkedin p-6 sm:p-7">
+            <div className="flex items-center justify-between mb-4 border-b border-black/[0.04] pb-2.5">
               <div>
-                <h2 className="font-bold text-sm text-[#173a35] uppercase tracking-wider">
+                <h2 className="font-bold text-xs text-[#173a35] uppercase tracking-wider">
                   Portfolio & Accomplishments
                 </h2>
                 <p className="text-[11px] text-[#62736b] mt-0.5">
@@ -499,7 +497,7 @@ export function ProfileView({
                 <button
                   type="button"
                   onClick={() => setIsAddPortfolioOpen(true)}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a]"
+                  className="btn-3d-primary flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Work</span>
@@ -508,16 +506,16 @@ export function ProfileView({
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-4 border-b border-[#eef2ef] scrollbar-none">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2.5 mb-4 border-b border-black/[0.04] scrollbar-none">
               {portfolioTabOptions.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActivePortfolioTab(tab.id)}
-                  className={`text-xs px-3 py-1.5 rounded-[2px] border transition-colors whitespace-nowrap font-medium ${
+                  className={`text-xs px-3.5 py-1.5 rounded-full transition-all whitespace-nowrap font-medium cursor-pointer ${
                     activePortfolioTab === tab.id
-                      ? "bg-[#173a35] text-white border-[#173a35]"
-                      : "bg-[#f7f5ef] text-[#62736b] border-[#cbd3ce] hover:text-[#173a35]"
+                      ? "btn-3d-primary text-white"
+                      : "bg-[#f4f6f5] text-[#62736b] hover:bg-white hover:shadow-xs"
                   }`}
                 >
                   <span>{tab.label}</span>
@@ -532,7 +530,7 @@ export function ProfileView({
 
             {/* Items list */}
             {filteredPortfolio.length === 0 ? (
-              <div className="p-8 text-center bg-[#f7f5ef] rounded-[2px] border border-[#d8ddd8] text-xs text-[#62736b]">
+              <div className="p-8 text-center bg-[#f8faf9] rounded-2xl border border-black/[0.04] text-xs text-[#62736b]">
                 <p className="font-semibold text-[#173a35]">
                   No items listed under this category.
                 </p>
@@ -540,7 +538,7 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => setIsAddPortfolioOpen(true)}
-                    className="mt-2 text-[#c46b4b] font-bold hover:underline"
+                    className="mt-2 text-[#c46b4b] font-bold hover:underline cursor-pointer"
                   >
                     + Add your first{" "}
                     {activePortfolioTab === "all" ? "work" : activePortfolioTab}
@@ -552,11 +550,11 @@ export function ProfileView({
                 {filteredPortfolio.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 bg-[#f0ede6] rounded-[2px] border border-[#cbd3ce] transition-all relative group"
+                    className="p-4 sm:p-5 bg-[#f8faf9] rounded-2xl border border-black/[0.04] shadow-xs hover:shadow-md transition-all relative group"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-[2px] bg-white border border-[#cbd3ce] flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-white border border-black/[0.06] shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
                           {getPortfolioIcon(item.type)}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -564,12 +562,12 @@ export function ProfileView({
                             <h3 className="font-bold text-sm text-[#173a35]">
                               {item.title}
                             </h3>
-                            <span className="text-[10px] uppercase font-mono px-2 py-0.2 rounded-[2px] bg-white border border-[#cbd3ce] text-[#62736b]">
+                            <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-white border border-black/[0.06] text-[#62736b] shadow-2xs">
                               {item.type}
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-3 text-[11px] text-[#62736b] mt-0.5">
+                          <div className="flex items-center gap-3 text-[11px] text-[#62736b] mt-1">
                             {item.organization && (
                               <span className="font-semibold text-[#242b29]">
                                 {item.organization}
@@ -590,25 +588,25 @@ export function ProfileView({
                         <button
                           type="button"
                           onClick={() => onRemovePortfolioItem(item.id)}
-                          className="text-[#62736b] hover:text-[#a33e32] p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-[#62736b] hover:text-[#a33e32] p-1.5 rounded-full hover:bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                           title="Delete item"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       )}
                     </div>
 
-                    <p className="text-xs text-[#242b29] mt-2.5 leading-relaxed">
+                    <p className="text-xs text-[#242b29] mt-3 leading-relaxed">
                       {item.description}
                     </p>
 
                     {/* Skills pills */}
                     {item.skills && item.skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2.5">
+                      <div className="flex flex-wrap gap-1.5 mt-3">
                         {item.skills.map((skill, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] px-2 py-0.5 bg-white border border-[#cbd3ce] rounded-[2px] text-[#4d5b54] font-medium"
+                            className="text-[10px] px-2.5 py-0.5 bg-white rounded-full text-[#4d5b54] font-medium shadow-2xs"
                           >
                             {skill}
                           </span>
@@ -618,15 +616,15 @@ export function ProfileView({
 
                     {/* External Link */}
                     {item.linkUrl && (
-                      <div className="mt-3 pt-2 border-t border-[#cbd3ce]">
+                      <div className="mt-3.5 pt-2.5 border-t border-black/[0.04]">
                         <a
                           href={item.linkUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-[#c46b4b] hover:underline font-semibold"
+                          className="inline-flex items-center gap-1.5 text-xs text-[#c46b4b] hover:underline font-semibold cursor-pointer"
                         >
                           <span>View Official Repository / Publication</span>
-                          <ExternalLink className="w-3 h-3" />
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                       </div>
                     )}
@@ -639,16 +637,16 @@ export function ProfileView({
           {/* 5. SKILLS & INTERESTS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Skills */}
-            <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
-              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3">
+            <div className="card-linkedin p-6">
+              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5">
                 Skills & Endorsements ({profile.skills?.length || 0})
               </h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {profile.skills && profile.skills.length > 0 ? (
                   profile.skills.map((skill, i) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 bg-[#f7f5ef] border border-[#cbd3ce] rounded-[2px] text-xs text-[#242b29] font-medium"
+                      className="px-3 py-1 bg-[#f4f6f5] rounded-full text-xs text-[#242b29] font-medium shadow-2xs"
                     >
                       {skill}
                     </span>
@@ -660,16 +658,16 @@ export function ProfileView({
             </div>
 
             {/* Academic Interests */}
-            <div className="bg-white rounded-[2px] border border-[#cbd3ce] p-5">
-              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3">
+            <div className="card-linkedin p-6">
+              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5">
                 Academic & Research Interests
               </h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {profile.interests && profile.interests.length > 0 ? (
                   profile.interests.map((interest, i) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 bg-[#dce8df] border border-[#b8c9bd] rounded-[2px] text-xs text-[#173a35] font-medium"
+                      className="px-3 py-1 bg-[#dce8df] text-[#173a35] rounded-full text-xs font-medium shadow-2xs"
                     >
                       #{interest}
                     </span>

@@ -79,14 +79,14 @@ export function ProfileEditModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs text-[#62736b] hover:text-[#242b29] font-medium"
+            className="px-4 py-2 text-xs text-[#62736b] hover:text-[#242b29] font-medium rounded-xl hover:bg-black/5 cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSubmit}
-            className="px-5 py-2 bg-[#173a35] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0e2f2a] transition-colors"
+            className="btn-3d-primary px-5 py-2 text-xs font-semibold cursor-pointer"
           >
             Save Changes
           </button>
@@ -104,7 +104,7 @@ export function ProfileEditModal({
             value={headline}
             onChange={(e) => setHeadline(e.target.value)}
             placeholder="e.g. Undergraduate Researcher in AI Systems @ MIT CSAIL"
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             required
           />
         </div>
@@ -120,7 +120,7 @@ export function ProfileEditModal({
               value={institution}
               onChange={(e) => setInstitution(e.target.value)}
               placeholder="e.g. Stanford University"
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
               required
             />
           </div>
@@ -133,7 +133,7 @@ export function ProfileEditModal({
               value={facultyOrDepartment}
               onChange={(e) => setFacultyOrDepartment(e.target.value)}
               placeholder="e.g. Department of Bioengineering"
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
         </div>
@@ -149,7 +149,7 @@ export function ProfileEditModal({
               value={degree}
               onChange={(e) => setDegree(e.target.value)}
               placeholder="e.g. B.S. in Computer Science"
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
           <div>
@@ -161,7 +161,7 @@ export function ProfileEditModal({
               value={graduationYear}
               onChange={(e) => setGraduationYear(e.target.value)}
               placeholder="e.g. 2026"
-              className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+              className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
             />
           </div>
         </div>
@@ -176,7 +176,7 @@ export function ProfileEditModal({
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="e.g. Cambridge, MA"
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
         </div>
 
@@ -190,7 +190,7 @@ export function ProfileEditModal({
             onChange={(e) => setAbout(e.target.value)}
             rows={4}
             placeholder="Describe your academic focus, research questions, and long-term career aspirations..."
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
         </div>
 
@@ -204,7 +204,7 @@ export function ProfileEditModal({
             value={skillsString}
             onChange={(e) => setSkillsString(e.target.value)}
             placeholder="e.g. PyTorch, CUDA, Algorithms, Technical Writing"
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
         </div>
 
@@ -218,22 +218,22 @@ export function ProfileEditModal({
             value={interestsString}
             onChange={(e) => setInterestsString(e.target.value)}
             placeholder="e.g. AI Ethics, Clean Tech, Synthetic Biology"
-            className="w-full p-2.5 bg-white border border-[#cbd3ce] rounded-[2px] focus:outline-none focus:border-[#173a35]"
+            className="w-full p-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner"
           />
         </div>
 
         {/* Visibility Controls */}
-        <div className="p-3 bg-[#f7f5ef] border border-[#d8ddd8] rounded-[2px]">
-          <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#173a35]">
+        <div className="p-3.5 bg-[#f8faf9] border border-black/[0.04] rounded-2xl">
+          <label className="flex items-center gap-2.5 cursor-pointer font-semibold text-[#173a35]">
             <input
               type="checkbox"
               checked={isPublic}
               onChange={(e) => setIsPublic(e.target.checked)}
-              className="rounded-[2px] text-[#173a35] focus:ring-[#173a35]"
+              className="rounded-md text-[#173a35] focus:ring-[#173a35]"
             />
             <span>Public Profile Visibility</span>
           </label>
-          <p className="text-[11px] text-[#62736b] mt-1 ml-5">
+          <p className="text-[11px] text-[#62736b] mt-1.5 ml-6">
             When enabled, your profile can be viewed by all verified student
             peers. When unchecked, only confirmed connections can view your full
             portfolio.

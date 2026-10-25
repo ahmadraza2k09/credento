@@ -24,13 +24,13 @@ export function Badge({
   }[variant]
 
   const sizeStyles = {
-    sm: "text-[11px] px-2 py-0.5 font-medium",
-    md: "text-xs px-2.5 py-1 font-medium",
+    sm: "text-[11px] px-2.5 py-0.5 font-medium",
+    md: "text-xs px-3 py-1 font-medium",
   }[size]
 
   return (
     <span
-      className={`inline-flex items-center gap-1 border rounded-[2px] font-mono ${variantStyles} ${sizeStyles} ${className}`}
+      className={`inline-flex items-center gap-1.5 border rounded-full ${variantStyles} ${sizeStyles} ${className} shadow-2xs`}
     >
       {children}
     </span>
