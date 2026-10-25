@@ -135,12 +135,12 @@ export function NetworkView({
               academic societies
             </p>
           </div>
-          <div className="flex items-center gap-3 text-xs font-mono">
+          <div className="flex items-center gap-3 text-xs">
             <div className="px-4 py-2 bg-[#f8faf9] border border-black/[0.04] rounded-2xl text-center shadow-xs">
               <span className="block font-bold text-[#173a35] text-base">
                 {connectedStudents.length}
               </span>
-              <span className="text-[10px] text-[#62736b] uppercase tracking-wider font-semibold">
+              <span className="text-[11px] text-[#62736b] font-medium">
                 Connections
               </span>
             </div>
@@ -148,7 +148,7 @@ export function NetworkView({
               <span className="block font-bold text-[#c46b4b] text-base">
                 {followingStudents.length}
               </span>
-              <span className="text-[10px] text-[#62736b] uppercase tracking-wider font-semibold">
+              <span className="text-[11px] text-[#62736b] font-medium">
                 Following
               </span>
             </div>
@@ -156,7 +156,7 @@ export function NetworkView({
               <span className="block font-bold text-[#173a35] text-base">
                 {pendingReceived.length}
               </span>
-              <span className="text-[10px] text-[#62736b] uppercase tracking-wider font-semibold">
+              <span className="text-[11px] text-[#62736b] font-medium">
                 Requests
               </span>
             </div>

@@ -1,11 +1,5 @@
 import React, { useState } from "react"
-import {
-  Eye,
-  EyeOff,
-  UserCheck,
-  ShieldCheck,
-  ArrowRight,
-} from "lucide-react"
+import { Eye, EyeOff, UserCheck, ShieldCheck, ArrowRight } from "lucide-react"
 import { BrandLogo } from "../common/BrandLogo"
 import { INITIAL_STUDENTS } from "../../data/mockData"
 import { Modal } from "../common/Modal"
@@ -98,10 +92,13 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
 
         <div className="login-card bg-white rounded-3xl p-6 sm:p-9 shadow-[0_2px_4px_rgba(0,0,0,0.03),0_12px_28px_-6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] border border-black/[0.04]">
           <div className="login-card__heading mb-6">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#c46b4b] mb-1.5">
-              {mode === "login" ? "Student access" : "New scholar enrollment"}
+            <p className="text-xs font-semibold text-[#c46b4b] mb-1.5">
+              {mode === "login" ? "Student Access" : "New Scholar Enrollment"}
             </p>
-            <h2 id="login-heading" className="text-2xl sm:text-3xl font-bold text-[#173a35] tracking-tight">
+            <h2
+              id="login-heading"
+              className="text-2xl sm:text-3xl font-bold text-[#173a35] tracking-tight"
+            >
               {mode === "login"
                 ? "Welcome to Credento"
                 : "Create your Student Identity"}
@@ -295,7 +292,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
 
           {/* Instant Student Profile Switcher Pills */}
           <div className="mt-6 pt-5 border-t border-black/[0.06]">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#173a35] mb-2.5 flex items-center gap-1.5">
+            <p className="text-xs font-semibold text-[#173a35] mb-2.5 flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-[#c46b4b]" />
               <span>Or sign in instantly as a demo scholar:</span>
             </p>
@@ -387,4 +384,3 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
     </main>
   )
 }
-

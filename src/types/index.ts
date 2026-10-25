@@ -92,6 +92,8 @@ export interface Comment {
   replies: CommentReply[]
 }
 
+export type ReactionType = "like" | "celebrate" | "support" | "insightful" | "curious"
+
 export interface Post {
   id: string
   authorId: string
@@ -109,6 +111,7 @@ export interface Post {
   }
   createdAt: string
   likes: string[] // list of userIds
+  reactions?: { [userId: string]: ReactionType }
   sharesCount: number
   comments: Comment[]
   topic?: PostTopic

@@ -10,7 +10,7 @@ import {
   CheckCircle,
   ExternalLink,
 } from "lucide-react"
-import { Opportunity, Post, StudentProfile } from "../../types"
+import { Opportunity, Post, ReactionType, StudentProfile } from "../../types"
 import { PostCreator } from "./PostCreator"
 import { PostCard } from "./PostCard"
 import { calculateProfileCompleteness } from "../../services/storage"
@@ -21,6 +21,7 @@ interface FeedViewProps {
   students: StudentProfile[]
   opportunities: Opportunity[]
   onToggleLike: (postId: string) => void
+  onSetReaction?: (postId: string, reaction: ReactionType) => void
   onAddComment: (postId: string, content: string) => void
   onAddReply: (postId: string, commentId: string, content: string) => void
   onCreatePost: (params: {
@@ -39,6 +40,12 @@ interface FeedViewProps {
   onBlockUser: (userId: string) => void
   onVotePoll?: (postId: string, optionId: string) => void
   onToggleSavePost?: (postId: string) => void
+  onEditComment?: (
+    postId: string,
+    commentId: string,
+    newContent: string,
+  ) => void
+  onDeleteComment?: (postId: string, commentId: string) => void
 }
 
 export function FeedView({
@@ -47,6 +54,7 @@ export function FeedView({
   students,
   opportunities,
   onToggleLike,
+  onSetReaction,
   onAddComment,
   onAddReply,
   onCreatePost,
@@ -61,6 +69,8 @@ export function FeedView({
   onBlockUser,
   onVotePoll,
   onToggleSavePost,
+  onEditComment,
+  onDeleteComment,
 }: FeedViewProps) {
   const [feedSort, setFeedSort] = useState<"latest" | "top">("latest")
   const [selectedTopic, setSelectedTopic] = useState<string>("all")
@@ -196,7 +206,7 @@ export function FeedView({
 
           {/* Quick Academic Hub Links */}
           <div className="hidden lg:block card-linkedin p-4 text-xs text-[#242b29] space-y-2.5">
-            <p className="font-bold text-[11px] uppercase tracking-wider text-[#173a35]">
+            <p className="font-semibold text-xs text-[#173a35]">
               Student Pathways
             </p>
             <div className="space-y-1.5 text-[#62736b]">
@@ -312,6 +322,7 @@ export function FeedView({
                 post={post}
                 currentUser={currentUser}
                 onToggleLike={onToggleLike}
+                onSetReaction={onSetReaction}
                 onAddComment={onAddComment}
                 onAddReply={onAddReply}
                 onSharePost={onSharePost}
@@ -322,6 +333,8 @@ export function FeedView({
                 onSelectStudentProfile={onSelectStudentProfile}
                 onVotePoll={onVotePoll}
                 onToggleSavePost={onToggleSavePost}
+                onEditComment={onEditComment}
+                onDeleteComment={onDeleteComment}
               />
             ))
           )}
@@ -332,7 +345,7 @@ export function FeedView({
           {/* Recommended Students */}
           <div className="card-linkedin p-5">
             <div className="flex items-center justify-between mb-3.5">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-[#173a35]">
+              <h3 className="font-semibold text-xs text-[#173a35]">
                 Students You May Know
               </h3>
               <button
@@ -389,7 +402,7 @@ export function FeedView({
           {/* Upcoming Opportunities */}
           <div className="card-linkedin p-5">
             <div className="flex items-center justify-between mb-3.5">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-[#173a35]">
+              <h3 className="font-semibold text-xs text-[#173a35]">
                 Upcoming Deadlines
               </h3>
               <button

@@ -553,7 +553,8 @@ export const INITIAL_POSTS: Post[] = [
       "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=1000&q=80",
     topic: "Research",
     poll: {
-      question: "What is your team's biggest bottleneck in university research projects?",
+      question:
+        "What is your team's biggest bottleneck in university research projects?",
       options: [
         {
           id: "opt-1",

@@ -63,7 +63,9 @@ export function OpportunityDetailModal({
               }`}
             >
               <Bookmark
-                className={`w-4 h-4 ${isSaved ? "fill-current text-[#c46b4b]" : ""}`}
+                className={`w-4 h-4 ${
+                  isSaved ? "fill-current text-[#c46b4b]" : ""
+                }`}
               />
               <span>{isSaved ? "Saved to Bookmarks" : "Save for Later"}</span>
             </button>
@@ -139,7 +141,7 @@ export function OpportunityDetailModal({
 
         {/* Full description */}
         <div>
-          <h4 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-2">
+          <h4 className="font-semibold text-xs text-[#173a35] mb-2">
             Description & Program Scope
           </h4>
           <p className="text-sm text-[#242b29] leading-relaxed whitespace-pre-line">
@@ -150,7 +152,7 @@ export function OpportunityDetailModal({
         {/* Eligibility criteria list */}
         {opportunity.eligibility && opportunity.eligibility.length > 0 && (
           <div>
-            <h4 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-2">
+            <h4 className="font-semibold text-xs text-[#173a35] mb-2">
               Eligibility & Candidate Requirements
             </h4>
             <ul className="space-y-1.5 pl-1">
@@ -183,19 +185,18 @@ export function OpportunityDetailModal({
           </div>
 
           <p className="text-[11px] text-[#62736b]">
-            Track your candidate status privately across your semester deadlines:
+            Track your candidate status privately across your semester
+            deadlines:
           </p>
 
           <div className="flex flex-wrap items-center gap-2">
-            {(
-              [
-                "submitted",
-                "under_review",
-                "interviewing",
-                "offered",
-                "withdrawn",
-              ] as ApplicationStatus[]
-            ).map((st) => (
+            {([
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "withdrawn",
+            ] as ApplicationStatus[]).map((st) => (
               <button
                 key={st}
                 type="button"

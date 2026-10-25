@@ -3,10 +3,12 @@ import {
   ApplicationStatus,
   Comment,
   Conversation,
+  EducationItem,
   Opportunity,
   OpportunityCategory,
   PortfolioItem,
   Post,
+  ReactionType,
   ReportItem,
   StudentProfile,
   StudyGroup,
@@ -204,6 +206,75 @@ export function removePortfolioItem(itemId: string): void {
     (item) => item.id !== itemId,
   )
   updateCurrentUserProfile({ portfolioItems: updatedItems })
+}
+
+export function updatePortfolioItem(
+  itemId: string,
+  updates: Partial<PortfolioItem>,
+): void {
+  const current = getCurrentUser()
+  const updatedItems = (current.portfolioItems || []).map((item) =>
+    item.id === itemId ? { ...item, ...updates } : item,
+  )
+  updateCurrentUserProfile({ portfolioItems: updatedItems })
+}
+
+export function addEducation(edu: Omit<EducationItem, "id">): EducationItem {
+  const current = getCurrentUser()
+  const newEdu: EducationItem = {
+    ...edu,
+    id: `edu-${Date.now()}`,
+  }
+  const updatedEdu = [newEdu, ...(current.education || [])]
+  updateCurrentUserProfile({ education: updatedEdu })
+  return newEdu
+}
+
+export function updateEducation(
+  eduId: string,
+  updates: Partial<EducationItem>,
+): void {
+  const current = getCurrentUser()
+  const updatedEdu = (current.education || []).map((e) =>
+    e.id === eduId ? { ...e, ...updates } : e,
+  )
+  updateCurrentUserProfile({ education: updatedEdu })
+}
+
+export function deleteEducation(eduId: string): void {
+  const current = getCurrentUser()
+  const updatedEdu = (current.education || []).filter((e) => e.id !== eduId)
+  updateCurrentUserProfile({ education: updatedEdu })
+}
+
+export function addSkill(skill: string): void {
+  const current = getCurrentUser()
+  const trimmed = skill.trim()
+  if (!trimmed || current.skills?.includes(trimmed)) return
+  updateCurrentUserProfile({ skills: [...(current.skills || []), trimmed] })
+}
+
+export function removeSkill(skill: string): void {
+  const current = getCurrentUser()
+  updateCurrentUserProfile({
+    skills: (current.skills || []).filter((s) => s !== skill),
+  })
+}
+
+export function addInterest(interest: string): void {
+  const current = getCurrentUser()
+  const trimmed = interest.trim()
+  if (!trimmed || current.interests?.includes(trimmed)) return
+  updateCurrentUserProfile({
+    interests: [...(current.interests || []), trimmed],
+  })
+}
+
+export function removeInterest(interest: string): void {
+  const current = getCurrentUser()
+  updateCurrentUserProfile({
+    interests: (current.interests || []).filter((i) => i !== interest),
+  })
 }
 
 export function calculateProfileCompleteness(
@@ -523,17 +594,60 @@ export function deletePost(postId: string): void {
   setItem(STORAGE_KEYS.POSTS, updatedPosts)
 }
 
-export function togglePostLike(postId: string): void {
+export function setPostReaction(postId: string, reaction: ReactionType): void {
   const currentId = getCurrentUserId()
   const posts = getPosts()
 
   const updatedPosts = posts.map((p) => {
     if (p.id === postId) {
-      const hasLiked = p.likes.includes(currentId)
-      const nextLikes = hasLiked
-        ? p.likes.filter((id) => id !== currentId)
-        : [...p.likes, currentId]
-      return { ...p, likes: nextLikes }
+      const reactions = p.reactions ? { ...p.reactions } : {}
+      let nextLikes = [...p.likes]
+
+      if (reactions[currentId] === reaction) {
+        delete reactions[currentId]
+        nextLikes = nextLikes.filter((id) => id !== currentId)
+      } else {
+        reactions[currentId] = reaction
+        if (!nextLikes.includes(currentId)) {
+          nextLikes.push(currentId)
+        }
+      }
+
+      return { ...p, reactions, likes: nextLikes }
+    }
+    return p
+  })
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+}
+
+export function togglePostLike(postId: string): void {
+  setPostReaction(postId, "like")
+}
+
+export function editComment(
+  postId: string,
+  commentId: string,
+  newContent: string,
+): void {
+  const posts = getPosts()
+  const updatedPosts = posts.map((p) => {
+    if (p.id === postId) {
+      const updatedComments = p.comments.map((c) =>
+        c.id === commentId ? { ...c, content: newContent } : c,
+      )
+      return { ...p, comments: updatedComments }
+    }
+    return p
+  })
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+}
+
+export function deleteComment(postId: string, commentId: string): void {
+  const posts = getPosts()
+  const updatedPosts = posts.map((p) => {
+    if (p.id === postId) {
+      const filtered = p.comments.filter((c) => c.id !== commentId)
+      return { ...p, comments: filtered }
     }
     return p
   })
@@ -620,7 +734,7 @@ export function updateApplicationStatus(
   const apps = getAllApplications()
   apps[oppId] = {
     status,
-    notes: notes !== undefined ? notes : apps[oppId]?.notes ?? "",
+    notes: notes !== undefined ? notes : (apps[oppId]?.notes ?? ""),
     appliedDate:
       apps[oppId]?.appliedDate ?? new Date().toISOString().split("T")[0],
   }

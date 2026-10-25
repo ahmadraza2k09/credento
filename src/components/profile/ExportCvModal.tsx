@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { Printer, Copy, Check, ExternalLink, Download, FileText } from "lucide-react"
+import {
+  Printer,
+  Copy,
+  Check,
+  ExternalLink,
+  Download,
+  FileText,
+} from "lucide-react"
 import { StudentProfile } from "../../types"
 import { Modal } from "../common/Modal"
 
@@ -39,7 +46,9 @@ export function ExportCvModal({
       "--- SCHOLARLY PROJECTS & PUBLICATIONS ---",
       ...profile.portfolioItems.map(
         (p) =>
-          `• [${p.type.toUpperCase()}] ${p.title} (${p.date})\n  ${p.organization ? p.organization + "\n  " : ""}${p.description}\n  Link: ${p.linkUrl || "N/A"}`,
+          `• [${p.type.toUpperCase()}] ${p.title} (${p.date})\n  ${
+            p.organization ? p.organization + "\n  " : ""
+          }${p.description}\n  Link: ${p.linkUrl || "N/A"}`,
       ),
       "",
       "--- CORE SKILLS & METHODOLOGIES ---",
@@ -121,7 +130,7 @@ export function ExportCvModal({
 
         {/* Academic Objective / About */}
         <div>
-          <h2 className="text-xs uppercase tracking-widest font-bold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2">
+          <h2 className="text-xs font-semibold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2">
             Scholarly Focus & Background
           </h2>
           <p className="text-xs text-[#35403c] leading-relaxed">
@@ -131,7 +140,7 @@ export function ExportCvModal({
 
         {/* Education Section */}
         <div>
-          <h2 className="text-xs uppercase tracking-widest font-bold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2.5">
+          <h2 className="text-xs font-semibold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2.5">
             Academic Background & Education
           </h2>
           <div className="space-y-3">
@@ -168,7 +177,7 @@ export function ExportCvModal({
         {/* Portfolio, Research & Publications */}
         {profile.portfolioItems.length > 0 && (
           <div>
-            <h2 className="text-xs uppercase tracking-widest font-bold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2.5">
+            <h2 className="text-xs font-semibold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2.5">
               Research, Publications & Significant Projects
             </h2>
             <div className="space-y-3.5">
@@ -205,7 +214,7 @@ export function ExportCvModal({
 
         {/* Skills & Competencies */}
         <div>
-          <h2 className="text-xs uppercase tracking-widest font-bold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2">
+          <h2 className="text-xs font-semibold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2">
             Technical & Scholarly Competencies
           </h2>
           <div className="flex flex-wrap gap-1.5">

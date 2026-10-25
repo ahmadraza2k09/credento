@@ -16,13 +16,19 @@ import {
   acceptConnectionRequest,
   addComment,
   addCommentReply,
+  addEducation,
+  addInterest,
   addPortfolioItem,
+  addSkill,
   blockUser,
   createGroup,
   createOpportunity,
   createPost,
   declineConnectionRequest,
+  deleteComment,
+  deleteEducation,
   deletePost,
+  editComment,
   editPost,
   endorseSkill,
   getAllUsers,
@@ -40,10 +46,13 @@ import {
   markConversationAsRead,
   markNotificationAsRead,
   registerStudent,
+  removeInterest,
   removePortfolioItem,
+  removeSkill,
   sendConnectionRequest,
   sendMessage,
   setCurrentUserId,
+  setPostReaction,
   sharePost,
   submitReport,
   subscribeToStore,
@@ -55,6 +64,8 @@ import {
   unblockUser,
   updateApplicationStatus,
   updateCurrentUserProfile,
+  updateEducation,
+  updatePortfolioItem,
   votePostPoll,
   withdrawConnectionRequest,
 } from "./services/storage"
@@ -258,6 +269,7 @@ export default function App() {
             students={visibleStudents}
             opportunities={opportunities}
             onToggleLike={togglePostLike}
+            onSetReaction={setPostReaction}
             onAddComment={addComment}
             onAddReply={addCommentReply}
             onCreatePost={createPost}
@@ -279,6 +291,8 @@ export default function App() {
             onBlockUser={blockUser}
             onVotePoll={votePostPoll}
             onToggleSavePost={toggleSavePost}
+            onEditComment={editComment}
+            onDeleteComment={deleteComment}
           />
         )}
 
@@ -348,7 +362,15 @@ export default function App() {
             isSelf={isViewingSelf}
             onUpdateProfile={updateCurrentUserProfile}
             onAddPortfolioItem={addPortfolioItem}
+            onUpdatePortfolioItem={updatePortfolioItem}
             onRemovePortfolioItem={removePortfolioItem}
+            onAddEducation={addEducation}
+            onUpdateEducation={updateEducation}
+            onDeleteEducation={deleteEducation}
+            onAddSkill={addSkill}
+            onRemoveSkill={removeSkill}
+            onAddInterest={addInterest}
+            onRemoveInterest={removeInterest}
             onConnect={sendConnectionRequest}
             onFollow={toggleFollowUser}
             onStartMessage={handleStartMessageWithStudent}

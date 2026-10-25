@@ -47,7 +47,7 @@ export function GroupsView({
   const [newGroupTags, setNewGroupTags] = useState("")
   const [newGroupMeeting, setNewGroupMeeting] = useState("")
 
-  const categories: { id: string; label: string }[] = [
+  const categories: { id: string label: string }[] = [
     { id: "all", label: "All Communities" },
     { id: "my-groups", label: "My Communities" },
     { id: "Research Lab", label: "Research Labs" },
@@ -94,7 +94,8 @@ export function GroupsView({
       )}&backgroundColor=173a35`,
       coverImage:
         "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
-      tags: tagsArray.length > 0 ? tagsArray : ["Academics", "Student Research"],
+      tags:
+        tagsArray.length > 0 ? tagsArray : ["Academics", "Student Research"],
       meetingSchedule: newGroupMeeting.trim() || "Weekly (Schedule TBD)",
       leadName: currentUser.name,
       recentDiscussion: "Welcoming founding members to the circle!",
@@ -122,7 +123,8 @@ export function GroupsView({
             </h1>
             <p className="text-xs sm:text-sm text-[#62736b] mt-1.5 max-w-2xl leading-relaxed">
               Connect with peer-led study groups, campus competition teams, and
-              inter-university research labs to collaborate beyond the classroom.
+              inter-university research labs to collaborate beyond the
+              classroom.
             </p>
           </div>
 
@@ -341,10 +343,14 @@ export function GroupsView({
                     )
                   }}
                   className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
-                    selectedGroup.isJoined ? "btn-3d-secondary" : "btn-3d-primary"
+                    selectedGroup.isJoined
+                      ? "btn-3d-secondary"
+                      : "btn-3d-primary"
                   }`}
                 >
-                  {selectedGroup.isJoined ? "Leave Community" : "Join Community"}
+                  {selectedGroup.isJoined
+                    ? "Leave Community"
+                    : "Join Community"}
                 </button>
               </div>
             </div>
@@ -353,7 +359,7 @@ export function GroupsView({
           <div className="space-y-4 text-xs text-[#242b29]">
             {/* Overview */}
             <div>
-              <h4 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-1.5">
+              <h4 className="font-semibold text-xs text-[#173a35] mb-1.5">
                 About this Academic Circle
               </h4>
               <p className="leading-relaxed text-[#4d5b54] bg-[#f8faf9] p-3.5 rounded-xl border border-black/[0.04]">
@@ -384,7 +390,7 @@ export function GroupsView({
             {/* Recent Discussion */}
             {selectedGroup.recentDiscussion && (
               <div>
-                <h4 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-1.5 flex items-center gap-1.5">
+                <h4 className="font-semibold text-xs text-[#173a35] mb-1.5 flex items-center gap-1.5">
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Current Research Discussion</span>
                 </h4>

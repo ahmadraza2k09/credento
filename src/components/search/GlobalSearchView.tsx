@@ -154,7 +154,7 @@ export function GlobalSearchView({
           {(category === "all" || category === "students") &&
             matchingStudents.length > 0 && (
               <div className="card-linkedin p-6">
-                <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5 flex items-center justify-between">
+                <h2 className="font-semibold text-xs text-[#173a35] mb-3.5 flex items-center justify-between">
                   <span>Students ({matchingStudents.length})</span>
                   {category === "all" && (
                     <button
@@ -202,7 +202,7 @@ export function GlobalSearchView({
           {(category === "all" || category === "opportunities") &&
             matchingOpportunities.length > 0 && (
               <div className="card-linkedin p-6">
-                <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5 flex items-center justify-between">
+                <h2 className="font-semibold text-xs text-[#173a35] mb-3.5 flex items-center justify-between">
                   <span>Opportunities ({matchingOpportunities.length})</span>
                   {category === "all" && (
                     <button
@@ -262,7 +262,7 @@ export function GlobalSearchView({
           {(category === "all" || category === "posts") &&
             matchingPosts.length > 0 && (
               <div className="card-linkedin p-6">
-                <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5 flex items-center justify-between">
+                <h2 className="font-semibold text-xs text-[#173a35] mb-3.5 flex items-center justify-between">
                   <span>Posts & Discussions ({matchingPosts.length})</span>
                   {category === "all" && (
                     <button

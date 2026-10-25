@@ -49,7 +49,7 @@ export function BlockedUsersModal({
         </div>
 
         <div>
-          <h4 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-2.5">
+          <h4 className="font-semibold text-xs text-[#173a35] mb-2.5">
             Currently Blocked Accounts ({blockedStudents.length})
           </h4>
 

@@ -9,6 +9,12 @@ interface CommentSectionProps {
   onAddComment: (postId: string, content: string) => void
   onAddReply: (postId: string, commentId: string, content: string) => void
   onSelectStudentProfile?: (studentId: string) => void
+  onEditComment?: (
+    postId: string,
+    commentId: string,
+    newContent: string,
+  ) => void
+  onDeleteComment?: (postId: string, commentId: string) => void
 }
 
 export function CommentSection({
@@ -18,10 +24,14 @@ export function CommentSection({
   onAddComment,
   onAddReply,
   onSelectStudentProfile,
+  onEditComment,
+  onDeleteComment,
 }: CommentSectionProps) {
   const [commentText, setCommentText] = useState("")
   const [replyingToId, setReplyingToId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState("")
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
+  const [editCommentText, setEditCommentText] = useState("")
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,7 +51,10 @@ export function CommentSection({
   return (
     <div className="pt-3 border-t border-black/[0.04] space-y-3">
       {/* Add new comment */}
-      <form onSubmit={handleCommentSubmit} className="flex gap-2.5 items-center">
+      <form
+        onSubmit={handleCommentSubmit}
+        className="flex gap-2.5 items-center"
+      >
         <img
           src={currentUser.avatar}
           alt={currentUser.name}
@@ -101,11 +114,48 @@ export function CommentSection({
                       {comment.authorHeadline}
                     </p>
                   )}
-                  <p className="text-[#242b29] whitespace-pre-line leading-relaxed">
-                    {comment.content}
-                  </p>
 
-                  <div className="flex items-center gap-4 mt-2 pt-1.5 border-t border-black/[0.04] text-[11px] text-[#62736b]">
+                  {editingCommentId === comment.id ? (
+                    <div className="space-y-2 mt-1">
+                      <input
+                        type="text"
+                        value={editCommentText}
+                        onChange={(e) => setEditCommentText(e.target.value)}
+                        className="w-full text-xs p-2 bg-white border border-[#cbd3ce] rounded-xl focus:outline-none focus:border-[#173a35]"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingCommentId(null)}
+                          className="px-2.5 py-1 text-[11px] text-[#62736b] hover:text-[#242b29] cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (editCommentText.trim() && onEditComment) {
+                              onEditComment(
+                                postId,
+                                comment.id,
+                                editCommentText.trim(),
+                              )
+                            }
+                            setEditingCommentId(null)
+                          }}
+                          className="btn-3d-primary px-3 py-1 text-[11px] font-semibold cursor-pointer"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[#242b29] whitespace-pre-line leading-relaxed">
+                      {comment.content}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between gap-4 mt-2 pt-1.5 border-t border-black/[0.04] text-[11px] text-[#62736b]">
                     <button
                       type="button"
                       onClick={() =>
@@ -118,6 +168,31 @@ export function CommentSection({
                       <Reply className="w-3 h-3" />
                       <span>Reply</span>
                     </button>
+
+                    {comment.authorId === currentUser.id && (
+                      <div className="flex items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingCommentId(comment.id)
+                            setEditCommentText(comment.content)
+                          }}
+                          className="hover:text-[#173a35] cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onDeleteComment &&
+                            onDeleteComment(postId, comment.id)
+                          }
+                          className="hover:text-[#a33e32] cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

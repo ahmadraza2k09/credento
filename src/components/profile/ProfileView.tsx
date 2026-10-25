@@ -26,10 +26,18 @@ import {
   FileText,
   ThumbsUp,
   Sparkles,
+  X,
 } from "lucide-react"
-import { PortfolioItem, PortfolioType, StudentProfile } from "../../types"
+import {
+  EducationItem,
+  PortfolioItem,
+  PortfolioType,
+  StudentProfile,
+} from "../../types"
 import { ProfileEditModal } from "./ProfileEditModal"
 import { AddPortfolioItemModal } from "./AddPortfolioItemModal"
+import { EditPortfolioItemModal } from "./EditPortfolioItemModal"
+import { EducationModal } from "./EducationModal"
 import { ExportCvModal } from "./ExportCvModal"
 import { calculateProfileCompleteness } from "../../services/storage"
 
@@ -39,7 +47,18 @@ interface ProfileViewProps {
   isSelf: boolean
   onUpdateProfile: (updates: Partial<StudentProfile>) => void
   onAddPortfolioItem: (item: Omit<PortfolioItem, "id">) => void
+  onUpdatePortfolioItem?: (
+    itemId: string,
+    updates: Partial<PortfolioItem>,
+  ) => void
   onRemovePortfolioItem: (itemId: string) => void
+  onAddEducation?: (edu: Omit<EducationItem, "id">) => void
+  onUpdateEducation?: (eduId: string, updates: Partial<EducationItem>) => void
+  onDeleteEducation?: (eduId: string) => void
+  onAddSkill?: (skill: string) => void
+  onRemoveSkill?: (skill: string) => void
+  onAddInterest?: (interest: string) => void
+  onRemoveInterest?: (interest: string) => void
   onConnect: (userId: string) => void
   onFollow: (userId: string) => void
   onStartMessage: (userId: string) => void
@@ -54,7 +73,15 @@ export function ProfileView({
   isSelf,
   onUpdateProfile,
   onAddPortfolioItem,
+  onUpdatePortfolioItem,
   onRemovePortfolioItem,
+  onAddEducation,
+  onUpdateEducation,
+  onDeleteEducation,
+  onAddSkill,
+  onRemoveSkill,
+  onAddInterest,
+  onRemoveInterest,
   onConnect,
   onFollow,
   onStartMessage,
@@ -65,6 +92,18 @@ export function ProfileView({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAddPortfolioOpen, setIsAddPortfolioOpen] = useState(false)
   const [isExportCvOpen, setIsExportCvOpen] = useState(false)
+  const [isEduModalOpen, setIsEduModalOpen] = useState(false)
+  const [selectedEduToEdit, setSelectedEduToEdit] =
+    useState<EducationItem | null>(null)
+  const [isEditPortfolioOpen, setIsEditPortfolioOpen] = useState(false)
+  const [selectedPortfolioToEdit, setSelectedPortfolioToEdit] =
+    useState<PortfolioItem | null>(null)
+
+  const [newSkillInput, setNewSkillInput] = useState("")
+  const [showAddSkillInput, setShowAddSkillInput] = useState(false)
+  const [newInterestInput, setNewInterestInput] = useState("")
+  const [showAddInterestInput, setShowAddInterestInput] = useState(false)
+
   const [activePortfolioTab, setActivePortfolioTab] = useState<string>("all")
   const [copiedLink, setCopiedLink] = useState(false)
 
@@ -468,14 +507,15 @@ export function ProfileView({
           {/* 2. ABOUT SECTION */}
           <div className="card-linkedin p-6 sm:p-7">
             <div className="flex items-center justify-between mb-3.5 border-b border-black/[0.04] pb-2.5">
-              <h2 className="font-bold text-xs text-[#173a35] uppercase tracking-wider">
+              <h2 className="font-semibold text-sm text-[#173a35]">
                 About & Research Focus
               </h2>
               {isSelf && (
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
-                  className="text-xs text-[#62736b] hover:text-[#173a35] p-1 rounded-full hover:bg-black/5 cursor-pointer"
+                  className="text-xs text-[#62736b] hover:text-[#173a35] p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+                  title="Edit about statement"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
@@ -489,9 +529,22 @@ export function ProfileView({
           {/* 3. EDUCATION & ACADEMIC CREDENTIALS */}
           <div className="card-linkedin p-6 sm:p-7">
             <div className="flex items-center justify-between mb-4 border-b border-black/[0.04] pb-2.5">
-              <h2 className="font-bold text-xs text-[#173a35] uppercase tracking-wider">
-                Education & Qualifications
+              <h2 className="font-semibold text-sm text-[#173a35]">
+                Education & Academic Qualifications
               </h2>
+              {isSelf && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedEduToEdit(null)
+                    setIsEduModalOpen(true)
+                  }}
+                  className="btn-3d-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Education</span>
+                </button>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -499,31 +552,57 @@ export function ProfileView({
                 profile.education.map((edu) => (
                   <div
                     key={edu.id}
-                    className="flex items-start gap-4 pb-4 border-b border-black/[0.04] last:border-0 last:pb-0"
+                    className="flex items-start justify-between gap-4 pb-4 border-b border-black/[0.04] last:border-0 last:pb-0"
                   >
-                    <div className="w-11 h-11 rounded-2xl bg-[#dce8df] text-[#173a35] flex items-center justify-center shrink-0 shadow-xs">
-                      <GraduationCap className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-sm sm:text-base text-[#173a35]">
-                        {edu.institution}
-                      </h3>
-                      <p className="text-xs font-semibold text-[#242b29] mt-0.5">
-                        {edu.degree} — {edu.fieldOfStudy}
-                      </p>
-                      <p className="text-[11px] text-[#62736b] mt-0.5">
-                        {edu.startYear} – {edu.endYear}{" "}
-                        {edu.gradeOrGpa ? `• ${edu.gradeOrGpa}` : ""}
-                      </p>
-                      {edu.activities && (
-                        <p className="text-xs text-[#4d5b54] mt-2.5 leading-relaxed bg-[#f8faf9] p-3 rounded-2xl border border-black/[0.04]">
-                          <strong className="text-[#173a35]">
-                            Activities & Societies:
-                          </strong>{" "}
-                          {edu.activities}
+                    <div className="flex items-start gap-4 min-w-0 flex-1">
+                      <div className="w-11 h-11 rounded-2xl bg-[#dce8df] text-[#173a35] flex items-center justify-center shrink-0 shadow-xs">
+                        <GraduationCap className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-bold text-sm sm:text-base text-[#173a35]">
+                          {edu.institution}
+                        </h3>
+                        <p className="text-xs font-semibold text-[#242b29] mt-0.5">
+                          {edu.degree} — {edu.fieldOfStudy}
                         </p>
-                      )}
+                        <p className="text-[11px] text-[#62736b] mt-0.5">
+                          {edu.startYear} – {edu.endYear}{" "}
+                          {edu.gradeOrGpa ? `• ${edu.gradeOrGpa}` : ""}
+                        </p>
+                        {edu.activities && (
+                          <p className="text-xs text-[#4d5b54] mt-2.5 leading-relaxed bg-[#f8faf9] p-3 rounded-2xl border border-black/[0.04]">
+                            <strong className="text-[#173a35]">
+                              Activities & Societies:
+                            </strong>{" "}
+                            {edu.activities}
+                          </p>
+                        )}
+                      </div>
                     </div>
+
+                    {isSelf && (
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedEduToEdit(edu)
+                            setIsEduModalOpen(true)
+                          }}
+                          className="p-1.5 text-[#62736b] hover:text-[#173a35] hover:bg-black/5 rounded-lg cursor-pointer"
+                          title="Edit education"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDeleteEducation?.(edu.id)}
+                          className="p-1.5 text-[#62736b] hover:text-[#a33e32] hover:bg-black/5 rounded-lg cursor-pointer"
+                          title="Delete education"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -536,7 +615,7 @@ export function ProfileView({
           <div className="card-linkedin p-6 sm:p-7">
             <div className="flex items-center justify-between mb-4 border-b border-black/[0.04] pb-2.5">
               <div>
-                <h2 className="font-bold text-xs text-[#173a35] uppercase tracking-wider">
+                <h2 className="font-semibold text-sm text-[#173a35]">
                   Portfolio & Accomplishments
                 </h2>
                 <p className="text-[11px] text-[#62736b] mt-0.5">
@@ -613,7 +692,7 @@ export function ProfileView({
                             <h3 className="font-bold text-sm text-[#173a35]">
                               {item.title}
                             </h3>
-                            <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-white border border-black/[0.06] text-[#62736b] shadow-2xs">
+                            <span className="text-[11px] capitalize px-2.5 py-0.5 rounded-full bg-white border border-black/[0.06] text-[#62736b] shadow-2xs">
                               {item.type}
                             </span>
                           </div>
@@ -634,16 +713,29 @@ export function ProfileView({
                         </div>
                       </div>
 
-                      {/* Remove item button for self */}
+                      {/* Remove / Edit item buttons for self */}
                       {isSelf && (
-                        <button
-                          type="button"
-                          onClick={() => onRemovePortfolioItem(item.id)}
-                          className="text-[#62736b] hover:text-[#a33e32] p-1.5 rounded-full hover:bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                          title="Delete item"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedPortfolioToEdit(item)
+                              setIsEditPortfolioOpen(true)
+                            }}
+                            className="text-[#62736b] hover:text-[#173a35] p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+                            title="Edit work"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onRemovePortfolioItem(item.id)}
+                            className="text-[#62736b] hover:text-[#a33e32] p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+                            title="Delete item"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       )}
                     </div>
 
@@ -689,9 +781,11 @@ export function ProfileView({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Skills */}
             <div className="card-linkedin p-6">
-              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5 flex items-center justify-between">
-                <span>Skills & Endorsements ({profile.skills?.length || 0})</span>
-                <span className="text-[10px] text-[#728078] font-normal normal-case">
+              <h2 className="font-semibold text-sm text-[#173a35] mb-3.5 flex items-center justify-between">
+                <span>
+                  Skills & Endorsements ({profile.skills?.length || 0})
+                </span>
+                <span className="text-[10px] text-[#728078] font-normal">
                   Peer verified
                 </span>
               </h2>
@@ -731,33 +825,157 @@ export function ProfileView({
                             {isEndorsedByMe ? "✓ Endorsed" : "+ Endorse"}
                           </button>
                         )}
+                        {isSelf && onRemoveSkill && (
+                          <button
+                            type="button"
+                            onClick={() => onRemoveSkill(skill)}
+                            className="text-[#87978f] hover:text-[#a33e32] ml-1 text-sm font-bold leading-none cursor-pointer"
+                            title="Remove skill"
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
                     )
                   })
                 ) : (
                   <p className="text-xs text-[#62736b]">No skills added.</p>
                 )}
+
+                {isSelf &&
+                  onAddSkill &&
+                  (showAddSkillInput ? (
+                    <div className="flex items-center gap-1 bg-white border border-[#cbd3ce] rounded-full px-2.5 py-1 shadow-2xs">
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Add skill..."
+                        value={newSkillInput}
+                        onChange={(e) => setNewSkillInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newSkillInput.trim()) {
+                            onAddSkill(newSkillInput.trim())
+                            setNewSkillInput("")
+                            setShowAddSkillInput(false)
+                          }
+                        }}
+                        className="text-xs focus:outline-none w-24 bg-transparent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newSkillInput.trim())
+                            onAddSkill(newSkillInput.trim())
+                          setNewSkillInput("")
+                          setShowAddSkillInput(false)
+                        }}
+                        className="text-xs font-bold text-[#173a35] cursor-pointer"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewSkillInput("")
+                          setShowAddSkillInput(false)
+                        }}
+                        className="text-xs font-bold text-[#62736b] cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddSkillInput(true)}
+                      className="text-xs px-3 py-1 rounded-full border border-dashed border-[#cbd3ce] text-[#62736b] hover:text-[#173a35] hover:border-[#173a35] cursor-pointer"
+                    >
+                      + Add Skill
+                    </button>
+                  ))}
               </div>
             </div>
 
             {/* Academic Interests */}
             <div className="card-linkedin p-6">
-              <h2 className="font-bold text-xs uppercase tracking-wider text-[#173a35] mb-3.5">
-                Academic & Research Interests
+              <h2 className="font-semibold text-sm text-[#173a35] mb-3.5 flex items-center justify-between">
+                <span>Academic & Research Interests</span>
               </h2>
               <div className="flex flex-wrap gap-2">
                 {profile.interests && profile.interests.length > 0 ? (
                   profile.interests.map((interest, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1 bg-[#dce8df] text-[#173a35] rounded-full text-xs font-medium shadow-2xs"
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-[#dce8df] text-[#173a35] rounded-full text-xs font-medium shadow-2xs"
                     >
-                      #{interest}
+                      <span>#{interest}</span>
+                      {isSelf && onRemoveInterest && (
+                        <button
+                          type="button"
+                          onClick={() => onRemoveInterest(interest)}
+                          className="text-[#62736b] hover:text-[#a33e32] ml-1 text-sm font-bold leading-none cursor-pointer"
+                          title="Remove interest"
+                        >
+                          ×
+                        </button>
+                      )}
                     </span>
                   ))
                 ) : (
                   <p className="text-xs text-[#62736b]">No interests added.</p>
                 )}
+
+                {isSelf &&
+                  onAddInterest &&
+                  (showAddInterestInput ? (
+                    <div className="flex items-center gap-1 bg-white border border-[#cbd3ce] rounded-full px-2.5 py-1 shadow-2xs">
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Add topic..."
+                        value={newInterestInput}
+                        onChange={(e) => setNewInterestInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newInterestInput.trim()) {
+                            onAddInterest(newInterestInput.trim())
+                            setNewInterestInput("")
+                            setShowAddInterestInput(false)
+                          }
+                        }}
+                        className="text-xs focus:outline-none w-24 bg-transparent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newInterestInput.trim())
+                            onAddInterest(newInterestInput.trim())
+                          setNewInterestInput("")
+                          setShowAddInterestInput(false)
+                        }}
+                        className="text-xs font-bold text-[#173a35] cursor-pointer"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewInterestInput("")
+                          setShowAddInterestInput(false)
+                        }}
+                        className="text-xs font-bold text-[#62736b] cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddInterestInput(true)}
+                      className="text-xs px-3 py-1 rounded-full border border-dashed border-[#cbd3ce] text-[#62736b] hover:text-[#173a35] hover:border-[#173a35] cursor-pointer"
+                    >
+                      + Add Interest
+                    </button>
+                  ))}
               </div>
             </div>
           </div>
@@ -776,6 +994,37 @@ export function ProfileView({
         isOpen={isAddPortfolioOpen}
         onClose={() => setIsAddPortfolioOpen(false)}
         onAdd={onAddPortfolioItem}
+      />
+
+      <EditPortfolioItemModal
+        isOpen={isEditPortfolioOpen}
+        onClose={() => {
+          setIsEditPortfolioOpen(false)
+          setSelectedPortfolioToEdit(null)
+        }}
+        item={selectedPortfolioToEdit}
+        onSave={(itemId, updates) => {
+          if (onUpdatePortfolioItem) {
+            onUpdatePortfolioItem(itemId, updates)
+          }
+        }}
+      />
+
+      <EducationModal
+        isOpen={isEduModalOpen}
+        onClose={() => {
+          setIsEduModalOpen(false)
+          setSelectedEduToEdit(null)
+        }}
+        initialData={selectedEduToEdit}
+        onSave={(edu, editId) => {
+          if (editId && onUpdateEducation) {
+            onUpdateEducation(editId, edu)
+          } else if (onAddEducation) {
+            onAddEducation(edu)
+          }
+        }}
+        onDelete={onDeleteEducation}
       />
 
       <ExportCvModal

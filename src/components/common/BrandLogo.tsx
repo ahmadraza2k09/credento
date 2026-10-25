@@ -55,7 +55,7 @@ export function BrandLogo({
             Credento
           </span>
           <span
-            className={`text-[9px] uppercase tracking-wider font-semibold ${
+            className={`text-[10px] font-medium ${
               inverse ? "text-[#aebcb4]" : "text-[#62736b]"
             }`}
           >

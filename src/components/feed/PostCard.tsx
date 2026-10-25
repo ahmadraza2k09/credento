@@ -12,14 +12,39 @@ import {
   Repeat,
   Check,
   Bookmark,
+  ThumbsUp,
 } from "lucide-react"
-import { Post, StudentProfile } from "../../types"
+import { Post, ReactionType, StudentProfile } from "../../types"
 import { CommentSection } from "./CommentSection"
+
+const LINKEDIN_REACTIONS: {
+  type: ReactionType
+  label: string
+  emoji: string
+  color: string
+}[] = [
+  { type: "like", label: "Like", emoji: "👍", color: "text-[#173a35]" },
+  {
+    type: "celebrate",
+    label: "Celebrate",
+    emoji: "👏",
+    color: "text-[#1b6b47]",
+  },
+  { type: "support", label: "Support", emoji: "🤝", color: "text-[#4f46e5]" },
+  {
+    type: "insightful",
+    label: "Insightful",
+    emoji: "💡",
+    color: "text-[#b45309]",
+  },
+  { type: "curious", label: "Curious", emoji: "🤔", color: "text-[#c46b4b]" },
+]
 
 interface PostCardProps {
   post: Post
   currentUser: StudentProfile
   onToggleLike: (postId: string) => void
+  onSetReaction?: (postId: string, reaction: ReactionType) => void
   onAddComment: (postId: string, content: string) => void
   onAddReply: (postId: string, commentId: string, content: string) => void
   onSharePost: (originalPost: Post, thoughts?: string) => void
@@ -30,12 +55,19 @@ interface PostCardProps {
   onSelectStudentProfile?: (studentId: string) => void
   onVotePoll?: (postId: string, optionId: string) => void
   onToggleSavePost?: (postId: string) => void
+  onEditComment?: (
+    postId: string,
+    commentId: string,
+    newContent: string,
+  ) => void
+  onDeleteComment?: (postId: string, commentId: string) => void
 }
 
 export function PostCard({
   post,
   currentUser,
   onToggleLike,
+  onSetReaction,
   onAddComment,
   onAddReply,
   onSharePost,
@@ -46,6 +78,8 @@ export function PostCard({
   onSelectStudentProfile,
   onVotePoll,
   onToggleSavePost,
+  onEditComment,
+  onDeleteComment,
 }: PostCardProps) {
   const [showComments, setShowComments] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
@@ -54,9 +88,34 @@ export function PostCard({
   const [copiedLink, setCopiedLink] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [shareThoughts, setShareThoughts] = useState("")
+  const [showReactionsMenu, setShowReactionsMenu] = useState(false)
 
   const isAuthor = post.authorId === currentUser.id
   const hasLiked = post.likes.includes(currentUser.id)
+
+  const currentReactionType: ReactionType | undefined =
+    post.reactions?.[currentUser.id] || (hasLiked ? "like" : undefined)
+
+  const activeReactionMeta = currentReactionType
+    ? LINKEDIN_REACTIONS.find((r) => r.type === currentReactionType)
+    : null
+
+  // Collect distinct emojis used on this post
+  const displayedEmojis = React.useMemo(() => {
+    const list: string[] = []
+    if (post.reactions) {
+      Object.values(post.reactions).forEach((rType) => {
+        const found = LINKEDIN_REACTIONS.find((r) => r.type === rType)
+        if (found && !list.includes(found.emoji)) {
+          list.push(found.emoji)
+        }
+      })
+    }
+    if (list.length === 0 && post.likes.length > 0) {
+      list.push("👍")
+    }
+    return list.slice(0, 3)
+  }, [post.reactions, post.likes])
   const totalComments =
     post.comments.length +
     post.comments.reduce(
@@ -109,11 +168,6 @@ export function PostCard({
               >
                 {post.authorName}
               </button>
-              {isAuthor && (
-                <span className="text-[10px] bg-[#dce8df] text-[#173a35] px-2 py-0.5 rounded-full font-mono font-medium shadow-xs">
-                  Author
-                </span>
-              )}
             </div>
             <p className="text-xs text-[#62736b] truncate leading-tight mt-0.5">
               {post.authorHeadline}
@@ -249,7 +303,7 @@ export function PostCard({
             <span className="font-bold text-[#173a35] text-xs sm:text-sm">
               {post.poll.question}
             </span>
-            <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-[#edf6f0] text-[#173a35] rounded-full font-semibold">
+            <span className="text-xs text-[#62736b] font-medium">
               Academic Poll
             </span>
           </div>
@@ -371,7 +425,7 @@ export function PostCard({
           className="mx-4 sm:mx-5 my-3 block border border-black/[0.06] rounded-2xl bg-[#f8faf9] p-3.5 hover:bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all group cursor-pointer"
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-[#c46b4b]">
+            <span className="text-[11px] font-semibold text-[#c46b4b]">
               {post.linkPreview.domain}
             </span>
             <ExternalLink className="w-3.5 h-3.5 text-[#62736b] group-hover:text-[#173a35]" />
@@ -390,11 +444,21 @@ export function PostCard({
       {/* Engagement Stats Bar */}
       <div className="px-4 sm:px-5 py-2.5 border-b border-black/[0.04] flex items-center justify-between text-xs text-[#62736b]">
         <div className="flex items-center gap-1.5">
-          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#173a35] to-[#275c53] flex items-center justify-center text-white text-[10px] shadow-xs">
-            👍
-          </div>
-          <span className="font-medium text-[11px]">
-            {post.likes.length} {post.likes.length === 1 ? "like" : "likes"}
+          {displayedEmojis.length > 0 && (
+            <div className="flex items-center -space-x-1">
+              {displayedEmojis.map((emoji, idx) => (
+                <span
+                  key={idx}
+                  className="w-5 h-5 rounded-full bg-white border border-black/10 flex items-center justify-center text-[11px] shadow-2xs"
+                >
+                  {emoji}
+                </span>
+              ))}
+            </div>
+          )}
+          <span className="font-medium text-[11px] ml-0.5">
+            {post.likes.length}{" "}
+            {post.likes.length === 1 ? "reaction" : "reactions"}
           </span>
         </div>
         <div className="flex items-center gap-3 text-[11px]">
@@ -411,19 +475,75 @@ export function PostCard({
       </div>
 
       {/* Interaction Buttons - Simple & Clean */}
-      <div className="px-3 py-1.5 grid grid-cols-4 gap-1">
-        <button
-          type="button"
-          onClick={() => onToggleLike(post.id)}
-          className={`flex items-center justify-center gap-1.5 h-10 rounded-xl transition-colors text-xs font-semibold focus:outline-none cursor-pointer ${
-            hasLiked
-              ? "text-[#c46b4b] bg-[#faf0eb]"
-              : "text-[#62736b] hover:bg-black/5 hover:text-[#173a35]"
-          }`}
+      <div className="px-3 py-1.5 grid grid-cols-4 gap-1 relative">
+        {/* LinkedIn Reaction Picker Popover */}
+        {showReactionsMenu && (
+          <div
+            onMouseEnter={() => setShowReactionsMenu(true)}
+            onMouseLeave={() => setShowReactionsMenu(false)}
+            className="absolute -top-12 left-2 z-30 bg-white rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-black/[0.08] px-2.5 py-1.5 flex items-center gap-2"
+          >
+            {LINKEDIN_REACTIONS.map((r) => (
+              <button
+                key={r.type}
+                type="button"
+                onClick={() => {
+                  if (onSetReaction) {
+                    onSetReaction(post.id, r.type)
+                  } else {
+                    onToggleLike(post.id)
+                  }
+                  setShowReactionsMenu(false)
+                }}
+                className="hover:scale-125 transition-transform text-lg leading-none p-1 cursor-pointer"
+                title={r.label}
+              >
+                {r.emoji}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div
+          className="relative"
+          onMouseEnter={() => setShowReactionsMenu(true)}
+          onMouseLeave={() => setShowReactionsMenu(false)}
         >
-          <Heart className={`w-4 h-4 ${hasLiked ? "fill-current" : ""}`} />
-          <span className="hidden sm:inline">{hasLiked ? "Liked" : "Like"}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (onSetReaction) {
+                onSetReaction(
+                  post.id,
+                  currentReactionType ? currentReactionType : "like",
+                )
+              } else {
+                onToggleLike(post.id)
+              }
+            }}
+            className={`w-full flex items-center justify-center gap-1.5 h-10 rounded-xl transition-colors text-xs focus:outline-none cursor-pointer ${
+              activeReactionMeta
+                ? activeReactionMeta.color + " font-semibold bg-[#edf2ee]/60"
+                : "text-[#62736b] hover:bg-black/5 hover:text-[#173a35]"
+            }`}
+          >
+            {activeReactionMeta ? (
+              <>
+                <span className="text-base leading-none">
+                  {activeReactionMeta.emoji}
+                </span>
+                <span className="hidden sm:inline">
+                  {activeReactionMeta.label}
+                </span>
+              </>
+            ) : (
+              <>
+                <ThumbsUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Like</span>
+              </>
+            )}
+          </button>
+        </div>
 
         <button
           type="button"
@@ -454,9 +574,13 @@ export function PostCard({
           title={post.isSaved ? "Saved to Bookmarks" : "Save post"}
         >
           <Bookmark
-            className={`w-4 h-4 ${post.isSaved ? "fill-current text-[#c46b4b]" : ""}`}
+            className={`w-4 h-4 ${
+              post.isSaved ? "fill-current text-[#c46b4b]" : ""
+            }`}
           />
-          <span className="hidden sm:inline">{post.isSaved ? "Saved" : "Save"}</span>
+          <span className="hidden sm:inline">
+            {post.isSaved ? "Saved" : "Save"}
+          </span>
         </button>
       </div>
 
@@ -470,6 +594,8 @@ export function PostCard({
             onAddComment={onAddComment}
             onAddReply={onAddReply}
             onSelectStudentProfile={onSelectStudentProfile}
+            onEditComment={onEditComment}
+            onDeleteComment={onDeleteComment}
           />
         </div>
       )}
@@ -489,7 +615,8 @@ export function PostCard({
               className="w-full text-xs p-3 border border-black/10 rounded-xl focus:outline-none focus:border-[#173a35] shadow-inner mb-3"
             />
             <div className="p-3 bg-[#f8faf9] rounded-xl border border-black/[0.04] text-xs text-[#62736b] mb-4">
-              <strong className="text-[#173a35]">{post.authorName}</strong>: "{post.content.slice(0, 110)}
+              <strong className="text-[#173a35]">{post.authorName}</strong>: "
+              {post.content.slice(0, 110)}
               ..."
             </div>
             <div className="flex justify-end gap-2.5">

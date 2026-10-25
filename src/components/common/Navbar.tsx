@@ -18,15 +18,7 @@ import {
 import { BrandLogo } from "./BrandLogo"
 import { StudentProfile } from "../../types"
 
-export type NavTab =
-  | "feed"
-  | "network"
-  | "opportunities"
-  | "groups"
-  | "messages"
-  | "notifications"
-  | "profile"
-  | "search"
+export type NavTab = "feed" | "network" | "opportunities" | "groups" | "messages" | "notifications" | "profile" | "search"
 
 interface NavbarProps {
   currentTab: NavTab
@@ -181,10 +173,10 @@ export function Navbar({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectTab(item.id)}
-                    className={`relative flex flex-col items-center justify-center min-w-[74px] h-14 px-2.5 text-center rounded-xl transition-all cursor-pointer ${
+                    className={`relative flex flex-col items-center justify-center min-w-[72px] h-14 px-2 text-center transition-colors cursor-pointer ${
                       isActive
-                        ? "text-[#173a35] font-semibold bg-[#e8ece9]/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.03)]"
-                        : "text-[#62736b] hover:text-[#173a35] hover:bg-[#f0f4f2]"
+                        ? "text-[#173a35] font-semibold"
+                        : "text-[#62736b] hover:text-[#173a35]"
                     }`}
                   >
                     <div className="relative">
@@ -201,9 +193,6 @@ export function Navbar({
                     <span className="text-[11px] mt-1 tracking-tight leading-none">
                       {item.label}
                     </span>
-                    {isActive && (
-                      <span className="absolute bottom-1 left-4 right-4 h-[2px] bg-[#173a35] rounded-full" />
-                    )}
                   </button>
                 )
               })}
@@ -297,7 +286,7 @@ export function Navbar({
 
                     {/* Quick Demo Student Switcher */}
                     <div className="px-3 py-2.5 border-b border-black/[0.04]">
-                      <div className="flex items-center justify-between text-[11px] font-semibold text-[#4d5b54] px-1 mb-1.5 uppercase tracking-wider">
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-[#4d5b54] px-1 mb-1.5">
                         <span>Switch Perspective</span>
                         <UserCheck className="w-3.5 h-3.5 text-[#c46b4b]" />
                       </div>
@@ -470,9 +459,6 @@ export function Navbar({
                         ? "Circles"
                         : item.label}
                 </span>
-                {isActive && (
-                  <span className="absolute top-0 left-4 right-4 h-[2px] bg-[#173a35] rounded-full" />
-                )}
               </button>
             )
           })}
