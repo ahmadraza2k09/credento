@@ -29,15 +29,16 @@ export function AuthScreen({
 }: AuthScreenProps) {
   const [mode, setMode] = useState<"login" | "register">("login")
 
-  // Form fields
-  const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
+  // Register form fields: First Name, Last Name, Email, Password only
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [regEmail, setRegEmail] = useState("")
+  const [regPassword, setRegPassword] = useState("")
+  const [showRegPassword, setShowRegPassword] = useState(false)
+
+  // Login form fields
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [institution, setInstitution] = useState("")
-  const [degree, setDegree] = useState("")
-  const [graduationYear, setGraduationYear] = useState("2027")
-  const [agreedToRules, setAgreedToRules] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
 
   // Modals & UI states
@@ -59,35 +60,21 @@ export function AuthScreen({
 
     const nextErrors: { [key: string]: string } = {}
 
-    if (!name.trim()) nextErrors.name = "Enter your full name."
-    if (!username.trim()) {
-      nextErrors.username = "Choose a unique username."
+    if (!firstName.trim()) nextErrors.firstName = "Enter your first name."
+    if (!lastName.trim()) nextErrors.lastName = "Enter your last name."
+
+    if (!regEmail.trim() || !regEmail.includes("@")) {
+      nextErrors.regEmail = "Enter a valid email address."
     } else if (
       registeredUsers.some(
-        (u) =>
-          u.username?.toLowerCase() ===
-          username.trim().toLowerCase().replace(/^@/, ""),
+        (u) => u.email?.toLowerCase() === regEmail.trim().toLowerCase(),
       )
     ) {
-      nextErrors.username = "This username is already taken."
+      nextErrors.regEmail = "An account with this email already exists."
     }
 
-    if (!email.trim() || !email.includes("@")) {
-      nextErrors.email = "Enter a valid student or institutional email."
-    } else if (
-      registeredUsers.some(
-        (u) => u.email?.toLowerCase() === email.trim().toLowerCase(),
-      )
-    ) {
-      nextErrors.email = "An account with this email already exists."
-    }
-
-    if (!password || password.length < 5) {
-      nextErrors.password = "Password must be at least 5 characters."
-    }
-
-    if (!institution.trim()) {
-      nextErrors.institution = "Enter your current university or college."
+    if (!regPassword || regPassword.length < 4) {
+      nextErrors.regPassword = "Password must be at least 4 characters."
     }
 
     setErrors(nextErrors)
@@ -96,13 +83,10 @@ export function AuthScreen({
     setIsSubmitting(true)
     try {
       const newStudent = registerStudent({
-        name: name.trim(),
-        username: username.trim(),
-        email: email.trim(),
-        password,
-        institution: institution.trim(),
-        degree: degree.trim() || "Undergraduate Degree",
-        graduationYear: graduationYear.trim() || 2027,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: regEmail.trim(),
+        password: regPassword,
       })
 
       setIsSubmitting(false)
@@ -253,76 +237,62 @@ export function AuthScreen({
               </div>
             )}
 
-            {/* REGISTER FORM */}
+            {/* REGISTER FORM: First Name, Last Name, Email, Password only */}
             {mode === "register" ? (
               <form
                 onSubmit={handleRegisterSubmit}
                 noValidate
-                className="space-y-3"
+                className="space-y-3.5"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-[#242b29] mb-1">
-                      Full Name *
+                      First Name *
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Maya Lin"
-                      value={name}
+                      placeholder="e.g. Maya"
+                      value={firstName}
                       onChange={(e) => {
-                        setName(e.target.value)
-                        if (!username) {
-                          setUsername(
-                            e.target.value
-                              .toLowerCase()
-                              .replace(/\s+/g, "_")
-                              .replace(/[^a-z0-9_]/g, ""),
-                          )
-                        }
-                        if (errors.name) setErrors({ ...errors, name: "" })
+                        setFirstName(e.target.value)
+                        if (errors.firstName)
+                          setErrors({ ...errors, firstName: "" })
                       }}
-                      className={`w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
-                        errors.name ? "border-[#a33e32]" : "border-black/15"
+                      className={`w-full h-11 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.firstName
+                          ? "border-[#a33e32]"
+                          : "border-black/15"
                       }`}
                     />
-                    {errors.name && (
+                    {errors.firstName && (
                       <p className="text-[11px] text-[#a33e32] mt-0.5">
-                        {errors.name}
+                        {errors.firstName}
                       </p>
                     )}
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-[#242b29] mb-1">
-                      Username *
+                      Last Name *
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-2.5 top-2.5 text-xs text-[#728078]">
-                        @
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="username"
-                        value={username}
-                        onChange={(e) => {
-                          setUsername(
-                            e.target.value
-                              .toLowerCase()
-                              .replace(/[^a-z0-9_]/g, ""),
-                          )
-                          if (errors.username)
-                            setErrors({ ...errors, username: "" })
-                        }}
-                        className={`w-full h-10 pl-6 pr-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
-                          errors.username
-                            ? "border-[#a33e32]"
-                            : "border-black/15"
-                        }`}
-                      />
-                    </div>
-                    {errors.username && (
+                    <input
+                      type="text"
+                      placeholder="e.g. Lin"
+                      value={lastName}
+                      onChange={(e) => {
+                        setLastName(e.target.value)
+                        if (errors.lastName)
+                          setErrors({ ...errors, lastName: "" })
+                      }}
+                      className={`w-full h-11 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.lastName
+                          ? "border-[#a33e32]"
+                          : "border-black/15"
+                      }`}
+                    />
+                    {errors.lastName && (
                       <p className="text-[11px] text-[#a33e32] mt-0.5">
-                        {errors.username}
+                        {errors.lastName}
                       </p>
                     )}
                   </div>
@@ -335,61 +305,23 @@ export function AuthScreen({
                   <input
                     type="email"
                     placeholder="name@university.edu"
-                    value={email}
+                    value={regEmail}
                     onChange={(e) => {
-                      setEmail(e.target.value)
-                      if (errors.email) setErrors({ ...errors, email: "" })
+                      setRegEmail(e.target.value)
+                      if (errors.regEmail)
+                        setErrors({ ...errors, regEmail: "" })
                     }}
-                    className={`w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
-                      errors.email ? "border-[#a33e32]" : "border-black/15"
+                    className={`w-full h-11 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                      errors.regEmail
+                        ? "border-[#a33e32]"
+                        : "border-black/15"
                     }`}
                   />
-                  {errors.email && (
+                  {errors.regEmail && (
                     <p className="text-[11px] text-[#a33e32] mt-0.5">
-                      {errors.email}
+                      {errors.regEmail}
                     </p>
                   )}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#242b29] mb-1">
-                      University / College *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Stanford University"
-                      value={institution}
-                      onChange={(e) => {
-                        setInstitution(e.target.value)
-                        if (errors.institution)
-                          setErrors({ ...errors, institution: "" })
-                      }}
-                      className={`w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
-                        errors.institution
-                          ? "border-[#a33e32]"
-                          : "border-black/15"
-                      }`}
-                    />
-                    {errors.institution && (
-                      <p className="text-[11px] text-[#a33e32] mt-0.5">
-                        {errors.institution}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-[#242b29] mb-1">
-                      Degree & Major
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. B.S. Computer Science"
-                      value={degree}
-                      onChange={(e) => setDegree(e.target.value)}
-                      className="w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border border-black/15 transition-all"
-                    />
-                  </div>
                 </div>
 
                 <div>
@@ -398,75 +330,47 @@ export function AuthScreen({
                   </label>
                   <div className="relative">
                     <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="At least 5 characters"
-                      value={password}
+                      type={showRegPassword ? "text" : "password"}
+                      placeholder="At least 4 characters"
+                      value={regPassword}
                       onChange={(e) => {
-                        setPassword(e.target.value)
-                        if (errors.password)
-                          setErrors({ ...errors, password: "" })
+                        setRegPassword(e.target.value)
+                        if (errors.regPassword)
+                          setErrors({ ...errors, regPassword: "" })
                       }}
-                      className={`w-full h-10 pl-3 pr-10 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
-                        errors.password ? "border-[#a33e32]" : "border-black/15"
+                      className={`w-full h-11 pl-3 pr-10 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.regPassword
+                          ? "border-[#a33e32]"
+                          : "border-black/15"
                       }`}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-[#62736b] hover:text-[#173a35]"
+                      onClick={() => setShowRegPassword(!showRegPassword)}
+                      className="absolute right-3 top-3 text-[#62736b] hover:text-[#173a35]"
                     >
-                      {showPassword ? (
+                      {showRegPassword ? (
                         <EyeOff className="w-4 h-4" />
                       ) : (
                         <Eye className="w-4 h-4" />
                       )}
                     </button>
                   </div>
-                  {errors.password && (
+                  {errors.regPassword && (
                     <p className="text-[11px] text-[#a33e32] mt-0.5">
-                      {errors.password}
+                      {errors.regPassword}
                     </p>
                   )}
                 </div>
 
-                {/* Rules Checkbox */}
-                <div className="pt-1">
-                  <label className="flex items-start gap-2 cursor-pointer text-xs text-[#4d5b54]">
-                    <input
-                      type="checkbox"
-                      checked={agreedToRules}
-                      onChange={(e) => {
-                        setAgreedToRules(e.target.checked)
-                        if (errors.rules) setErrors({ ...errors, rules: "" })
-                      }}
-                      className="mt-0.5 rounded text-[#173a35] focus:ring-[#173a35]"
-                    />
-                    <span>
-                      I agree to the{" "}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setShowRulesModal(true)
-                        }}
-                        className="font-semibold text-[#173a35] hover:underline"
-                      >
-                        Credento Community Standards & Safety Oath
-                      </button>
-                      .
-                    </span>
-                  </label>
-                  {errors.rules && (
-                    <p className="text-[11px] text-[#a33e32] mt-0.5">
-                      {errors.rules}
-                    </p>
-                  )}
-                </div>
+                <p className="text-[11px] text-[#62736b] pt-0.5">
+                  Institution, degree, projects, and skills can be added or updated anytime from your profile.
+                </p>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-3d-primary w-full h-11 mt-2 text-xs font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                  className="btn-3d-primary w-full h-11 mt-1 text-xs font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
                 >
                   {isSubmitting ? (
                     <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -596,7 +500,7 @@ export function AuthScreen({
                           {user.name}
                         </p>
                         <p className="text-[10px] text-[#728078] truncate leading-none">
-                          {user.institution.split(" ")[0]}
+                          {(user.institution || "Student").split(" ")[0]}
                         </p>
                       </div>
                     </button>
@@ -622,8 +526,8 @@ export function AuthScreen({
       <CommunityRulesModal
         isOpen={showRulesModal}
         onClose={() => setShowRulesModal(false)}
-        onAccept={() => setAgreedToRules(true)}
-        showAcceptButton={mode === "register" && !agreedToRules}
+        onAccept={() => setShowRulesModal(false)}
+        showAcceptButton={false}
       />
 
       {/* Forgot Password Modal */}

@@ -145,7 +145,7 @@ export function MessagesView({
                         {conv.lastMessage}
                       </p>
                       <span className="text-[10px] text-[#87978f] truncate block">
-                        {conv.otherUser.institution.split(" ")[0]}
+                        {(conv.otherUser.institution || "Student").split(" ")[0]}
                       </span>
                     </div>
                     {conv.unreadCount > 0 && (

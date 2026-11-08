@@ -188,7 +188,10 @@ export default function App() {
   const currentUser = sessionUserId
     ? getUserById(sessionUserId) || getCurrentUser()
     : getCurrentUser()
-  const isAdmin = adminSessionState || isUserAdmin()
+  const isAdmin = currentUser
+    ? currentUser.email?.toLowerCase() === "team@credento.world" ||
+      currentUser.role === "admin"
+    : adminSessionState && isUserAdmin()
   const rawUsers = getAllUsers()
   const rawPosts = getPosts()
   const opportunities = getOpportunities()

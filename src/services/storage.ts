@@ -219,11 +219,13 @@ export function getCurrentUser(): StudentProfile | null {
 }
 
 export function registerStudent(params: {
-  name: string
-  username: string
+  firstName?: string
+  lastName?: string
+  name?: string
+  username?: string
   email: string
   password?: string
-  institution: string
+  institution?: string
   facultyOrDepartment?: string
   degree?: string
   graduationYear?: number | string
@@ -231,14 +233,46 @@ export function registerStudent(params: {
   location?: string
 }): StudentProfile {
   const users = getAllUsers()
-  const cleanUsername = params.username.replace(/^@/, "").trim().toLowerCase()
+  
+  // Construct full name from firstName + lastName or name
+  const fullName = (
+    params.name ||
+    `${params.firstName || ""} ${params.lastName || ""}`
+  ).trim() || "Student Scholar"
+
+  // Derive unique clean username
+  let cleanUsername = (params.username || "")
+    .replace(/^@/, "")
+    .trim()
+    .toLowerCase()
+
+  if (!cleanUsername) {
+    const fromName = fullName
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+    const fromEmail = (params.email || "")
+      .split("@")[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+    cleanUsername = fromName || fromEmail || `scholar_${Date.now().toString().slice(-4)}`
+  }
+
+  // Ensure username uniqueness
+  let finalUsername = cleanUsername
+  let counter = 1
+  while (users.some((u) => u.username?.toLowerCase() === finalUsername.toLowerCase())) {
+    finalUsername = `${cleanUsername}${counter}`
+    counter++
+  }
 
   // Generate unique ID
   const newId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
 
   // Instant reliable initials SVG avatar (no external dependency)
   const initials =
-    params.name
+    fullName
       .split(" ")
       .map((w) => w[0])
       .filter(Boolean)
@@ -248,39 +282,44 @@ export function registerStudent(params: {
 
   const avatar = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" fill="%23173a35"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-weight="bold" font-size="44" fill="%23ffffff">${encodeURIComponent(initials)}</text></svg>`
 
+  const inst = params.institution?.trim() || "Student"
+  const deg = params.degree?.trim() || "Student"
+  const head = params.headline?.trim() || (inst !== "Student" ? `Student @ ${inst}` : "Student Scholar")
+
   const newStudent: StudentProfile = {
     id: newId,
-    name: params.name.trim(),
-    username: cleanUsername,
+    name: fullName,
+    username: finalUsername,
     email: params.email.trim().toLowerCase(),
     password: params.password || "student123",
     role: "student",
-    headline:
-      params.headline?.trim() || `Student @ ${params.institution.trim()}`,
-    institution: params.institution.trim(),
-    facultyOrDepartment:
-      params.facultyOrDepartment?.trim() || "Academic Studies",
-    degree: params.degree?.trim() || "Undergraduate Degree",
+    headline: head,
+    institution: inst,
+    facultyOrDepartment: params.facultyOrDepartment?.trim() || "Academic Studies",
+    degree: deg,
     graduationYear: params.graduationYear || 2027,
     location: params.location?.trim() || "Campus",
     avatar,
     coverImage:
       "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
-    about: `Hello, I'm ${params.name.trim()} at ${params.institution.trim()}. I'm on Credento to connect with students, share research projects, and discover academic opportunities.`,
+    about: `Hello, I'm ${fullName}. I'm on Credento to connect with students, share research projects, and discover academic opportunities.`,
     isPublic: true,
     visibility: "public",
     skills: ["Academic Research", "Collaboration", "Critical Thinking"],
     interests: ["Higher Education", "Technology & Society"],
-    education: [
-      {
-        id: `edu-${Date.now()}`,
-        institution: params.institution.trim(),
-        degree: params.degree?.trim() || "Undergraduate Degree",
-        fieldOfStudy: params.facultyOrDepartment?.trim() || "Academic Focus",
-        startYear: 2023,
-        endYear: params.graduationYear || 2027,
-      },
-    ],
+    education:
+      inst !== "Student"
+        ? [
+            {
+              id: `edu-${Date.now()}`,
+              institution: inst,
+              degree: deg,
+              fieldOfStudy: params.facultyOrDepartment?.trim() || "Academic Focus",
+              startYear: 2023,
+              endYear: params.graduationYear || 2027,
+            },
+          ]
+        : [],
     portfolioItems: [],
     connectionsCount: 0,
     followersCount: 0,
@@ -289,6 +328,9 @@ export function registerStudent(params: {
 
   const updatedUsers = [...users, newStudent]
   setItem(STORAGE_KEYS.USERS, updatedUsers)
+  
+  // Clear any stale admin session flag
+  setAdminSession(false)
   setCurrentUserId(newId)
 
   // Create welcome notification
@@ -298,7 +340,6 @@ export function registerStudent(params: {
     title: "Welcome to Credento!",
     description:
       "Your genuine student profile is created. Add your projects, skills, and connect with peers.",
-    targetTab: "profile",
   })
 
   return newStudent
@@ -442,8 +483,9 @@ export function loginStudent(
     return { success: true, user: found, isAdmin: true }
   }
 
+  setAdminSession(false)
   setCurrentUserId(found.id)
-  return { success: true, user: found }
+  return { success: true, user: found, isAdmin: false }
 }
 
 export function updateCurrentUserProfile(
@@ -1888,18 +1930,15 @@ export function updateServiceRequestStatus(
 // ==========================================
 
 export function isUserAdmin(): boolean {
-  if (sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === "active") {
-    return true
-  }
   const current = getCurrentUser()
-  if (
-    current?.email?.toLowerCase() === "team@credento.world" ||
-    current?.username?.toLowerCase() === "team" ||
-    current?.role === "admin"
-  ) {
-    return true
+  if (current) {
+    return (
+      current.email?.toLowerCase() === "team@credento.world" ||
+      current.username?.toLowerCase() === "team" ||
+      current.role === "admin"
+    )
   }
-  return false
+  return sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === "active"
 }
 
 export function setAdminSession(active: boolean): void {

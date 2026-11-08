@@ -163,7 +163,7 @@ export function ProfileEditModal({
         {/* Headline */}
         <div>
           <label className="block font-bold text-[#173a35] mb-1">
-            Professional & Academic Headline *
+            Professional & Academic Headline
           </label>
           <input
             type="text"
@@ -171,7 +171,6 @@ export function ProfileEditModal({
             value={headline}
             onChange={(e) => setHeadline(e.target.value)}
             className="w-full p-2.5 bg-white rounded-xl border border-black/10 focus:outline-none focus:border-[#173a35]"
-            required
           />
         </div>
 
@@ -179,7 +178,7 @@ export function ProfileEditModal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block font-bold text-[#173a35] mb-1">
-              Current Institution *
+              Current Institution
             </label>
             <input
               type="text"
@@ -187,7 +186,6 @@ export function ProfileEditModal({
               value={institution}
               onChange={(e) => setInstitution(e.target.value)}
               className="w-full p-2.5 bg-white rounded-xl border border-black/10 focus:outline-none focus:border-[#173a35]"
-              required
             />
           </div>
           <div>
@@ -207,7 +205,7 @@ export function ProfileEditModal({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2">
             <label className="block font-bold text-[#173a35] mb-1">
-              Degree & Major *
+              Degree & Major
             </label>
             <input
               type="text"
@@ -215,7 +213,6 @@ export function ProfileEditModal({
               value={degree}
               onChange={(e) => setDegree(e.target.value)}
               className="w-full p-2.5 bg-white rounded-xl border border-black/10 focus:outline-none focus:border-[#173a35]"
-              required
             />
           </div>
           <div>

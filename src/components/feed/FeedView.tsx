@@ -402,8 +402,10 @@ export function FeedView({
                         {student.name}
                       </button>
                       <p className="text-[10px] text-[#62736b] truncate">
-                        {student.institution.split(" ")[0]} •{" "}
-                        {student.degree.split("in ")[1] || student.degree}
+                        {(student.institution || "Student").split(" ")[0]} •{" "}
+                        {student.degree
+                          ? student.degree.split("in ")[1] || student.degree
+                          : "Scholar"}
                       </p>
                       <button
                         type="button"
