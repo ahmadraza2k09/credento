@@ -261,12 +261,92 @@ export function registerStudent(params: {
   return newStudent
 }
 
+export function getAdminUserProfile(): StudentProfile {
+  const users = getAllUsers()
+  let admin = users.find(
+    (u) =>
+      u.email?.toLowerCase() === "team@credento.world" ||
+      u.username?.toLowerCase() === "team" ||
+      u.id === "credento-admin",
+  )
+
+  if (!admin) {
+    admin = {
+      id: "credento-admin",
+      name: "Credento Team",
+      username: "team",
+      email: "team@credento.world",
+      role: "admin",
+      password: "badabdcad786",
+      headline: "Credento Platform Administration & Academic Standards",
+      institution: "Credento Global Administration",
+      location: "San Francisco, CA & Global",
+      about:
+        "Official platform administration and community standards verification team for Credento. Ensuring authentic student identity, safety oath adherence, and Access Center ecosystem governance.",
+      avatar:
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+      coverImage:
+        "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80",
+      connectionsCount: 0,
+      skills: [
+        "Platform Governance",
+        "Academic Verification",
+        "Access Center Review",
+        "Student Safety",
+      ],
+      interests: [
+        "Higher Education",
+        "Collegiate Enablement",
+        "Digital Access",
+      ],
+      portfolio: [],
+      education: [
+        {
+          id: "edu-admin",
+          institution: "Credento Administration",
+          degree: "Platform Moderation & Security",
+          startYear: "2024",
+          endYear: "Present",
+        },
+      ],
+      isPrivate: false,
+      isVerified: true,
+      registeredAt: new Date().toISOString(),
+    }
+    setItem(STORAGE_KEYS.USERS, [admin, ...users])
+  } else {
+    // Keep credentials synchronized
+    if (admin.password !== "badabdcad786" || admin.role !== "admin") {
+      admin.password = "badabdcad786"
+      admin.role = "admin"
+      setItem(
+        STORAGE_KEYS.USERS,
+        users.map((u) => (u.id === admin!.id ? admin! : u)),
+      )
+    }
+  }
+
+  return admin
+}
+
 export function loginStudent(
   emailOrUsername: string,
   password?: string,
-): { success: boolean user?: StudentProfile error?: string } {
+): { success: boolean user?: StudentProfile error?: string isAdmin?: boolean } {
   const users = getAllUsers()
   const q = emailOrUsername.trim().toLowerCase().replace(/^@/, "")
+  const pwd = password ? password.trim() : ""
+
+  // Direct Credento Team Admin Login Verification
+  if (
+    (q === "team@credento.world" || q === "team" || q === "admin") &&
+    pwd === "badabdcad786"
+  ) {
+    const adminUser = getAdminUserProfile()
+    setAdminSession(true)
+    setCurrentUserId(adminUser.id)
+    return { success: true, user: adminUser, isAdmin: true }
+  }
 
   const found = users.find(
     (u) =>
@@ -292,12 +372,22 @@ export function loginStudent(
     }
   }
 
-  // Password check (simple verification for local auth)
+  // Password check (verification for local auth)
   if (password && found.password && found.password !== password) {
     return {
       success: false,
       error: "Incorrect password. Please verify and try again.",
     }
+  }
+
+  // If user is admin profile
+  if (
+    found.email?.toLowerCase() === "team@credento.world" ||
+    found.role === "admin"
+  ) {
+    setAdminSession(true)
+    setCurrentUserId(found.id)
+    return { success: true, user: found, isAdmin: true }
   }
 
   setCurrentUserId(found.id)
@@ -1725,7 +1815,18 @@ export function updateServiceRequestStatus(
 // ==========================================
 
 export function isUserAdmin(): boolean {
-  return sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === "active"
+  if (sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === "active") {
+    return true
+  }
+  const current = getCurrentUser()
+  if (
+    current?.email?.toLowerCase() === "team@credento.world" ||
+    current?.username?.toLowerCase() === "team" ||
+    current?.role === "admin"
+  ) {
+    return true
+  }
+  return false
 }
 
 export function setAdminSession(active: boolean): void {
@@ -1738,9 +1839,10 @@ export function setAdminSession(active: boolean): void {
 }
 
 export function verifyAdminCredential(passkey: string): boolean {
-  // Secure administrator secret check
-  const validSecret = "credento-admin-2026"
-  const isCorrect = passkey.trim() === validSecret
+  // Passkey verification supporting the designated credential and backup
+  const cleaned = passkey.trim()
+  const isCorrect =
+    cleaned === "badabdcad786" || cleaned === "credento-admin-2026"
   if (isCorrect) {
     setAdminSession(true)
   }

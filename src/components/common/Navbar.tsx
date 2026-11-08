@@ -16,7 +16,6 @@ import {
   ShieldAlert,
   Scale,
   Clock,
-  Sparkles,
 } from "lucide-react"
 import { BrandLogo } from "./BrandLogo"
 import { StudentProfile } from "../../types"
@@ -210,12 +209,15 @@ export function Navbar({
                   onClick={() => onSelectTab("admin")}
                   className={`relative flex flex-col items-center justify-center min-w-[72px] h-14 px-2 text-center transition-colors cursor-pointer ${
                     currentTab === "admin"
-                      ? "text-[#c46b4b] font-semibold"
-                      : "text-[#a33e32] hover:text-[#7f1d1d]"
+                      ? "text-[#173a35] font-semibold border-b-2 border-[#173a35]"
+                      : "text-[#62736b] hover:text-[#173a35]"
                   }`}
                   title="Credento Administrative Dashboard"
                 >
-                  <ShieldAlert className="w-5 h-5" strokeWidth={2.2} />
+                  <ShieldAlert
+                    className="w-5 h-5 text-[#c46b4b]"
+                    strokeWidth={2}
+                  />
                   <span className="text-[11px] mt-1 tracking-tight leading-none font-bold">
                     Admin
                   </span>

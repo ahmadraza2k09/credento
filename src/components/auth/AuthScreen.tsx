@@ -4,12 +4,9 @@ import {
   EyeOff,
   ShieldCheck,
   ArrowRight,
-  GraduationCap,
-  Sparkles,
   Lock,
   UserCheck,
   CheckCircle2,
-  ExternalLink,
 } from "lucide-react"
 import { BrandLogo } from "../common/BrandLogo"
 import { Modal } from "../common/Modal"
@@ -59,7 +56,9 @@ export function AuthScreen({
   const [adminError, setAdminError] = useState("")
 
   // Check existing registered users in the database
-  const registeredUsers = getAllUsers()
+  const registeredUsers = getAllUsers().filter(
+    (u) => u.email !== "team@credento.world" && u.id !== "credento-admin",
+  )
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -138,7 +137,15 @@ export function AuthScreen({
       setIsSubmitting(false)
       const res = loginStudent(email.trim(), password)
       if (res.success && res.user) {
-        onLoginSuccess(res.user)
+        if (
+          res.isAdmin ||
+          email.trim().toLowerCase() === "team@credento.world" ||
+          email.trim().toLowerCase() === "team"
+        ) {
+          onAdminLoginSuccess()
+        } else {
+          onLoginSuccess(res.user)
+        }
       } else {
         setErrors({ form: res.error || "Authentication failed." })
       }
@@ -166,519 +173,482 @@ export function AuthScreen({
   }
 
   return (
-    <main className="login-page min-h-screen bg-[#f7f5ef] flex flex-col justify-between">
-      <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Editorial Brand Panel */}
+    <main className="min-h-screen bg-[#f7f5ef] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-10 font-sans">
+      <div className="w-full max-w-4xl bg-white rounded-2xl border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden grid grid-cols-1 md:grid-cols-12">
+        {/* Left Formal Brand Panel */}
         <section
-          className="brand-panel lg:w-5/12 bg-[#173a35] text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden"
+          className="md:col-span-5 bg-[#173a35] text-white p-7 sm:p-10 flex flex-col justify-between"
           aria-labelledby="brand-heading"
         >
-          <div className="relative z-10">
+          <div>
             <BrandLogo inverse />
-          </div>
+            <div className="mt-8 sm:mt-12 space-y-4">
+              <h1
+                id="brand-heading"
+                className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug"
+              >
+                Student Academic & Opportunity Network
+              </h1>
+              <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-normal">
+                Connect with authentic collegiate peers, build your verified
+                academic profile, access free services via the Access Center,
+                and discover verified opportunities.
+              </p>
 
-          <div className="relative z-10 my-10 lg:my-0 space-y-6 max-w-lg">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[11px] font-semibold text-[#f7f5ef] tracking-wide uppercase border border-white/15">
-              <Sparkles className="w-3.5 h-3.5 text-[#c46b4b]" />
-              Collegiate Identity & Networking
-            </span>
-            <h1
-              id="brand-heading"
-              className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#f7f5ef] leading-[1.15] tracking-tight"
-            >
-              Stand out in the student world with your genuine Credento profile.
-            </h1>
-            <p className="text-sm sm:text-base text-white/80 leading-relaxed font-light">
-              Connect with fellow university scholars, showcase research &
-              projects, discover verified fellowships, and unlock free community
-              assistance through the Credento Access Center.
-            </p>
-
-            <div className="pt-4 border-t border-white/15 grid grid-cols-2 gap-4 text-xs text-white/70">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#c46b4b]" />
-                <span>Zero vanity metrics</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#c46b4b]" />
-                <span>Genuine student members</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#c46b4b]" />
-                <span>Free Access Center services</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#c46b4b]" />
-                <span>Verified academic integrity</span>
+              <div className="pt-4 space-y-2.5 text-xs text-white/85">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#c46b4b] shrink-0" />
+                  <span>Authentic registered scholars only</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#c46b4b] shrink-0" />
+                  <span>Free community Access Center services</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#c46b4b] shrink-0" />
+                  <span>Zero vanity algorithms or simulated profiles</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10 text-[11px] text-white/50 flex items-center justify-between">
-            <span>© 2026 Credento Platform</span>
+          <div className="pt-8 text-[11px] text-white/50 flex items-center justify-between">
+            <span>© 2026 Credento</span>
             <button
               type="button"
-              onClick={() => setShowAdminModal(true)}
-              className="text-white/60 hover:text-white underline hover:no-underline cursor-pointer"
+              onClick={() => {
+                setEmail("team@credento.world")
+                setPassword("badabdcad786")
+                setShowAdminModal(true)
+              }}
+              className="text-white/60 hover:text-white underline cursor-pointer"
             >
-              Staff & Admin Portal
+              Staff Portal
             </button>
           </div>
         </section>
 
-        {/* Right Form Panel */}
+        {/* Right Authentication Form */}
         <section
-          className="login-panel lg:w-7/12 p-6 sm:p-10 lg:p-16 flex flex-col justify-center items-center"
+          className="md:col-span-7 p-6 sm:p-9 flex flex-col justify-center bg-white"
           aria-labelledby="login-heading"
         >
-          <div className="w-full max-w-lg">
-            <div className="lg:hidden mb-6 flex justify-between items-center">
-              <BrandLogo />
-              <button
-                type="button"
-                onClick={() => setShowAdminModal(true)}
-                className="text-xs text-[#62736b] hover:text-[#173a35] underline"
-              >
-                Admin
-              </button>
-            </div>
-
-            <div className="login-card bg-white rounded-3xl p-6 sm:p-9 shadow-[0_2px_4px_rgba(0,0,0,0.03),0_12px_28px_-6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] border border-black/[0.04]">
-              {/* Header */}
-              <div className="login-card__heading mb-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-[#c46b4b] uppercase tracking-wider">
-                    {mode === "login"
-                      ? "Student Sign In"
-                      : "New Student Registration"}
-                  </p>
-                  <span className="text-[11px] text-[#728078] font-mono">
-                    Step {mode === "login" ? "1 of 1" : "1 of 2"}
-                  </span>
-                </div>
+          <div className="w-full max-w-md mx-auto">
+            {/* Header with minimal toggle */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
                 <h2
                   id="login-heading"
-                  className="text-2xl sm:text-3xl font-bold text-[#173a35] tracking-tight mt-1"
+                  className="text-lg sm:text-xl font-bold text-[#173a35] tracking-tight"
                 >
                   {mode === "login"
-                    ? "Welcome to Credento"
-                    : "Create your Student Identity"}
+                    ? "Sign In to Credento"
+                    : "Create Student Account"}
                 </h2>
-                <p className="text-xs sm:text-sm text-[#62736b] mt-1.5">
-                  {mode === "login"
-                    ? "Sign in to access your student network, feed, and messaging."
-                    : "Join genuine students across universities worldwide."}
-                </p>
-              </div>
-
-              {errors.form && (
-                <div className="mb-4 p-3 bg-[#fdf3f2] border border-[#f1c5c0] rounded-xl text-xs text-[#a33e32]">
-                  {errors.form}
-                </div>
-              )}
-
-              {/* REGISTER FORM */}
-              {mode === "register" ? (
-                <form
-                  onSubmit={handleRegisterSubmit}
-                  noValidate
-                  className="space-y-3.5"
-                >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-[#242b29] mb-1">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Maya Lin"
-                        value={name}
-                        onChange={(e) => {
-                          setName(e.target.value)
-                          if (!username) {
-                            setUsername(
-                              e.target.value
-                                .toLowerCase()
-                                .replace(/\s+/g, "_")
-                                .replace(/[^a-z0-9_]/g, ""),
-                            )
-                          }
-                          if (errors.name) setErrors({ ...errors, name: "" })
-                        }}
-                        className={`w-full h-11 px-3.5 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                          errors.name ? "border-[#a33e32]" : "border-black/10"
-                        }`}
-                      />
-                      {errors.name && (
-                        <p className="text-[11px] text-[#a33e32] mt-0.5">
-                          {errors.name}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-[#242b29] mb-1">
-                        Profile Handle / Username *
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-3 text-xs text-[#728078]">
-                          @
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="username"
-                          value={username}
-                          onChange={(e) => {
-                            setUsername(
-                              e.target.value
-                                .toLowerCase()
-                                .replace(/[^a-z0-9_]/g, ""),
-                            )
-                            if (errors.username)
-                              setErrors({ ...errors, username: "" })
-                          }}
-                          className={`w-full h-11 pl-7 pr-3 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                            errors.username
-                              ? "border-[#a33e32]"
-                              : "border-black/10"
-                          }`}
-                        />
-                      </div>
-                      {errors.username && (
-                        <p className="text-[11px] text-[#a33e32] mt-0.5">
-                          {errors.username}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#242b29] mb-1">
-                      Student / University Email *
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. name@university.edu"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value)
-                        if (errors.email) setErrors({ ...errors, email: "" })
-                      }}
-                      className={`w-full h-11 px-3.5 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                        errors.email ? "border-[#a33e32]" : "border-black/10"
-                      }`}
-                    />
-                    {errors.email && (
-                      <p className="text-[11px] text-[#a33e32] mt-0.5">
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-[#242b29] mb-1">
-                        Current Institution *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Stanford University"
-                        value={institution}
-                        onChange={(e) => {
-                          setInstitution(e.target.value)
-                          if (errors.institution)
-                            setErrors({ ...errors, institution: "" })
-                        }}
-                        className={`w-full h-11 px-3.5 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                          errors.institution
-                            ? "border-[#a33e32]"
-                            : "border-black/10"
-                        }`}
-                      />
-                      {errors.institution && (
-                        <p className="text-[11px] text-[#a33e32] mt-0.5">
-                          {errors.institution}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-[#242b29] mb-1">
-                        Degree & Major
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. B.S. in Computer Science"
-                        value={degree}
-                        onChange={(e) => setDegree(e.target.value)}
-                        className="w-full h-11 px-3.5 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border border-black/10 transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#242b29] mb-1">
-                      Password *
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Create a secure password"
-                        value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value)
-                          if (errors.password)
-                            setErrors({ ...errors, password: "" })
-                        }}
-                        className={`w-full h-11 pl-3.5 pr-10 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                          errors.password
-                            ? "border-[#a33e32]"
-                            : "border-black/10"
-                        }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-[#62736b] hover:text-[#173a35]"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="w-4 h-4" />
-                        ) : (
-                          <Eye className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                    {errors.password && (
-                      <p className="text-[11px] text-[#a33e32] mt-0.5">
-                        {errors.password}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Rules Checkbox */}
-                  <div className="pt-2">
-                    <label className="flex items-start gap-2 cursor-pointer text-xs text-[#4d5b54]">
-                      <input
-                        type="checkbox"
-                        checked={agreedToRules}
-                        onChange={(e) => {
-                          setAgreedToRules(e.target.checked)
-                          if (errors.rules) setErrors({ ...errors, rules: "" })
-                        }}
-                        className="mt-0.5 rounded text-[#173a35] focus:ring-[#173a35]"
-                      />
-                      <span>
-                        I agree to the{" "}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setShowRulesModal(true)
-                          }}
-                          className="font-bold text-[#c46b4b] hover:underline"
-                        >
-                          Credento Community Standards & Safety Oath
-                        </button>
-                        , affirming my identity as an authentic student scholar.
-                      </span>
-                    </label>
-                    {errors.rules && (
-                      <p className="text-[11px] text-[#a33e32] mt-1">
-                        {errors.rules}
-                      </p>
-                    )}
-                  </div>
-
+                <div className="flex items-center gap-1 bg-[#f0f4f2] p-1 rounded-lg text-xs">
                   <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-3d-primary w-full h-12 mt-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                    type="button"
+                    onClick={() => {
+                      setMode("login")
+                      setErrors({})
+                    }}
+                    className={`px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                      mode === "login"
+                        ? "bg-white text-[#173a35] shadow-xs"
+                        : "text-[#62736b] hover:text-[#173a35]"
+                    }`}
                   >
-                    {isSubmitting ? (
-                      <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <span>Complete Registration & Enter Credento</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
+                    Sign In
                   </button>
-                </form>
-              ) : (
-                /* LOGIN FORM */
-                <form
-                  onSubmit={handleLoginSubmit}
-                  noValidate
-                  className="space-y-4"
-                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("register")
+                      setErrors({})
+                    }}
+                    className={`px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                      mode === "register"
+                        ? "bg-white text-[#173a35] shadow-xs"
+                        : "text-[#62736b] hover:text-[#173a35]"
+                    }`}
+                  >
+                    Register
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {errors.form && (
+              <div className="mb-4 p-3 bg-[#fdf3f2] border border-[#f1c5c0] rounded-xl text-xs text-[#a33e32]">
+                {errors.form}
+              </div>
+            )}
+
+            {/* REGISTER FORM */}
+            {mode === "register" ? (
+              <form
+                onSubmit={handleRegisterSubmit}
+                noValidate
+                className="space-y-3"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-[#242b29] mb-1.5">
-                      Student Email or Username
+                    <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                      Full Name *
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. name@university.edu or @username"
-                      value={email}
+                      placeholder="e.g. Maya Lin"
+                      value={name}
                       onChange={(e) => {
-                        setEmail(e.target.value)
-                        if (errors.email) setErrors({ ...errors, email: "" })
+                        setName(e.target.value)
+                        if (!username) {
+                          setUsername(
+                            e.target.value
+                              .toLowerCase()
+                              .replace(/\s+/g, "_")
+                              .replace(/[^a-z0-9_]/g, ""),
+                          )
+                        }
+                        if (errors.name) setErrors({ ...errors, name: "" })
                       }}
-                      className={`w-full h-12 px-4 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                        errors.email ? "border-[#a33e32]" : "border-black/10"
+                      className={`w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.name ? "border-[#a33e32]" : "border-black/15"
                       }`}
                     />
-                    {errors.email && (
-                      <p className="text-[11px] text-[#a33e32] mt-1">
-                        {errors.email}
+                    {errors.name && (
+                      <p className="text-[11px] text-[#a33e32] mt-0.5">
+                        {errors.name}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-bold text-[#242b29]">
-                        Password
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setShowForgotModal(true)}
-                        className="text-[11px] text-[#c46b4b] hover:underline font-medium"
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
+                    <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                      Username *
+                    </label>
                     <div className="relative">
+                      <span className="absolute left-2.5 top-2.5 text-xs text-[#728078]">
+                        @
+                      </span>
                       <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your student password"
-                        value={password}
+                        type="text"
+                        placeholder="username"
+                        value={username}
                         onChange={(e) => {
-                          setPassword(e.target.value)
-                          if (errors.password)
-                            setErrors({ ...errors, password: "" })
+                          setUsername(
+                            e.target.value
+                              .toLowerCase()
+                              .replace(/[^a-z0-9_]/g, ""),
+                          )
+                          if (errors.username)
+                            setErrors({ ...errors, username: "" })
                         }}
-                        className={`w-full h-12 pl-4 pr-11 text-xs bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border transition-all ${
-                          errors.password
+                        className={`w-full h-10 pl-6 pr-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                          errors.username
                             ? "border-[#a33e32]"
-                            : "border-black/10"
+                            : "border-black/15"
                         }`}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-3.5 text-[#62736b] hover:text-[#173a35]"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
                     </div>
-                    {errors.password && (
-                      <p className="text-[11px] text-[#a33e32] mt-1">
-                        {errors.password}
+                    {errors.username && (
+                      <p className="text-[11px] text-[#a33e32] mt-0.5">
+                        {errors.username}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                    Student Email *
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="name@university.edu"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (errors.email) setErrors({ ...errors, email: "" })
+                    }}
+                    className={`w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                      errors.email ? "border-[#a33e32]" : "border-black/15"
+                    }`}
+                  />
+                  {errors.email && (
+                    <p className="text-[11px] text-[#a33e32] mt-0.5">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                      University / College *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Stanford University"
+                      value={institution}
+                      onChange={(e) => {
+                        setInstitution(e.target.value)
+                        if (errors.institution)
+                          setErrors({ ...errors, institution: "" })
+                      }}
+                      className={`w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.institution
+                          ? "border-[#a33e32]"
+                          : "border-black/15"
+                      }`}
+                    />
+                    {errors.institution && (
+                      <p className="text-[11px] text-[#a33e32] mt-0.5">
+                        {errors.institution}
                       </p>
                     )}
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-3d-primary w-full h-12 mt-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
-                  >
-                    {isSubmitting ? (
-                      <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <span>Sign In to Credento</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
-
-              {/* Toggle Login / Register */}
-              <div className="mt-5 pt-4 border-t border-black/[0.06] text-center text-xs text-[#62736b]">
-                {mode === "login" ? (
-                  <span>
-                    New student to Credento?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode("register")
-                        setErrors({})
-                      }}
-                      className="font-bold text-[#c46b4b] hover:underline ml-1"
-                    >
-                      Create your Student Account
-                    </button>
-                  </span>
-                ) : (
-                  <span>
-                    Already registered on Credento?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode("login")
-                        setErrors({})
-                      }}
-                      className="font-bold text-[#173a35] hover:underline ml-1"
-                    >
-                      Sign in here
-                    </button>
-                  </span>
-                )}
-              </div>
-
-              {/* Local multi-user switcher (only if genuine accounts exist in local DB) */}
-              {registeredUsers.length > 0 && mode === "login" && (
-                <div className="mt-5 pt-4 border-t border-dashed border-black/[0.08]">
-                  <p className="text-[11px] font-semibold text-[#173a35] mb-2 flex items-center gap-1.5">
-                    <UserCheck className="w-3.5 h-3.5 text-[#1b6b47]" />
-                    <span>Quick Switch (Registered Local Scholars):</span>
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {registeredUsers.map((user) => (
-                      <button
-                        key={user.id}
-                        type="button"
-                        onClick={() => handleQuickSwitchUser(user.id)}
-                        className="flex items-center gap-2.5 p-2 rounded-xl bg-[#f8faf9] hover:bg-[#eef2f0] border border-black/[0.04] text-left transition-all text-xs group cursor-pointer"
-                      >
-                        <img
-                          src={user.avatar}
-                          alt={user.name}
-                          className="w-7 h-7 rounded-full object-cover shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <p className="font-semibold text-[#173a35] truncate leading-tight group-hover:text-[#c46b4b]">
-                            {user.name}
-                          </p>
-                          <p className="text-[10px] text-[#728078] truncate leading-none">
-                            {user.institution.split(" ")[0]}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                      Degree & Major
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. B.S. Computer Science"
+                      value={degree}
+                      onChange={(e) => setDegree(e.target.value)}
+                      className="w-full h-10 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border border-black/15 transition-all"
+                    />
                   </div>
                 </div>
-              )}
-            </div>
 
-            <div className="mt-6 flex items-center justify-between text-xs text-[#8b9891] px-2">
+                <div>
+                  <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="At least 5 characters"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                        if (errors.password)
+                          setErrors({ ...errors, password: "" })
+                      }}
+                      className={`w-full h-10 pl-3 pr-10 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.password ? "border-[#a33e32]" : "border-black/15"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-[#62736b] hover:text-[#173a35]"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-[11px] text-[#a33e32] mt-0.5">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                {/* Rules Checkbox */}
+                <div className="pt-1">
+                  <label className="flex items-start gap-2 cursor-pointer text-xs text-[#4d5b54]">
+                    <input
+                      type="checkbox"
+                      checked={agreedToRules}
+                      onChange={(e) => {
+                        setAgreedToRules(e.target.checked)
+                        if (errors.rules) setErrors({ ...errors, rules: "" })
+                      }}
+                      className="mt-0.5 rounded text-[#173a35] focus:ring-[#173a35]"
+                    />
+                    <span>
+                      I agree to the{" "}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setShowRulesModal(true)
+                        }}
+                        className="font-semibold text-[#173a35] hover:underline"
+                      >
+                        Credento Community Standards & Safety Oath
+                      </button>
+                      .
+                    </span>
+                  </label>
+                  {errors.rules && (
+                    <p className="text-[11px] text-[#a33e32] mt-0.5">
+                      {errors.rules}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-3d-primary w-full h-11 mt-2 text-xs font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                >
+                  {isSubmitting ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Complete Registration</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            ) : (
+              /* LOGIN FORM */
+              <form
+                onSubmit={handleLoginSubmit}
+                noValidate
+                className="space-y-3.5"
+              >
+                <div>
+                  <label className="block text-xs font-semibold text-[#242b29] mb-1">
+                    Student Email or Username
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. name@university.edu or @username"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (errors.email) setErrors({ ...errors, email: "" })
+                    }}
+                    className={`w-full h-11 px-3 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                      errors.email ? "border-[#a33e32]" : "border-black/15"
+                    }`}
+                  />
+                  {errors.email && (
+                    <p className="text-[11px] text-[#a33e32] mt-0.5">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-[#242b29]">
+                      Password
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotModal(true)}
+                      className="text-[11px] text-[#c46b4b] hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                        if (errors.password)
+                          setErrors({ ...errors, password: "" })
+                      }}
+                      className={`w-full h-11 pl-3 pr-10 text-xs bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border transition-all ${
+                        errors.password ? "border-[#a33e32]" : "border-black/15"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-[#62736b] hover:text-[#173a35]"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-[11px] text-[#a33e32] mt-0.5">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-3d-primary w-full h-11 mt-2 text-xs font-medium flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                >
+                  {isSubmitting ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Sign In</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* Registered user switcher if accounts exist in database */}
+            {registeredUsers.length > 0 && mode === "login" && (
+              <div className="mt-5 pt-4 border-t border-black/[0.06]">
+                <p className="text-[11px] font-semibold text-[#173a35] mb-2 flex items-center gap-1.5">
+                  <UserCheck className="w-3.5 h-3.5 text-[#173a35]" />
+                  <span>Switch Registered Scholar Profile:</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {registeredUsers.slice(0, 4).map((user) => (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onClick={() => handleQuickSwitchUser(user.id)}
+                      className="flex items-center gap-2.5 p-2 rounded-lg bg-[#f8faf9] hover:bg-[#eef2f0] border border-black/[0.05] text-left transition-all text-xs cursor-pointer"
+                    >
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-7 h-7 rounded-full object-cover shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-[#173a35] truncate leading-tight">
+                          {user.name}
+                        </p>
+                        <p className="text-[10px] text-[#728078] truncate leading-none">
+                          {user.institution.split(" ")[0]}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Platform Admin Login Hint */}
+            <div className="mt-6 pt-3 border-t border-black/[0.06] flex items-center justify-between text-[11px] text-[#728078]">
               <button
                 type="button"
                 onClick={() => setShowRulesModal(true)}
                 className="hover:text-[#173a35] underline"
               >
-                Community Standards & Safety Oath
+                Community Standards
               </button>
               <button
                 type="button"
                 onClick={() => setShowAdminModal(true)}
-                className="hover:text-[#173a35] flex items-center gap-1"
+                className="hover:text-[#173a35] flex items-center gap-1 text-[#173a35] font-medium"
               >
                 <Lock className="w-3 h-3" />
                 <span>Admin Login</span>
@@ -700,8 +670,8 @@ export function AuthScreen({
       <Modal
         isOpen={showForgotModal}
         onClose={() => setShowForgotModal(false)}
-        title="Reset Student Password"
-        subtitle="Enter your verified university email to receive a recovery token"
+        title="Reset Password"
+        subtitle="Enter your student email to receive recovery instructions."
         maxWidth="sm"
         footer={
           !recoverySent ? (
@@ -717,7 +687,7 @@ export function AuthScreen({
                 }, 2000)
               }}
               disabled={!recoveryEmail.trim()}
-              className="btn-3d-primary px-4 py-2 text-xs font-semibold rounded-xl disabled:opacity-40"
+              className="btn-3d-primary px-4 py-2 text-xs font-semibold rounded-lg disabled:opacity-40"
             >
               Send Recovery Token
             </button>
@@ -726,7 +696,7 @@ export function AuthScreen({
       >
         {recoverySent ? (
           <div className="py-4 text-center text-xs">
-            <ShieldCheck className="w-8 h-8 text-[#1b6b47] mx-auto mb-2" />
+            <ShieldCheck className="w-8 h-8 text-[#173a35] mx-auto mb-2" />
             <p className="font-bold text-sm text-[#173a35]">
               Recovery Link Dispatched
             </p>
@@ -745,19 +715,18 @@ export function AuthScreen({
                 placeholder="name@university.edu"
                 value={recoveryEmail}
                 onChange={(e) => setRecoveryEmail(e.target.value)}
-                className="w-full p-3 bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border border-black/10"
+                className="w-full p-2.5 bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border border-black/15 text-xs"
                 autoFocus
               />
             </div>
             <p className="text-[11px] text-[#728078]">
-              Password reset links are valid for 60 minutes and verified against
-              student enrollment directories.
+              Password reset links are valid for 60 minutes.
             </p>
           </div>
         )}
       </Modal>
 
-      {/* Secure Credento Staff & Admin Modal */}
+      {/* Credento Admin Login Modal */}
       <Modal
         isOpen={showAdminModal}
         onClose={() => {
@@ -765,50 +734,53 @@ export function AuthScreen({
           setAdminError("")
           setAdminPasskey("")
         }}
-        title="Credento Administrative Portal"
-        subtitle="Restricted to authorized platform administrators and moderation staff."
+        title="Administrator Access"
+        subtitle="Sign in with your administrator email (team@credento.world) or passkey."
         maxWidth="sm"
         footer={
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={() => setShowAdminModal(false)}
-              className="px-4 py-2 text-xs font-semibold text-[#62736b] hover:text-[#242b29] rounded-xl hover:bg-black/5"
+              className="px-3 py-1.5 text-xs font-medium text-[#62736b] hover:text-[#242b29] rounded-lg"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleAdminLoginSubmit}
-              className="btn-3d-primary px-5 py-2 text-xs font-semibold rounded-xl"
+              className="btn-3d-primary px-4 py-1.5 text-xs font-medium rounded-lg"
             >
-              Authorize & Enter Dashboard
+              Access Dashboard
             </button>
           </div>
         }
       >
-        <form onSubmit={handleAdminLoginSubmit} className="space-y-3.5 text-xs">
-          <div className="p-3 bg-[#f0f4f2] border border-[#cbd3ce] rounded-xl text-xs text-[#242b29]">
-            <p className="font-bold text-[#173a35]">
-              Administrator Verification
+        <form onSubmit={handleAdminLoginSubmit} className="space-y-3 text-xs">
+          <div className="p-3 bg-[#f0f4f2] border border-[#cbd3ce] rounded-lg text-xs text-[#242b29]">
+            <p className="font-semibold text-[#173a35] mb-1">
+              Platform Administration
             </p>
-            Enter the authorized Credento Administrative passkey to access
-            system moderation, Access Center reviews, and platform analytics.
+            Enter the authorized admin passkey (or sign in using{" "}
+            <code className="font-mono bg-white px-1 py-0.5 rounded text-[#173a35]">
+              team@credento.world
+            </code>{" "}
+            on the main sign-in screen).
           </div>
 
           <div>
-            <label className="block font-bold text-[#173a35] mb-1">
-              Admin Passkey
+            <label className="block font-semibold text-[#173a35] mb-1">
+              Admin Passkey / Password
             </label>
             <input
               type="password"
-              placeholder="Enter administrator passkey"
+              placeholder="Enter admin password / passkey"
               value={adminPasskey}
               onChange={(e) => {
                 setAdminPasskey(e.target.value)
                 setAdminError("")
               }}
-              className="w-full p-3 bg-white rounded-xl focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/20 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.04)] border border-black/10"
+              className="w-full p-2.5 bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border border-black/15 text-xs"
               autoFocus
             />
             {adminError && (
@@ -816,12 +788,6 @@ export function AuthScreen({
                 {adminError}
               </p>
             )}
-            <p className="text-[10px] text-[#728078] mt-1.5">
-              Default secure passkey:{" "}
-              <code className="bg-black/5 px-1 rounded font-mono">
-                credento-admin-2026
-              </code>
-            </p>
           </div>
         </form>
       </Modal>

@@ -13,7 +13,6 @@ import {
   Edit3,
   CheckCircle2,
   Clock,
-  Sparkles,
   Save,
   MessageSquare,
   Users,
@@ -208,7 +207,7 @@ export function OrganizationDashboardModal({
 
             {requests.length === 0 ? (
               <div className="p-10 text-center text-xs text-[#62736b] bg-[#f8faf9] rounded-2xl">
-                <Sparkles className="w-8 h-8 text-[#c46b4b] mx-auto mb-2" />
+                <Clock className="w-8 h-8 text-[#87978f] mx-auto mb-2" />
                 <p className="font-bold text-sm text-[#173a35]">
                   No requests yet
                 </p>

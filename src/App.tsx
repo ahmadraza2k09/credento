@@ -45,6 +45,7 @@ import {
   editPost,
   endorseSkill,
   getAdminPlatformStats,
+  getAdminUserProfile,
   getAllAccessCenters,
   getAllServiceRequests,
   getAllUsers,
@@ -211,11 +212,22 @@ export default function App() {
   const handleLoginSuccess = (user: StudentProfile) => {
     setCurrentUserId(user.id)
     setInspectedStudentId(null)
-    setCurrentTab("feed")
+    if (
+      user.email?.toLowerCase() === "team@credento.world" ||
+      user.role === "admin"
+    ) {
+      setAdminSession(true)
+      setCurrentTab("admin")
+    } else {
+      setCurrentTab("feed")
+    }
   }
 
   const handleAdminLoginSuccess = () => {
     setAdminSession(true)
+    const adminUser = getAdminUserProfile()
+    setCurrentUserId(adminUser.id)
+    setInspectedStudentId(null)
     setCurrentTab("admin")
   }
 

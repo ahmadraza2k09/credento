@@ -5,7 +5,6 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
   Building,
   Calendar,
   ArrowRight,
@@ -87,7 +86,7 @@ export function UserServiceRequestsModal({
       <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
         {requests.length === 0 ? (
           <div className="py-12 text-center text-xs text-[#62736b]">
-            <Sparkles className="w-9 h-9 text-[#c46b4b] mx-auto mb-2" />
+            <Clock className="w-8 h-8 text-[#87978f] mx-auto mb-2" />
             <p className="font-bold text-sm text-[#173a35]">
               No service requests yet.
             </p>

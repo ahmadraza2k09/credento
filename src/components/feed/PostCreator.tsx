@@ -4,7 +4,6 @@ import {
   Link as LinkIcon,
   Send,
   X,
-  Sparkles,
   FileText,
 } from "lucide-react"
 import { StudentProfile } from "../../types"

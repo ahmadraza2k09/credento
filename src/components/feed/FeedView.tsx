@@ -3,7 +3,7 @@ import {
   Users,
   Bookmark,
   Calendar,
-  Sparkles,
+  MessageSquare,
   ArrowRight,
   TrendingUp,
   Clock,
@@ -304,7 +304,7 @@ export function FeedView({
           {/* Post list */}
           {posts.length === 0 ? (
             <div className="card-linkedin p-10 text-center text-[#62736b]">
-              <Sparkles className="w-10 h-10 text-[#c46b4b] mx-auto mb-3" />
+              <MessageSquare className="w-9 h-9 text-[#87978f] mx-auto mb-3" />
               <h3 className="font-bold text-base text-[#173a35]">
                 No posts in the academic feed yet.
               </h3>

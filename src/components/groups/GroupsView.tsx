@@ -5,7 +5,6 @@ import {
   Plus,
   BookOpen,
   Calendar,
-  Sparkles,
   Check,
   Tag,
   Building,

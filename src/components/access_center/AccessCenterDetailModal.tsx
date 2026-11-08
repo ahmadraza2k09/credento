@@ -15,7 +15,6 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
-  Sparkles,
   HelpCircle,
   ExternalLink,
 } from "lucide-react"
@@ -83,7 +82,7 @@ export function AccessCenterDetailModal({
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
                     {center.name}
                   </h2>
                   <span className="px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-xs text-[10px] font-semibold uppercase tracking-wider text-white">
@@ -125,7 +124,7 @@ export function AccessCenterDetailModal({
                 <h3 className="font-bold text-xs uppercase tracking-wider text-[#c46b4b] mb-1">
                   Our Mission
                 </h3>
-                <p className="text-[#242b29] text-xs sm:text-sm leading-relaxed font-serif font-medium">
+                <p className="text-[#242b29] text-xs sm:text-sm leading-relaxed font-normal">
                   "{center.mission}"
                 </p>
               </div>
@@ -170,7 +169,7 @@ export function AccessCenterDetailModal({
           <div>
             <div className="flex items-center justify-between mb-3.5">
               <div>
-                <h3 className="font-serif font-bold text-base text-[#173a35]">
+                <h3 className="font-bold text-base text-[#173a35]">
                   Free Services Offered
                 </h3>
                 <p className="text-xs text-[#62736b]">

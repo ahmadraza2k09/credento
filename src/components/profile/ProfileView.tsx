@@ -25,7 +25,6 @@ import {
   Trash2,
   FileText,
   ThumbsUp,
-  Sparkles,
   X,
   Eye,
   Link as LinkIcon,
@@ -426,7 +425,7 @@ export function ProfileView({
           {/* Student Name & Handles */}
           <div>
             <div className="flex items-baseline gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#173a35]">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#173a35]">
                 {profile.name}
               </h1>
               {profile.username && (

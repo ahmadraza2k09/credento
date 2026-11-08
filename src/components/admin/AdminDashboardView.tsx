@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  Sparkles,
   BarChart3,
   Search,
   Filter,
@@ -201,7 +200,7 @@ export function AdminDashboardView({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#173a35]">
+                <h1 className="text-xl sm:text-2xl font-bold text-[#173a35]">
                   Credento Administration & Operations
                 </h1>
                 <span className="px-2 py-0.5 rounded-full bg-[#edf6f0] text-[#155738] font-mono text-[10px] font-bold border border-[#b8dec4]">

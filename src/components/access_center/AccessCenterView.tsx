@@ -12,7 +12,6 @@ import {
   Filter,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   ArrowRight,
   Plus,
   Clock,
@@ -125,25 +124,22 @@ export function AccessCenterView({
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
       {/* 1. HERO ECOSYSTEM BANNER */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#173a35] via-[#1a443e] to-[#0f2622] text-white p-6 sm:p-10 shadow-lg border border-black/10">
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[11px] font-semibold text-[#f7f5ef] tracking-wide uppercase border border-white/15">
+      <div className="rounded-2xl bg-[#173a35] text-white p-6 sm:p-8 border border-black/10">
+        <div className="max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[11px] font-medium text-[#f7f5ef] tracking-wide uppercase border border-white/15">
             <HeartHandshake className="w-3.5 h-3.5 text-[#c46b4b]" />
             <span>Credento Free Access Ecosystem</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white tracking-tight leading-[1.15]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Credento Access Center
           </h1>
 
-          <p className="text-sm sm:text-base text-white/85 leading-relaxed font-light">
-            <strong>
-              Organizations provide free services → Credento makes those
-              services discoverable and accessible.
-            </strong>{" "}
-            A structured platform where verified NGOs, tech coalitions, schools,
-            and consulting groups provide free website creation, digital setup
-            assistance, academic consulting, and community enablement.
+          <p className="text-xs sm:text-sm text-white/85 leading-relaxed font-normal">
+            Organizations provide free services → Credento makes those services
+            discoverable and accessible. Verified NGOs, institutions, and
+            coalitions offering free website creation, digital assistance, and
+            consulting.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -292,7 +288,7 @@ export function AccessCenterView({
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-serif font-bold text-[#173a35]">
+            <h2 className="text-lg sm:text-xl font-bold text-[#173a35]">
               Approved Access Centers
             </h2>
             <p className="text-xs text-[#62736b]">

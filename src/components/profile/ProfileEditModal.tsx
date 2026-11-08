@@ -1,14 +1,7 @@
 import React, { useState } from "react"
 import { Modal } from "../common/Modal"
 import { ProfileVisibility, StudentProfile } from "../../types"
-import {
-  Globe,
-  Lock,
-  Users,
-  Sparkles,
-  Image,
-  Link as LinkIcon,
-} from "lucide-react"
+import { Globe, Lock, Users, Image, Link as LinkIcon } from "lucide-react"
 
 interface ProfileEditModalProps {
   isOpen: boolean
