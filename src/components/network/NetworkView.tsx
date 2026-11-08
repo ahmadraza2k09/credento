@@ -22,6 +22,7 @@ interface NetworkViewProps {
   onAcceptConnection: (userId: string) => void
   onDeclineConnection: (userId: string) => void
   onWithdrawConnection: (userId: string) => void
+  onRemoveConnection?: (userId: string) => void
   onToggleFollow: (userId: string) => void
   onStartMessage: (userId: string) => void
   onSelectStudentProfile: (userId: string) => void
@@ -257,10 +258,22 @@ export function NetworkView({
         <div className="card-linkedin p-12 text-center text-[#62736b]">
           <Users className="w-10 h-10 text-[#87978f] mx-auto mb-2.5" />
           <p className="font-bold text-base text-[#173a35]">
-            No students found in this view.
+            {activeTab === "connections"
+              ? "No connections yet."
+              : activeTab === "pending"
+                ? "No pending connection requests."
+                : activeTab === "following"
+                  ? "You are not following any students yet."
+                  : "No students match your filter."}
           </p>
-          <p className="text-xs mt-1">
-            Try adjusting your search query or university filter.
+          <p className="text-xs mt-1 max-w-md mx-auto">
+            {activeTab === "connections"
+              ? "Build your collegiate network by connecting with students from your campus and other academic disciplines."
+              : activeTab === "pending"
+                ? "Sent and received requests will appear here with instant accept/withdraw controls."
+                : activeTab === "following"
+                  ? "Follow scholars to stay updated on their latest research papers and published projects."
+                  : "Try clearing your search query or selecting 'All Universities'."}
           </p>
         </div>
       ) : (
@@ -386,15 +399,16 @@ export function NetworkView({
                         <MessageSquare className="w-3.5 h-3.5" />
                         <span>Message</span>
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => onToggleFollow(student.id)}
-                        className={`btn-3d-secondary px-3 py-1.5 text-xs font-medium cursor-pointer ${
-                          student.isFollowing ? "text-[#173a35] font-bold" : ""
-                        }`}
-                      >
-                        {student.isFollowing ? "Following" : "Follow"}
-                      </button>
+                      {onRemoveConnection && (
+                        <button
+                          type="button"
+                          onClick={() => onRemoveConnection(student.id)}
+                          className="btn-3d-secondary px-2.5 py-1.5 text-xs text-[#a33e32] hover:bg-[#fdf3f2] cursor-pointer"
+                          title="Remove connection"
+                        >
+                          Disconnect
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 w-full">

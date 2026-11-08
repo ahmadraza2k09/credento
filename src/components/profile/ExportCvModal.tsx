@@ -38,13 +38,13 @@ export function ExportCvModal({
       profile.about,
       "",
       "--- EDUCATION ---",
-      ...profile.education.map(
+      ...(profile.education || []).map(
         (e) =>
           `• ${e.degree} in ${e.fieldOfStudy}\n  ${e.institution} (${e.startYear} - ${e.endYear})\n  GPA: ${e.gradeOrGpa || "N/A"}\n  Honors/Activities: ${e.activities || "N/A"}`,
       ),
       "",
       "--- SCHOLARLY PROJECTS & PUBLICATIONS ---",
-      ...profile.portfolioItems.map(
+      ...(profile.portfolioItems || []).map(
         (p) =>
           `• [${p.type.toUpperCase()}] ${p.title} (${p.date})\n  ${
             p.organization ? p.organization + "\n  " : ""
@@ -52,7 +52,7 @@ export function ExportCvModal({
       ),
       "",
       "--- CORE SKILLS & METHODOLOGIES ---",
-      profile.skills.join(", "),
+      (profile.skills || []).join(", "),
     ]
 
     navigator.clipboard.writeText(lines.join("\n"))
@@ -144,7 +144,7 @@ export function ExportCvModal({
             Academic Background & Education
           </h2>
           <div className="space-y-3">
-            {profile.education.map((edu) => (
+            {(profile.education || []).map((edu) => (
               <div key={edu.id} className="text-xs">
                 <div className="flex items-start justify-between">
                   <span className="font-bold text-[#173a35]">
@@ -175,13 +175,13 @@ export function ExportCvModal({
         </div>
 
         {/* Portfolio, Research & Publications */}
-        {profile.portfolioItems.length > 0 && (
+        {(profile.portfolioItems || []).length > 0 && (
           <div>
             <h2 className="text-xs font-semibold text-[#173a35] border-b border-[#cbd3ce] pb-1 mb-2.5">
               Research, Publications & Significant Projects
             </h2>
             <div className="space-y-3.5">
-              {profile.portfolioItems.map((item) => (
+              {(profile.portfolioItems || []).map((item) => (
                 <div key={item.id} className="text-xs">
                   <div className="flex items-start justify-between">
                     <div>

@@ -27,6 +27,9 @@ import {
   ThumbsUp,
   Sparkles,
   X,
+  Eye,
+  Link as LinkIcon,
+  Code,
 } from "lucide-react"
 import {
   EducationItem,
@@ -60,6 +63,7 @@ interface ProfileViewProps {
   onAddInterest?: (interest: string) => void
   onRemoveInterest?: (interest: string) => void
   onConnect: (userId: string) => void
+  onRemoveConnection?: (userId: string) => void
   onFollow: (userId: string) => void
   onStartMessage: (userId: string) => void
   onReport: (type: "user", targetId: string) => void
@@ -83,6 +87,7 @@ export function ProfileView({
   onAddInterest,
   onRemoveInterest,
   onConnect,
+  onRemoveConnection,
   onFollow,
   onStartMessage,
   onReport,
@@ -99,6 +104,9 @@ export function ProfileView({
   const [selectedPortfolioToEdit, setSelectedPortfolioToEdit] =
     useState<PortfolioItem | null>(null)
 
+  // Preview Mode: Allows user to preview their profile as external viewers see it
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+
   const [newSkillInput, setNewSkillInput] = useState("")
   const [showAddSkillInput, setShowAddSkillInput] = useState(false)
   const [newInterestInput, setNewInterestInput] = useState("")
@@ -106,6 +114,8 @@ export function ProfileView({
 
   const [activePortfolioTab, setActivePortfolioTab] = useState<string>("all")
   const [copiedLink, setCopiedLink] = useState(false)
+
+  const effectiveIsSelf = isSelf && !isPreviewMode
 
   const completeness = useMemo(
     () => calculateProfileCompleteness(profile),
@@ -117,10 +127,13 @@ export function ProfileView({
   const isPendingReceived = profile.connectionStatus === "pending_received"
 
   // Visibility check: If not public and not self and not connected
-  const isRestricted = !profile.isPublic && !isSelf && !isConnected
+  const isRestricted =
+    !profile.isPublic && !isSelf && !isConnected && !isPreviewMode
+
+  const profileUrl = `${window.location.origin}/p/${profile.username || profile.id}`
 
   const handleCopyLink = () => {
-    navigator.clipboard?.writeText(window.location.href)
+    navigator.clipboard?.writeText(profileUrl)
     setCopiedLink(true)
     setTimeout(() => setCopiedLink(false), 2000)
   }
@@ -180,6 +193,12 @@ export function ProfileView({
         profile.portfolioItems?.filter((p) => p.type === "certificate")
           .length || 0,
     },
+    {
+      id: "work",
+      label: "Experience",
+      count:
+        profile.portfolioItems?.filter((p) => p.type === "work").length || 0,
+    },
   ]
 
   const getPortfolioIcon = (type: PortfolioType) => {
@@ -193,6 +212,8 @@ export function ProfileView({
       case "leadership":
       case "volunteer":
         return <Briefcase className="w-4 h-4 text-[#1b6b47]" />
+      case "work":
+        return <Building className="w-4 h-4 text-[#173a35]" />
       default:
         return <ShieldCheck className="w-4 h-4 text-[#0369a1]" />
     }
@@ -200,25 +221,46 @@ export function ProfileView({
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-5 py-5 sm:py-8 space-y-6">
+      {/* PREVIEW MODE BANNER */}
+      {isSelf && (
+        <div className="flex items-center justify-between p-3 px-4 bg-white border border-[#cbd3ce] rounded-2xl shadow-sm text-xs">
+          <div className="flex items-center gap-2">
+            <Eye className="w-4 h-4 text-[#173a35]" />
+            <span className="font-semibold text-[#173a35]">
+              {isPreviewMode
+                ? "Preview Mode Active — You are viewing your profile exactly as external students see it."
+                : "Author Mode — You can edit credentials, projects, and visibility settings."}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsPreviewMode(!isPreviewMode)}
+            className="btn-3d-secondary px-3.5 py-1 text-xs font-semibold cursor-pointer"
+          >
+            {isPreviewMode ? "Return to Edit Mode" : "Preview Public View"}
+          </button>
+        </div>
+      )}
+
       {/* 1. PROFILE HEADER CARD */}
       <div className="card-linkedin overflow-hidden">
-        {/* Banner Cover Image - Solid Archival Evergreen Cover */}
+        {/* Banner Cover Image */}
         <div className="h-44 sm:h-60 bg-gradient-to-r from-[#173a35] to-[#102d29] relative">
           {profile.coverImage && (
             <img
               src={profile.coverImage}
               alt="Profile Cover"
-              className="w-full h-full object-cover opacity-75"
+              className="w-full h-full object-cover opacity-80"
             />
           )}
           <div className="absolute top-4 right-4 flex items-center gap-2">
             {profile.isPublic ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-xs text-[#173a35] text-[11px] font-semibold rounded-full shadow-sm">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/95 backdrop-blur-xs text-[#173a35] text-[11px] font-semibold rounded-full shadow-sm">
                 <Globe className="w-3 h-3 text-[#173a35]" />
                 <span>Public Profile</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-xs text-[#9f5138] text-[11px] font-semibold rounded-full shadow-sm">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/95 backdrop-blur-xs text-[#9f5138] text-[11px] font-semibold rounded-full shadow-sm">
                 <Lock className="w-3 h-3 text-[#9f5138]" />
                 <span>Connections Only</span>
               </span>
@@ -237,7 +279,7 @@ export function ProfileView({
               />
               <span
                 className="absolute bottom-1.5 right-1.5 w-7 h-7 bg-[#173a35] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm"
-                title="Verified University Student"
+                title="Verified Student Scholar"
               >
                 <ShieldCheck className="w-4 h-4 text-[#dce8df]" />
               </span>
@@ -245,7 +287,7 @@ export function ProfileView({
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5">
-              {isSelf ? (
+              {effectiveIsSelf ? (
                 <>
                   <button
                     type="button"
@@ -276,7 +318,7 @@ export function ProfileView({
                     type="button"
                     onClick={handleCopyLink}
                     className="btn-3d-secondary flex items-center gap-1.5 px-3 py-2 text-xs cursor-pointer"
-                    title="Share profile"
+                    title="Share profile link"
                   >
                     {copiedLink ? (
                       <Check className="w-4 h-4 text-[#173a35]" />
@@ -288,14 +330,26 @@ export function ProfileView({
               ) : (
                 <>
                   {isConnected ? (
-                    <button
-                      type="button"
-                      onClick={() => onStartMessage(profile.id)}
-                      className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold cursor-pointer"
-                    >
-                      <MessageSquare className="w-4 h-4" />
-                      <span>Message</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onStartMessage(profile.id)}
+                        className="btn-3d-primary flex items-center gap-1.5 px-4.5 py-2 text-xs font-semibold cursor-pointer"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        <span>Message</span>
+                      </button>
+                      {onRemoveConnection && (
+                        <button
+                          type="button"
+                          onClick={() => onRemoveConnection(profile.id)}
+                          className="px-3 py-2 text-xs text-[#a33e32] hover:bg-[#fdf3f2] rounded-xl border border-[#f1c5c0] cursor-pointer"
+                          title="Remove connection"
+                        >
+                          Disconnect
+                        </button>
+                      )}
+                    </div>
                   ) : isPendingSent ? (
                     <span className="flex items-center gap-1.5 px-4 py-2 bg-[#f4f6f5] text-[#62736b] rounded-xl text-xs font-semibold shadow-xs">
                       <Clock className="w-4 h-4" />
@@ -332,7 +386,7 @@ export function ProfileView({
                     <span>{profile.isFollowing ? "Following" : "Follow"}</span>
                   </button>
 
-                  {/* Direct message if not connected */}
+                  {/* Direct message shortcut if not connected */}
                   {!isConnected && (
                     <button
                       type="button"
@@ -344,7 +398,7 @@ export function ProfileView({
                     </button>
                   )}
 
-                  {/* Export CV button for peers */}
+                  {/* Export CV button */}
                   <button
                     type="button"
                     onClick={() => setIsExportCvOpen(true)}
@@ -359,7 +413,7 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => onReport("user", profile.id)}
-                    className="btn-3d-secondary p-2.5 text-xs cursor-pointer hover:text-[#a33e32]"
+                    className="p-2 text-[#62736b] hover:text-[#a33e32] hover:bg-black/5 rounded-xl cursor-pointer"
                     title="Report profile"
                   >
                     <Flag className="w-4 h-4" />
@@ -369,44 +423,22 @@ export function ProfileView({
             </div>
           </div>
 
-          {/* Name & Headline */}
+          {/* Student Name & Handles */}
           <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#173a35] tracking-tight">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#173a35]">
                 {profile.name}
               </h1>
-              <span className="text-xs bg-[#f4f6f5] text-[#4d5b54] px-2.5 py-0.5 rounded-full font-mono font-medium shadow-2xs">
-                Class of {profile.graduationYear}
-              </span>
+              {profile.username && (
+                <span className="text-xs text-[#728078] font-mono font-medium">
+                  @{profile.username}
+                </span>
+              )}
             </div>
 
             <p className="text-xs sm:text-sm text-[#242b29] font-medium mt-1 leading-snug">
-              {profile.headline}
+              {profile.headline || `Student @ ${profile.institution}`}
             </p>
-
-            {/* Open To Badges */}
-            {profile.openToBadges && profile.openToBadges.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                {profile.openToBadges.includes("research") && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#edf6f0] text-[#155738] border border-[#b8dec4] text-[11px] font-semibold rounded-full shadow-2xs">
-                    <span className="w-2 h-2 rounded-full bg-[#1b6b47] animate-pulse" />
-                    <span>Open to Research Collaboration</span>
-                  </span>
-                )}
-                {profile.openToBadges.includes("internships") && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#fef3eb] text-[#9f5138] border border-[#fbd3bc] text-[11px] font-semibold rounded-full shadow-2xs">
-                    <Briefcase className="w-3 h-3 text-[#c46b4b]" />
-                    <span>Seeking Summer / Fall Internships</span>
-                  </span>
-                )}
-                {profile.openToBadges.includes("tutoring") && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#f0f4fe] text-[#2563eb] border border-[#c7d9fe] text-[11px] font-semibold rounded-full shadow-2xs">
-                    <BookOpen className="w-3 h-3 text-[#2563eb]" />
-                    <span>Available for Peer Tutoring</span>
-                  </span>
-                )}
-              </div>
-            )}
 
             {/* Academic Institution & Location Meta */}
             <div className="flex flex-wrap items-center gap-y-1.5 gap-x-4 text-xs text-[#62736b] mt-3">
@@ -434,28 +466,89 @@ export function ProfileView({
             <div className="flex items-center gap-4 text-xs text-[#62736b] mt-3.5 pt-3.5 border-t border-black/[0.04]">
               <div>
                 <strong className="text-[#173a35] font-mono">
-                  {profile.connectionsCount}
+                  {profile.connectionsCount || 0}
                 </strong>{" "}
                 connections
               </div>
               <div>
                 <strong className="text-[#173a35] font-mono">
-                  {profile.followersCount}
+                  {profile.followersCount || 0}
                 </strong>{" "}
                 followers
               </div>
+              {profile.username && (
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="text-[11px] text-[#c46b4b] hover:underline font-mono ml-auto"
+                >
+                  {copiedLink
+                    ? "✓ Link Copied"
+                    : `credento.org/p/${profile.username}`}
+                </button>
+              )}
             </div>
+
+            {/* Social Links Row */}
+            {profile.socialLinks && (
+              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-black/[0.04]">
+                {profile.socialLinks.website && (
+                  <a
+                    href={profile.socialLinks.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#f4f6f5] hover:bg-[#eef2f0] text-[11px] text-[#173a35] font-medium"
+                  >
+                    <ExternalLink className="w-3 h-3 text-[#62736b]" />
+                    <span>Portfolio</span>
+                  </a>
+                )}
+                {profile.socialLinks.github && (
+                  <a
+                    href={profile.socialLinks.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#f4f6f5] hover:bg-[#eef2f0] text-[11px] text-[#173a35] font-medium"
+                  >
+                    <Code className="w-3 h-3 text-[#62736b]" />
+                    <span>GitHub</span>
+                  </a>
+                )}
+                {profile.socialLinks.linkedin && (
+                  <a
+                    href={profile.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#f4f6f5] hover:bg-[#eef2f0] text-[11px] text-[#173a35] font-medium"
+                  >
+                    <ExternalLink className="w-3 h-3 text-[#0369a1]" />
+                    <span>LinkedIn</span>
+                  </a>
+                )}
+                {profile.socialLinks.scholar && (
+                  <a
+                    href={profile.socialLinks.scholar}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#f4f6f5] hover:bg-[#eef2f0] text-[11px] text-[#173a35] font-medium"
+                  >
+                    <BookOpen className="w-3 h-3 text-[#c46b4b]" />
+                    <span>Google Scholar</span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Profile Completeness Recommendation Bar (Self only) */}
-          {isSelf && completeness.percentage < 100 && (
+          {/* Profile Completeness Recommendation Bar (Self only in Edit Mode) */}
+          {effectiveIsSelf && completeness.percentage < 100 && (
             <div className="mt-5 p-4 sm:p-5 bg-[#f8faf9] border border-black/[0.04] rounded-2xl shadow-xs">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="font-bold text-xs text-[#173a35]">
-                  Profile Completeness Indicator
+                  Profile Completion Guidance
                 </span>
                 <span className="text-xs font-mono font-bold text-[#c46b4b]">
-                  {completeness.percentage}%
+                  {completeness.percentage}% Complete
                 </span>
               </div>
               <div className="w-full bg-[#d8ddd8] rounded-full h-2 overflow-hidden mb-2.5 shadow-inner">
@@ -466,15 +559,15 @@ export function ProfileView({
               </div>
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <p className="text-[11px] text-[#62736b]">
-                  Improve your profile to reach full student credential status.
-                  Missing: {completeness.missingFields.join(", ")}.
+                  Complete your profile to build credibility. Missing:{" "}
+                  <strong>{completeness.missingFields.join(", ")}</strong>.
                 </p>
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
                   className="text-xs text-[#c46b4b] font-bold hover:underline cursor-pointer"
                 >
-                  Complete Now →
+                  Complete Profile →
                 </button>
               </div>
             </div>
@@ -504,83 +597,92 @@ export function ProfileView({
         </div>
       ) : (
         <>
-          {/* 2. ABOUT SECTION */}
+          {/* 2. ABOUT / STATEMENT OF PURPOSE */}
           <div className="card-linkedin p-6 sm:p-7">
-            <div className="flex items-center justify-between mb-3.5 border-b border-black/[0.04] pb-2.5">
-              <h2 className="font-semibold text-sm text-[#173a35]">
-                About & Research Focus
-              </h2>
-              {isSelf && (
+            <div className="flex items-center justify-between mb-3.5">
+              <h2 className="font-semibold text-sm text-[#173a35]">About</h2>
+              {effectiveIsSelf && (
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
-                  className="text-xs text-[#62736b] hover:text-[#173a35] p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
-                  title="Edit about statement"
+                  className="p-1 text-[#62736b] hover:text-[#173a35] cursor-pointer"
                 >
-                  <Edit3 className="w-4 h-4" />
+                  <Edit3 className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
-            <p className="text-sm text-[#242b29] leading-relaxed whitespace-pre-line">
-              {profile.about || "No personal statement provided yet."}
-            </p>
+            {profile.about ? (
+              <p className="text-xs sm:text-sm text-[#3b4742] leading-relaxed whitespace-pre-line">
+                {profile.about}
+              </p>
+            ) : (
+              <div className="p-4 bg-[#f8faf9] rounded-xl text-center text-xs text-[#62736b]">
+                <p>No biography added yet.</p>
+                {effectiveIsSelf && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="text-[#c46b4b] font-semibold hover:underline mt-1 block mx-auto"
+                  >
+                    + Write about your academic focus
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* 3. EDUCATION & ACADEMIC CREDENTIALS */}
+          {/* 3. EDUCATION SECTION */}
           <div className="card-linkedin p-6 sm:p-7">
-            <div className="flex items-center justify-between mb-4 border-b border-black/[0.04] pb-2.5">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-sm text-[#173a35]">
-                Education & Academic Qualifications
+                Education
               </h2>
-              {isSelf && (
+              {effectiveIsSelf && onAddEducation && (
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedEduToEdit(null)
                     setIsEduModalOpen(true)
                   }}
-                  className="btn-3d-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium cursor-pointer"
+                  className="btn-3d-secondary flex items-center gap-1 px-3 py-1 text-xs font-semibold cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add Education</span>
+                  <span>Add School</span>
                 </button>
               )}
             </div>
 
-            <div className="space-y-4">
-              {profile.education && profile.education.length > 0 ? (
-                profile.education.map((edu) => (
+            {profile.education && profile.education.length > 0 ? (
+              <div className="space-y-4">
+                {profile.education.map((edu) => (
                   <div
                     key={edu.id}
-                    className="flex items-start justify-between gap-4 pb-4 border-b border-black/[0.04] last:border-0 last:pb-0"
+                    className="flex items-start justify-between gap-3 pb-4 border-b border-black/[0.04] last:border-0 last:pb-0"
                   >
-                    <div className="flex items-start gap-4 min-w-0 flex-1">
-                      <div className="w-11 h-11 rounded-2xl bg-[#dce8df] text-[#173a35] flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#eef2f0] flex items-center justify-center text-[#173a35] shrink-0 mt-0.5">
                         <GraduationCap className="w-5 h-5" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-sm sm:text-base text-[#173a35]">
+                      <div className="text-xs">
+                        <h3 className="font-bold text-sm text-[#173a35]">
                           {edu.institution}
                         </h3>
-                        <p className="text-xs font-semibold text-[#242b29] mt-0.5">
+                        <p className="font-medium text-[#242b29] mt-0.5">
                           {edu.degree} — {edu.fieldOfStudy}
                         </p>
-                        <p className="text-[11px] text-[#62736b] mt-0.5">
-                          {edu.startYear} – {edu.endYear}{" "}
-                          {edu.gradeOrGpa ? `• ${edu.gradeOrGpa}` : ""}
+                        <p className="text-[11px] text-[#728078] mt-0.5">
+                          {edu.startYear} – {edu.endYear}
+                          {edu.gradeOrGpa && ` • ${edu.gradeOrGpa}`}
                         </p>
                         {edu.activities && (
-                          <p className="text-xs text-[#4d5b54] mt-2.5 leading-relaxed bg-[#f8faf9] p-3 rounded-2xl border border-black/[0.04]">
-                            <strong className="text-[#173a35]">
-                              Activities & Societies:
-                            </strong>{" "}
+                          <p className="text-[#62736b] mt-1.5 leading-relaxed text-[11px]">
                             {edu.activities}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    {isSelf && (
+                    {effectiveIsSelf && onUpdateEducation && (
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           type="button"
@@ -588,206 +690,216 @@ export function ProfileView({
                             setSelectedEduToEdit(edu)
                             setIsEduModalOpen(true)
                           }}
-                          className="p-1.5 text-[#62736b] hover:text-[#173a35] hover:bg-black/5 rounded-lg cursor-pointer"
-                          title="Edit education"
+                          className="p-1.5 text-[#62736b] hover:text-[#173a35] cursor-pointer"
                         >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteEducation?.(edu.id)}
-                          className="p-1.5 text-[#62736b] hover:text-[#a33e32] hover:bg-black/5 rounded-lg cursor-pointer"
-                          title="Delete education"
-                        >
-                          <Trash2 className="w-4 h-4" />
+                          <Edit3 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     )}
                   </div>
-                ))
-              ) : (
-                <p className="text-xs text-[#62736b]">No education listed.</p>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-6 bg-[#f8faf9] rounded-2xl text-center text-xs text-[#62736b]">
+                <GraduationCap className="w-8 h-8 text-[#173a35]/40 mx-auto mb-2" />
+                <p className="font-semibold text-[#173a35]">
+                  No education history recorded yet.
+                </p>
+                <p className="text-[11px] mt-0.5">
+                  Add your current university and previous institutions.
+                </p>
+                {effectiveIsSelf && onAddEducation && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedEduToEdit(null)
+                      setIsEduModalOpen(true)
+                    }}
+                    className="btn-3d-secondary mt-3 px-4 py-1.5 text-xs font-semibold"
+                  >
+                    + Add University or Degree
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* 4. STUDENT PORTFOLIO, PROJECTS & ACCOMPLISHMENTS */}
+          {/* 4. ACADEMIC & PROFESSIONAL ACCOMPLISHMENTS (PORTFOLIO) */}
           <div className="card-linkedin p-6 sm:p-7">
-            <div className="flex items-center justify-between mb-4 border-b border-black/[0.04] pb-2.5">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div>
                 <h2 className="font-semibold text-sm text-[#173a35]">
-                  Portfolio & Accomplishments
+                  Scholarly Accomplishments & Portfolio
                 </h2>
-                <p className="text-[11px] text-[#62736b] mt-0.5">
-                  Verified research projects, publications, awards, and
-                  certifications
+                <p className="text-[11px] text-[#728078] mt-0.5">
+                  Verified projects, published papers, awards, certificates, and
+                  leadership roles.
                 </p>
               </div>
-              {isSelf && (
+
+              {effectiveIsSelf && (
                 <button
                   type="button"
                   onClick={() => setIsAddPortfolioOpen(true)}
-                  className="btn-3d-primary flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold cursor-pointer"
+                  className="btn-3d-primary flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add Work</span>
+                  <span>Add Item</span>
                 </button>
               )}
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2.5 mb-4 border-b border-black/[0.04] scrollbar-none">
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap gap-1.5 pb-4 border-b border-black/[0.04]">
               {portfolioTabOptions.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActivePortfolioTab(tab.id)}
-                  className={`text-xs px-3.5 py-1.5 rounded-full transition-all whitespace-nowrap font-medium cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer ${
                     activePortfolioTab === tab.id
-                      ? "btn-3d-primary text-white"
-                      : "bg-[#f4f6f5] text-[#62736b] hover:bg-white hover:shadow-xs"
+                      ? "bg-[#173a35] text-white"
+                      : "bg-[#f4f6f5] text-[#62736b] hover:text-[#173a35]"
                   }`}
                 >
                   <span>{tab.label}</span>
                   {tab.count !== undefined && tab.count > 0 && (
-                    <span className="ml-1.5 font-mono text-[10px] opacity-80">
-                      ({tab.count})
+                    <span
+                      className={`ml-1.5 text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full ${
+                        activePortfolioTab === tab.id
+                          ? "bg-white/20 text-white"
+                          : "bg-white text-[#173a35]"
+                      }`}
+                    >
+                      {tab.count}
                     </span>
                   )}
                 </button>
               ))}
             </div>
 
-            {/* Items list */}
-            {filteredPortfolio.length === 0 ? (
-              <div className="p-8 text-center bg-[#f8faf9] rounded-2xl border border-black/[0.04] text-xs text-[#62736b]">
-                <p className="font-semibold text-[#173a35]">
-                  No items listed under this category.
-                </p>
-                {isSelf && (
-                  <button
-                    type="button"
-                    onClick={() => setIsAddPortfolioOpen(true)}
-                    className="mt-2 text-[#c46b4b] font-bold hover:underline cursor-pointer"
-                  >
-                    + Add your first{" "}
-                    {activePortfolioTab === "all" ? "work" : activePortfolioTab}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
+            {/* List */}
+            {filteredPortfolio.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 {filteredPortfolio.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 sm:p-5 bg-[#f8faf9] rounded-2xl border border-black/[0.04] shadow-xs hover:shadow-md transition-all relative group"
+                    className="p-4 rounded-2xl bg-[#f8faf9] border border-black/[0.04] hover:bg-white hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-xl bg-white border border-black/[0.06] shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-1.5 text-xs text-[#62736b]">
                           {getPortfolioIcon(item.type)}
+                          <span className="capitalize font-semibold text-[11px] text-[#173a35]">
+                            {item.type}
+                          </span>
+                          <span>•</span>
+                          <span className="text-[10px]">{item.date}</span>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-sm text-[#173a35]">
-                              {item.title}
-                            </h3>
-                            <span className="text-[11px] capitalize px-2.5 py-0.5 rounded-full bg-white border border-black/[0.06] text-[#62736b] shadow-2xs">
-                              {item.type}
-                            </span>
-                          </div>
 
-                          <div className="flex items-center gap-3 text-[11px] text-[#62736b] mt-1">
-                            {item.organization && (
-                              <span className="font-semibold text-[#242b29]">
-                                {item.organization}
-                              </span>
-                            )}
-                            {item.date && <span>• {item.date}</span>}
-                            {item.credentialId && (
-                              <span className="font-mono text-[#728078]">
-                                ID: {item.credentialId}
-                              </span>
-                            )}
+                        {effectiveIsSelf && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedPortfolioToEdit(item)
+                                setIsEditPortfolioOpen(true)
+                              }}
+                              className="p-1 text-[#62736b] hover:text-[#173a35] cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => onRemovePortfolioItem(item.id)}
+                              className="p-1 text-[#62736b] hover:text-[#a33e32] cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
-                        </div>
+                        )}
                       </div>
 
-                      {/* Remove / Edit item buttons for self */}
-                      {isSelf && (
-                        <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedPortfolioToEdit(item)
-                              setIsEditPortfolioOpen(true)
-                            }}
-                            className="text-[#62736b] hover:text-[#173a35] p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
-                            title="Edit work"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onRemovePortfolioItem(item.id)}
-                            className="text-[#62736b] hover:text-[#a33e32] p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
-                            title="Delete item"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                      <h3 className="font-bold text-xs sm:text-sm text-[#173a35]">
+                        {item.title}
+                      </h3>
+                      {item.organization && (
+                        <p className="text-[11px] text-[#c46b4b] font-medium mt-0.5">
+                          {item.organization}
+                        </p>
+                      )}
+                      <p className="text-xs text-[#4d5b54] mt-2 leading-relaxed">
+                        {item.description}
+                      </p>
+
+                      {item.credentialId && (
+                        <div className="mt-2 text-[10px] font-mono text-[#728078] bg-white p-1.5 rounded-lg border border-black/5">
+                          Credential ID: {item.credentialId}
+                        </div>
+                      )}
+
+                      {/* Skills */}
+                      {item.skills && item.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-3">
+                          {item.skills.map((s, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 rounded-md bg-white text-[10px] text-[#173a35] font-medium border border-black/5"
+                            >
+                              {s}
+                            </span>
+                          ))}
                         </div>
                       )}
                     </div>
 
-                    <p className="text-xs text-[#242b29] mt-3 leading-relaxed">
-                      {item.description}
-                    </p>
-
-                    {/* Skills pills */}
-                    {item.skills && item.skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-3">
-                        {item.skills.map((skill, idx) => (
-                          <span
-                            key={idx}
-                            className="text-[10px] px-2.5 py-0.5 bg-white rounded-full text-[#4d5b54] font-medium shadow-2xs"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* External Link */}
                     {item.linkUrl && (
-                      <div className="mt-3.5 pt-2.5 border-t border-black/[0.04]">
+                      <div className="pt-3 mt-3 border-t border-black/[0.04]">
                         <a
                           href={item.linkUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-[#c46b4b] hover:underline font-semibold cursor-pointer"
+                          className="inline-flex items-center gap-1 text-xs text-[#c46b4b] font-bold hover:underline"
                         >
-                          <span>View Official Repository / Publication</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>View Official Link / Repository</span>
+                          <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="p-8 text-center text-xs text-[#62736b]">
+                <FolderGit2 className="w-8 h-8 text-[#173a35]/40 mx-auto mb-2" />
+                <p className="font-semibold text-[#173a35]">
+                  {activePortfolioTab === "all"
+                    ? "Your portfolio is ready to build."
+                    : `No ${activePortfolioTab} items recorded yet.`}
+                </p>
+                <p className="text-[11px] mt-0.5">
+                  Publish research preprints, technical projects, and awards to
+                  showcase your academic journey.
+                </p>
+                {effectiveIsSelf && (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddPortfolioOpen(true)}
+                    className="btn-3d-secondary mt-3 px-4 py-1.5 text-xs font-semibold"
+                  >
+                    + Add First Project or Award
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
           {/* 5. SKILLS & INTERESTS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {/* Skills */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Skills with Endorsements */}
             <div className="card-linkedin p-6">
               <h2 className="font-semibold text-sm text-[#173a35] mb-3.5 flex items-center justify-between">
-                <span>
-                  Skills & Endorsements ({profile.skills?.length || 0})
-                </span>
-                <span className="text-[10px] text-[#728078] font-normal">
-                  Peer verified
-                </span>
+                <span>Core Competencies & Skills</span>
               </h2>
               <div className="flex flex-wrap gap-2">
                 {profile.skills && profile.skills.length > 0 ? (
@@ -816,21 +928,15 @@ export function ProfileView({
                                 ? "bg-[#173a35] text-white"
                                 : "bg-white text-[#62736b] hover:text-[#173a35] hover:bg-[#edf2ee]"
                             }`}
-                            title={
-                              isEndorsedByMe
-                                ? "Remove endorsement"
-                                : "Endorse skill"
-                            }
                           >
                             {isEndorsedByMe ? "✓ Endorsed" : "+ Endorse"}
                           </button>
                         )}
-                        {isSelf && onRemoveSkill && (
+                        {effectiveIsSelf && onRemoveSkill && (
                           <button
                             type="button"
                             onClick={() => onRemoveSkill(skill)}
                             className="text-[#87978f] hover:text-[#a33e32] ml-1 text-sm font-bold leading-none cursor-pointer"
-                            title="Remove skill"
                           >
                             ×
                           </button>
@@ -839,10 +945,10 @@ export function ProfileView({
                     )
                   })
                 ) : (
-                  <p className="text-xs text-[#62736b]">No skills added.</p>
+                  <p className="text-xs text-[#62736b]">No skills added yet.</p>
                 )}
 
-                {isSelf &&
+                {effectiveIsSelf &&
                   onAddSkill &&
                   (showAddSkillInput ? (
                     <div className="flex items-center gap-1 bg-white border border-[#cbd3ce] rounded-full px-2.5 py-1 shadow-2xs">
@@ -909,12 +1015,11 @@ export function ProfileView({
                       className="inline-flex items-center gap-1 px-3 py-1 bg-[#dce8df] text-[#173a35] rounded-full text-xs font-medium shadow-2xs"
                     >
                       <span>#{interest}</span>
-                      {isSelf && onRemoveInterest && (
+                      {effectiveIsSelf && onRemoveInterest && (
                         <button
                           type="button"
                           onClick={() => onRemoveInterest(interest)}
                           className="text-[#62736b] hover:text-[#a33e32] ml-1 text-sm font-bold leading-none cursor-pointer"
-                          title="Remove interest"
                         >
                           ×
                         </button>
@@ -922,10 +1027,12 @@ export function ProfileView({
                     </span>
                   ))
                 ) : (
-                  <p className="text-xs text-[#62736b]">No interests added.</p>
+                  <p className="text-xs text-[#62736b]">
+                    No interests added yet.
+                  </p>
                 )}
 
-                {isSelf &&
+                {effectiveIsSelf &&
                   onAddInterest &&
                   (showAddInterestInput ? (
                     <div className="flex items-center gap-1 bg-white border border-[#cbd3ce] rounded-full px-2.5 py-1 shadow-2xs">

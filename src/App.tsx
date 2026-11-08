@@ -3,82 +3,106 @@ import { Navbar, NavTab } from "./components/common/Navbar"
 import { AuthScreen } from "./components/auth/AuthScreen"
 import { FeedView } from "./components/feed/FeedView"
 import { NetworkView } from "./components/network/NetworkView"
+import { AccessCenterView } from "./components/access_center/AccessCenterView"
 import { OpportunitiesView } from "./components/opportunities/OpportunitiesView"
-import { GroupsView } from "./components/groups/GroupsView"
 import { MessagesView } from "./components/messages/MessagesView"
 import { NotificationsView } from "./components/notifications/NotificationsView"
 import { ProfileView } from "./components/profile/ProfileView"
 import { GlobalSearchView } from "./components/search/GlobalSearchView"
+import { AdminDashboardView } from "./components/admin/AdminDashboardView"
 import { BlockedUsersModal } from "./components/safety/BlockedUsersModal"
 import { ReportModal } from "./components/safety/ReportModal"
-import { Opportunity, Post, StudentProfile } from "./types"
+import { CommunityRulesModal } from "./components/safety/CommunityRulesModal"
+import {
+  AccessCenterOrganization,
+  Opportunity,
+  Post,
+  StudentProfile,
+} from "./types"
 import {
   acceptConnectionRequest,
+  addCenterService,
   addComment,
   addCommentReply,
   addEducation,
   addInterest,
   addPortfolioItem,
   addSkill,
+  approveAccessCenter,
   blockUser,
-  createGroup,
+  broadcastOfficialAnnouncement,
   createOpportunity,
   createPost,
   declineConnectionRequest,
+  deleteAccessCenter,
+  deleteCenterService,
   deleteComment,
   deleteEducation,
+  deleteOpportunity,
   deletePost,
+  deleteUserAccount,
   editComment,
   editPost,
   endorseSkill,
+  getAdminPlatformStats,
+  getAllAccessCenters,
+  getAllServiceRequests,
   getAllUsers,
   getBlockedUserIds,
   getConversations,
   getCurrentUser,
-  getGroups,
   getNotifications,
+  getOfficialAnnouncements,
   getOpportunities,
   getOrCreateConversation,
   getPosts,
+  getReports,
+  getStudentWithNetworkStatus,
   getUserById,
+  getUserServiceRequests,
   initializeStorage,
+  isUserAdmin,
   markAllNotificationsAsRead,
   markConversationAsRead,
   markNotificationAsRead,
-  registerStudent,
+  reactivateAccessCenter,
+  reactivateUser,
+  rejectAccessCenter,
+  removeConnection,
   removeInterest,
   removePortfolioItem,
   removeSkill,
   sendConnectionRequest,
   sendMessage,
+  setAdminSession,
   setCurrentUserId,
   setPostReaction,
   sharePost,
+  submitOrganizationApplication,
   submitReport,
+  submitServiceRequest,
   subscribeToStore,
+  suspendAccessCenter,
+  suspendUser,
   toggleFollowUser,
-  toggleJoinGroup,
   togglePostLike,
   toggleSaveOpportunity,
   toggleSavePost,
   unblockUser,
   updateApplicationStatus,
+  updateCenterProfile,
+  updateCenterService,
   updateCurrentUserProfile,
   updateEducation,
   updatePortfolioItem,
+  updateReportStatus,
+  updateServiceRequestStatus,
   votePostPoll,
   withdrawConnectionRequest,
 } from "./services/storage"
 
-const SESSION_KEY = "credento-demo-name"
-
 export default function App() {
-  // Session check
-  const [sessionName, setSessionName] = useState<string>(
-    () => sessionStorage.getItem(SESSION_KEY) ?? "",
-  )
-
-  // Current active navigation tab
+  // Navigation State
   const [currentTab, setCurrentTab] = useState<NavTab>("feed")
 
   // Selected student profile to inspect (if null, views self)
@@ -96,11 +120,12 @@ export default function App() {
     category: "all",
   })
 
-  // Modals state
+  // Safety Modals state
   const [blockedModalOpen, setBlockedModalOpen] = useState(false)
+  const [rulesModalOpen, setRulesModalOpen] = useState(false)
   const [reportState, setReportState] = useState<{
     isOpen: boolean
-    targetType: "user" | "post" | "comment" | "opportunity"
+    targetType: "user" | "post" | "comment" | "opportunity" | "access_center"
     targetId: string
   }>({
     isOpen: false,
@@ -111,52 +136,63 @@ export default function App() {
   // Ensure storage is initialized
   useEffect(() => {
     initializeStorage()
-    document.title = "Credento — Student Credential & Networking Platform"
+    document.title = "Credento — Student Academic Network & Access Center"
   }, [])
 
   // Subscribe to storage store for real-time reactivity
-  const storeVersion = useSyncExternalStore(
+  useSyncExternalStore(
     subscribeToStore,
     () => {
-      // Return a lightweight snapshot hash of storage
       return (
-        localStorage.getItem("credento_posts")?.length +
+        (localStorage.getItem("credento_posts")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_users")?.length +
+        (localStorage.getItem("credento_users")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_saved_opportunities") +
+        (localStorage.getItem("credento_connections")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_saved_posts") +
+        (localStorage.getItem("credento_access_centers")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_applications") +
+        (localStorage.getItem("credento_service_requests")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_groups")?.length +
+        (localStorage.getItem("credento_conversations")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_conversations")?.length +
+        (localStorage.getItem("credento_notifications")?.length || 0) +
         "_" +
-        localStorage.getItem("credento_notifications")?.length +
+        (localStorage.getItem("credento_current_user_id") || "none") +
         "_" +
-        localStorage.getItem("credento_current_user_id")
+        (sessionStorage.getItem("credento_admin_session") || "off")
       )
     },
     () => "initial",
   )
 
-  // Data queries from storage
+  // Current session & user data
   const currentUser = getCurrentUser()
-  const allUsers = getAllUsers()
-  const posts = getPosts()
+  const isAdmin = isUserAdmin()
+  const rawUsers = getAllUsers()
+  const rawPosts = getPosts()
   const opportunities = getOpportunities()
-  const groups = getGroups()
+  const accessCenters = getAllAccessCenters()
+  const serviceRequests = getAllServiceRequests()
   const conversations = getConversations()
   const notifications = getNotifications()
   const blockedUserIds = getBlockedUserIds()
+  const adminStats = getAdminPlatformStats()
+  const reports = getReports()
+  const announcements = getOfficialAnnouncements()
 
-  // Filter blocked users out of posts and visible students
-  const visiblePosts = posts.filter((p) => !blockedUserIds.includes(p.authorId))
+  // Map users with relational network status relative to currentUser
+  const allUsers = rawUsers.map((u) =>
+    getStudentWithNetworkStatus(u, currentUser?.id),
+  )
+
+  // Filter blocked users
+  const visiblePosts = rawPosts.filter(
+    (p) => !blockedUserIds.includes(p.authorId),
+  )
   const visibleStudents = allUsers.filter((u) => !blockedUserIds.includes(u.id))
 
-  // Unread counts for badges
+  // Badge counters
   const unreadMessagesCount = conversations.reduce(
     (acc, c) => acc + (c.unreadCount || 0),
     0,
@@ -166,43 +202,26 @@ export default function App() {
     (s) => s.connectionStatus === "pending_received",
   ).length
 
+  // User service requests (for current logged in user)
+  const myServiceRequests = currentUser
+    ? getUserServiceRequests(currentUser.id)
+    : []
+
   // Handlers
-  const handleLogin = (enteredName: string, studentId?: string) => {
-    sessionStorage.setItem(SESSION_KEY, enteredName)
-    setSessionName(enteredName)
-    if (studentId) {
-      setCurrentUserId(studentId)
-    } else {
-      // Find matching user or update current user name
-      const found = allUsers.find(
-        (u) => u.name.toLowerCase() === enteredName.toLowerCase(),
-      )
-      if (found) {
-        setCurrentUserId(found.id)
-      } else {
-        updateCurrentUserProfile({ name: enteredName })
-      }
-    }
+  const handleLoginSuccess = (user: StudentProfile) => {
+    setCurrentUserId(user.id)
+    setInspectedStudentId(null)
+    setCurrentTab("feed")
   }
 
-  const handleRegister = (name: string, institution: string, email: string) => {
-    const newStudent = registerStudent(name, institution, email)
-    sessionStorage.setItem(SESSION_KEY, newStudent.name)
-    setSessionName(newStudent.name)
+  const handleAdminLoginSuccess = () => {
+    setAdminSession(true)
+    setCurrentTab("admin")
   }
 
   const handleSignOut = () => {
-    sessionStorage.removeItem(SESSION_KEY)
-    setSessionName("")
-  }
-
-  const handleSwitchUser = (userId: string) => {
-    setCurrentUserId(userId)
-    const nextUser = getUserById(userId)
-    if (nextUser) {
-      sessionStorage.setItem(SESSION_KEY, nextUser.name)
-      setSessionName(nextUser.name)
-    }
+    setCurrentUserId(null)
+    setAdminSession(false)
     setInspectedStudentId(null)
   }
 
@@ -213,6 +232,7 @@ export default function App() {
   }
 
   const handleStartMessageWithStudent = (studentId: string) => {
+    if (!currentUser) return
     const conv = getOrCreateConversation(studentId)
     setActiveConversationId(conv.id)
     setCurrentTab("messages")
@@ -227,13 +247,21 @@ export default function App() {
 
   // Active student profile being displayed (either self or inspected peer)
   const displayedProfile = inspectedStudentId
-    ? getUserById(inspectedStudentId) || currentUser
+    ? visibleStudents.find((u) => u.id === inspectedStudentId) || currentUser
     : currentUser
 
-  const isViewingSelf = displayedProfile.id === currentUser.id
+  const isViewingSelf = currentUser
+    ? displayedProfile?.id === currentUser.id
+    : false
 
-  if (!sessionName) {
-    return <AuthScreen onLogin={handleLogin} onRegister={handleRegister} />
+  // If no user is authenticated and not in admin mode, render authentic AuthScreen
+  if (!currentUser && !isAdmin) {
+    return (
+      <AuthScreen
+        onLoginSuccess={handleLoginSuccess}
+        onAdminLoginSuccess={handleAdminLoginSuccess}
+      />
+    )
   }
 
   return (
@@ -243,16 +271,17 @@ export default function App() {
         currentTab={currentTab}
         onSelectTab={(tab) => {
           if (tab === "profile") {
-            setInspectedStudentId(null) // Reset to self
+            setInspectedStudentId(null) // Reset to view own profile
           }
           setCurrentTab(tab)
           window.scrollTo({ top: 0, behavior: "smooth" })
         }}
         currentUser={currentUser}
-        allUsers={allUsers}
-        onSwitchUser={handleSwitchUser}
+        allUsers={visibleStudents}
+        isAdmin={isAdmin}
         onSignOut={handleSignOut}
         onOpenBlockedModal={() => setBlockedModalOpen(true)}
+        onOpenRulesModal={() => setRulesModalOpen(true)}
         unreadMessagesCount={unreadMessagesCount}
         unreadNotificationsCount={unreadNotificationsCount}
         pendingRequestsCount={pendingRequestsCount}
@@ -262,7 +291,8 @@ export default function App() {
 
       {/* Main Tab Views */}
       <main className="flex-1">
-        {currentTab === "feed" && (
+        {/* 1. ACADEMIC FEED */}
+        {currentTab === "feed" && currentUser && (
           <FeedView
             currentUser={currentUser}
             posts={visiblePosts}
@@ -278,7 +308,7 @@ export default function App() {
             onDeletePost={deletePost}
             onConnectStudent={sendConnectionRequest}
             onSelectStudentProfile={handleSelectStudentProfile}
-            onSelectOpportunity={(opp) => {
+            onSelectOpportunity={() => {
               setCurrentTab("opportunities")
             }}
             onNavigateToTab={(tab) => {
@@ -296,7 +326,8 @@ export default function App() {
           />
         )}
 
-        {currentTab === "network" && (
+        {/* 2. REAL NETWORKING */}
+        {currentTab === "network" && currentUser && (
           <NetworkView
             currentUser={currentUser}
             allStudents={visibleStudents}
@@ -304,32 +335,63 @@ export default function App() {
             onAcceptConnection={acceptConnectionRequest}
             onDeclineConnection={declineConnectionRequest}
             onWithdrawConnection={withdrawConnectionRequest}
+            onRemoveConnection={removeConnection}
             onToggleFollow={toggleFollowUser}
             onStartMessage={handleStartMessageWithStudent}
             onSelectStudentProfile={handleSelectStudentProfile}
           />
         )}
 
+        {/* 3. CREDENTO ACCESS CENTER (CORE FEATURE) */}
+        {currentTab === "access_center" && (
+          <AccessCenterView
+            currentUser={currentUser}
+            centers={accessCenters}
+            userRequests={myServiceRequests}
+            onSubmitApplication={submitOrganizationApplication}
+            onSubmitServiceRequest={submitServiceRequest}
+            onUpdateCenter={updateCenterProfile}
+            onAddService={addCenterService}
+            onUpdateService={updateCenterService}
+            onDeleteService={deleteCenterService}
+            onUpdateRequestStatus={updateServiceRequestStatus}
+          />
+        )}
+
+        {/* 4. OPPORTUNITIES & FELLOWSHIPS */}
         {currentTab === "opportunities" && (
           <OpportunitiesView
             opportunities={opportunities}
-            currentUser={currentUser}
+            currentUser={
+              currentUser || {
+                id: "admin",
+                name: "Admin Staff",
+                headline: "Staff",
+                institution: "Credento",
+                facultyOrDepartment: "",
+                degree: "",
+                graduationYear: 2026,
+                location: "",
+                avatar: "",
+                coverImage: "",
+                about: "",
+                isPublic: true,
+                skills: [],
+                interests: [],
+                education: [],
+                portfolioItems: [],
+                connectionsCount: 0,
+                followersCount: 0,
+              }
+            }
             onToggleSave={toggleSaveOpportunity}
             onAddOpportunity={createOpportunity}
             onUpdateApplicationStatus={updateApplicationStatus}
           />
         )}
 
-        {currentTab === "groups" && (
-          <GroupsView
-            groups={groups}
-            currentUser={currentUser}
-            onToggleJoinGroup={toggleJoinGroup}
-            onCreateGroup={createGroup}
-          />
-        )}
-
-        {currentTab === "messages" && (
+        {/* 5. USER-TO-USER MESSAGING */}
+        {currentTab === "messages" && currentUser && (
           <MessagesView
             conversations={conversations}
             currentUser={currentUser}
@@ -340,6 +402,7 @@ export default function App() {
           />
         )}
 
+        {/* 6. NOTIFICATIONS */}
         {currentTab === "notifications" && (
           <NotificationsView
             notifications={notifications}
@@ -355,7 +418,8 @@ export default function App() {
           />
         )}
 
-        {currentTab === "profile" && (
+        {/* 7. REAL STUDENT PROFILE */}
+        {currentTab === "profile" && displayedProfile && currentUser && (
           <ProfileView
             profile={displayedProfile}
             currentUser={currentUser}
@@ -372,6 +436,7 @@ export default function App() {
             onAddInterest={addInterest}
             onRemoveInterest={removeInterest}
             onConnect={sendConnectionRequest}
+            onRemoveConnection={removeConnection}
             onFollow={toggleFollowUser}
             onStartMessage={handleStartMessageWithStudent}
             onReport={(type, targetId) =>
@@ -382,6 +447,7 @@ export default function App() {
           />
         )}
 
+        {/* 8. GLOBAL ACADEMIC SEARCH */}
         {currentTab === "search" && (
           <GlobalSearchView
             initialQuery={searchParams.query}
@@ -389,14 +455,49 @@ export default function App() {
             allStudents={visibleStudents}
             allOpportunities={opportunities}
             allPosts={visiblePosts}
+            allCenters={accessCenters}
             onSelectStudentProfile={handleSelectStudentProfile}
-            onSelectOpportunity={(opp) => {
+            onSelectOpportunity={() => {
               setCurrentTab("opportunities")
+            }}
+            onSelectAccessCenter={() => {
+              setCurrentTab("access_center")
             }}
             onNavigateToTab={(tab) => {
               setCurrentTab(tab)
               window.scrollTo({ top: 0, behavior: "smooth" })
             }}
+          />
+        )}
+
+        {/* 9. CREDENTO ADMIN DASHBOARD */}
+        {currentTab === "admin" && (
+          <AdminDashboardView
+            stats={adminStats}
+            allUsers={rawUsers}
+            allCenters={accessCenters}
+            allReports={reports}
+            allAnnouncements={announcements}
+            posts={rawPosts}
+            opportunities={opportunities}
+            onSuspendUser={suspendUser}
+            onReactivateUser={reactivateUser}
+            onDeleteUser={deleteUserAccount}
+            onApproveCenter={approveAccessCenter}
+            onRejectCenter={rejectAccessCenter}
+            onSuspendCenter={suspendAccessCenter}
+            onReactivateCenter={reactivateAccessCenter}
+            onDeleteCenter={deleteAccessCenter}
+            onResolveReport={updateReportStatus}
+            onDeletePost={deletePost}
+            onBroadcastAnnouncement={broadcastOfficialAnnouncement}
+            onExitAdmin={() => {
+              setAdminSession(false)
+              if (currentUser) {
+                setCurrentTab("feed")
+              }
+            }}
+            onSelectStudentProfile={handleSelectStudentProfile}
           />
         )}
       </main>
@@ -406,8 +507,13 @@ export default function App() {
         isOpen={blockedModalOpen}
         onClose={() => setBlockedModalOpen(false)}
         blockedUserIds={blockedUserIds}
-        allStudents={allUsers}
+        allStudents={rawUsers}
         onUnblockUser={unblockUser}
+      />
+
+      <CommunityRulesModal
+        isOpen={rulesModalOpen}
+        onClose={() => setRulesModalOpen(false)}
       />
 
       <ReportModal
@@ -415,11 +521,11 @@ export default function App() {
         onClose={() =>
           setReportState({ isOpen: false, targetType: "post", targetId: "" })
         }
-        targetType={reportState.targetType}
+        targetType={reportState.targetType as any}
         targetId={reportState.targetId}
         onSubmitReport={(reason, details) =>
           submitReport({
-            targetType: reportState.targetType,
+            targetType: reportState.targetType as any,
             targetId: reportState.targetId,
             reason,
             details,
@@ -427,55 +533,74 @@ export default function App() {
         }
       />
 
-      {/* Structured WordPress-style Footer */}
+      {/* Structured WordPress-style Editorial Footer */}
       <footer className="hidden lg:block border-t border-[#cbd3ce] bg-[#f7f5ef] py-6 text-xs text-[#62736b]">
         <div className="max-w-7xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-bold text-[#173a35]">Credento</span>
             <span>•</span>
-            <span>Student Networking & Credential Platform</span>
+            <span>The Student Academic Network & Access Center</span>
           </div>
 
           <div className="flex items-center gap-6 text-[11px]">
             <button
               type="button"
-              onClick={() => setCurrentTab("feed")}
-              className="hover:text-[#173a35]"
+              onClick={() => {
+                setCurrentTab("feed")
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }}
+              className="hover:text-[#173a35] cursor-pointer"
             >
               Academic Feed
             </button>
             <button
               type="button"
-              onClick={() => setCurrentTab("opportunities")}
-              className="hover:text-[#173a35]"
+              onClick={() => {
+                setCurrentTab("network")
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }}
+              className="hover:text-[#173a35] cursor-pointer"
+            >
+              Collegiate Network
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentTab("access_center")
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }}
+              className="hover:text-[#173a35] font-semibold text-[#173a35] cursor-pointer"
+            >
+              Access Center
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentTab("opportunities")
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }}
+              className="hover:text-[#173a35] cursor-pointer"
             >
               Scholarships & Grants
             </button>
             <button
               type="button"
-              onClick={() => setCurrentTab("groups")}
-              className="hover:text-[#173a35]"
+              onClick={() => setRulesModalOpen(true)}
+              className="hover:text-[#173a35] cursor-pointer"
             >
-              Campus Communities
+              Community Standards
             </button>
             <button
               type="button"
               onClick={() => setBlockedModalOpen(true)}
-              className="hover:text-[#173a35]"
+              className="hover:text-[#173a35] cursor-pointer"
             >
               Safety & Moderation
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTab("network")}
-              className="hover:text-[#173a35]"
-            >
-              Collegiate Directory
             </button>
           </div>
 
           <div className="text-[11px] text-[#728078] font-mono">
-            Clean WordPress Design • LinkedIn Functionality
+            Verified Student Merit • Zero Fake Profiles
           </div>
         </div>
       </footer>

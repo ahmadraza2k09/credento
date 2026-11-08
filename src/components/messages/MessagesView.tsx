@@ -95,8 +95,14 @@ export function MessagesView({
           {/* List items */}
           <div className="flex-1 overflow-y-auto divide-y divide-black/[0.04]">
             {filteredConversations.length === 0 ? (
-              <div className="p-6 text-center text-xs text-[#62736b]">
-                No conversations found.
+              <div className="p-8 text-center text-xs text-[#62736b] space-y-2">
+                <MessageSquare className="w-8 h-8 text-[#87978f] mx-auto opacity-50" />
+                <p className="font-bold text-[#173a35]">
+                  No conversations yet.
+                </p>
+                <p className="text-[11px] text-[#728078] leading-relaxed">
+                  Connect with fellow students to start direct peer messaging.
+                </p>
               </div>
             ) : (
               filteredConversations.map((conv) => {

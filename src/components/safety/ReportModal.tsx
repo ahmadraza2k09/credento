@@ -5,7 +5,7 @@ import { Flag, AlertTriangle, Check } from "lucide-react"
 interface ReportModalProps {
   isOpen: boolean
   onClose: () => void
-  targetType: "user" | "post" | "comment" | "opportunity"
+  targetType: "user" | "post" | "comment" | "opportunity" | "access_center" | "organization"
   targetId: string
   onSubmitReport: (reason: string, details: string) => void
 }

@@ -52,6 +52,10 @@ export function OpportunityCategoryBadge({
     competition: { label: "Competition", variant: "warning" },
     course: { label: "Course", variant: "info" },
     volunteer: { label: "Volunteering", variant: "success" },
+    job: { label: "Job & Career", variant: "evergreen" },
+    conference: { label: "Conference", variant: "info" },
+    exchange: { label: "Exchange", variant: "copper" },
+    training: { label: "Training", variant: "warning" },
   }
 
   const { label, variant } = meta[category] || {

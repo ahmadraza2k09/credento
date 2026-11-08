@@ -9,6 +9,7 @@ import {
   Info,
   Check,
   CheckCheck,
+  Building,
 } from "lucide-react"
 import { AppNotification, NotificationType } from "../../types"
 
@@ -50,6 +51,8 @@ export function NotificationsView({
         return <MessageSquare className="w-4 h-4 text-[#0369a1]" />
       case "like":
         return <Heart className="w-4 h-4 text-[#c46b4b] fill-current" />
+      case "service_request_update":
+        return <Building className="w-4 h-4 text-[#173a35]" />
       case "opportunity_alert":
         return <Clock className="w-4 h-4 text-[#b45309]" />
       case "announcement":

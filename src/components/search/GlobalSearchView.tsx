@@ -9,8 +9,15 @@ import {
   Clock,
   ArrowRight,
   ExternalLink,
+  ShieldCheck,
+  FolderGit2,
 } from "lucide-react"
-import { Opportunity, Post, StudentProfile } from "../../types"
+import {
+  AccessCenterOrganization,
+  Opportunity,
+  Post,
+  StudentProfile,
+} from "../../types"
 import { OpportunityCategoryBadge } from "../common/Badge"
 
 interface GlobalSearchViewProps {
@@ -19,8 +26,10 @@ interface GlobalSearchViewProps {
   allStudents: StudentProfile[]
   allOpportunities: Opportunity[]
   allPosts: Post[]
+  allCenters?: AccessCenterOrganization[]
   onSelectStudentProfile: (userId: string) => void
   onSelectOpportunity: (opportunity: Opportunity) => void
+  onSelectAccessCenter?: (center: AccessCenterOrganization) => void
   onNavigateToTab: (tab: any) => void
 }
 
@@ -30,29 +39,35 @@ export function GlobalSearchView({
   allStudents,
   allOpportunities,
   allPosts,
+  allCenters = [],
   onSelectStudentProfile,
   onSelectOpportunity,
+  onSelectAccessCenter,
   onNavigateToTab,
 }: GlobalSearchViewProps) {
   const [query, setQuery] = useState(initialQuery)
   const [category, setCategory] =
-    useState<"all" | "students" | "opportunities" | "posts">(
+    useState<"all" | "students" | "opportunities" | "centers" | "posts">(
       initialCategory as any || "all",
     )
 
   const normalizedQuery = query.toLowerCase().trim()
 
-  // Matching students
+  // Matching students (respecting privacy: if private and not connected, headline/institution might still be public or filtered)
   const matchingStudents = useMemo(() => {
     if (!normalizedQuery) return allStudents
     return allStudents.filter(
       (s) =>
         s.name.toLowerCase().includes(normalizedQuery) ||
+        s.username?.toLowerCase().includes(normalizedQuery) ||
         s.headline.toLowerCase().includes(normalizedQuery) ||
         s.institution.toLowerCase().includes(normalizedQuery) ||
         s.location.toLowerCase().includes(normalizedQuery) ||
         s.skills?.some((sk) => sk.toLowerCase().includes(normalizedQuery)) ||
-        s.interests?.some((i) => i.toLowerCase().includes(normalizedQuery)),
+        s.interests?.some((i) => i.toLowerCase().includes(normalizedQuery)) ||
+        s.portfolioItems?.some((p) =>
+          p.title.toLowerCase().includes(normalizedQuery),
+        ),
     )
   }, [allStudents, normalizedQuery])
 
@@ -68,6 +83,23 @@ export function GlobalSearchView({
         o.category.toLowerCase().includes(normalizedQuery),
     )
   }, [allOpportunities, normalizedQuery])
+
+  // Matching access centers
+  const matchingCenters = useMemo(() => {
+    const approved = allCenters.filter((c) => c.status === "approved")
+    if (!normalizedQuery) return approved
+    return approved.filter(
+      (c) =>
+        c.name.toLowerCase().includes(normalizedQuery) ||
+        c.tagline.toLowerCase().includes(normalizedQuery) ||
+        c.description.toLowerCase().includes(normalizedQuery) ||
+        c.services.some(
+          (s) =>
+            s.title.toLowerCase().includes(normalizedQuery) ||
+            s.description.toLowerCase().includes(normalizedQuery),
+        ),
+    )
+  }, [allCenters, normalizedQuery])
 
   // Matching posts
   const matchingPosts = useMemo(() => {
@@ -87,6 +119,9 @@ export function GlobalSearchView({
     (category === "all" || category === "opportunities"
       ? matchingOpportunities.length
       : 0) +
+    (category === "all" || category === "centers"
+      ? matchingCenters.length
+      : 0) +
     (category === "all" || category === "posts" ? matchingPosts.length : 0)
 
   return (
@@ -99,220 +134,295 @@ export function GlobalSearchView({
 
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-[#728078] absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-[#62736b] absolute left-3.5 top-3" />
             <input
               type="text"
-              placeholder="Search across students, research papers, and opportunities..."
+              placeholder="Search students, skills, institutions, grants, Access Centers..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-xs bg-[#f4f6f5] border border-black/10 rounded-full focus:outline-none focus:border-[#173a35] focus:bg-white text-[#242b29] shadow-inner transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#f8faf9] rounded-xl text-xs text-[#242b29] border border-black/[0.06] focus:outline-none focus:border-[#173a35] focus:bg-white transition-all shadow-inner"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            {(["all", "students", "opportunities", "posts"] as const).map(
-              (cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setCategory(cat)}
-                  className={`text-xs capitalize px-4 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer ${
-                    category === cat
-                      ? "btn-3d-primary text-white"
-                      : "bg-[#f4f6f5] text-[#62736b] hover:bg-white hover:shadow-xs"
-                  }`}
-                >
-                  {cat === "all" ? "All Results" : cat}
-                </button>
-              ),
-            )}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as any)}
+              className="w-full sm:w-auto px-3 py-2.5 bg-white border border-black/10 rounded-xl text-xs text-[#242b29] focus:outline-none focus:border-[#173a35]"
+            >
+              <option value="all">All Categories</option>
+              <option value="students">Scholars & Students</option>
+              <option value="centers">Access Centers & Services</option>
+              <option value="opportunities">Opportunities & Grants</option>
+              <option value="posts">Discussions & Posts</option>
+            </select>
           </div>
         </div>
 
-        <p className="text-xs text-[#62736b] mt-3.5">
-          Found{" "}
-          <strong className="text-[#173a35] font-mono">{totalResults}</strong>{" "}
-          result{totalResults === 1 ? "" : "s"}{" "}
-          {query ? `for "${query}"` : "across Credento"}
-        </p>
+        {/* Filter Badges */}
+        <div className="flex flex-wrap gap-2 mt-4 pt-3.5 border-t border-black/[0.04]">
+          {[
+            { id: "all", label: "All Results", count: totalResults },
+            {
+              id: "students",
+              label: "Scholars",
+              count: matchingStudents.length,
+            },
+            {
+              id: "centers",
+              label: "Access Centers",
+              count: matchingCenters.length,
+            },
+            {
+              id: "opportunities",
+              label: "Opportunities",
+              count: matchingOpportunities.length,
+            },
+            { id: "posts", label: "Posts", count: matchingPosts.length },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setCategory(tab.id as any)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                category === tab.id
+                  ? "bg-[#173a35] text-white"
+                  : "bg-[#f4f6f5] text-[#62736b] hover:bg-[#eef2f0] hover:text-[#173a35]"
+              }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
+        </div>
       </div>
 
-      {totalResults === 0 ? (
-        <div className="card-linkedin p-12 text-center text-[#62736b]">
-          <Search className="w-10 h-10 text-[#87978f] mx-auto mb-2.5 opacity-40" />
-          <p className="font-bold text-base text-[#173a35]">
-            No matching items found
-          </p>
-          <p className="text-xs mt-1 max-w-sm mx-auto">
-            Try searching for broader keywords like "PyTorch", "Stanford",
-            "Scholarship", or "Fellowship".
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Students section */}
-          {(category === "all" || category === "students") &&
-            matchingStudents.length > 0 && (
-              <div className="card-linkedin p-6">
-                <h2 className="font-semibold text-xs text-[#173a35] mb-3.5 flex items-center justify-between">
-                  <span>Students ({matchingStudents.length})</span>
-                  {category === "all" && (
-                    <button
-                      type="button"
-                      onClick={() => setCategory("students")}
-                      className="text-[#c46b4b] hover:underline cursor-pointer font-semibold"
-                    >
-                      View all students →
-                    </button>
-                  )}
-                </h2>
+      {/* RESULTS LIST */}
+      <div className="space-y-6">
+        {/* STUDENTS SECTION */}
+        {(category === "all" || category === "students") && (
+          <div className="card-linkedin p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-black/[0.04] pb-3">
+              <h2 className="font-bold text-sm text-[#173a35] flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#173a35]" />
+                <span>Scholars & Students ({matchingStudents.length})</span>
+              </h2>
+              {matchingStudents.length > 3 && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateToTab("network")}
+                  className="text-xs text-[#c46b4b] hover:underline font-semibold"
+                >
+                  View in Network Directory →
+                </button>
+              )}
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                  {matchingStudents
-                    .slice(0, category === "all" ? 4 : 20)
-                    .map((student) => (
-                      <div
-                        key={student.id}
-                        onClick={() => onSelectStudentProfile(student.id)}
-                        className="p-3.5 bg-[#f8faf9] rounded-2xl border border-black/[0.04] hover:bg-white hover:shadow-md cursor-pointer transition-all flex items-start gap-3.5"
-                      >
-                        <img
-                          src={student.avatar}
-                          alt={student.name}
-                          className="w-11 h-11 rounded-full object-cover shadow-xs ring-1 ring-black/5 shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-bold text-xs sm:text-sm text-[#173a35] truncate">
-                            {student.name}
-                          </p>
-                          <p className="text-[11px] text-[#62736b] truncate mt-0.5">
-                            {student.headline}
-                          </p>
-                          <p className="text-[10px] text-[#728078] mt-1 font-medium">
-                            {student.institution}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
+            {matchingStudents.length === 0 ? (
+              <p className="text-xs text-[#62736b] py-2">
+                No scholars matched "{query}".
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {matchingStudents.slice(0, 6).map((student) => (
+                  <div
+                    key={student.id}
+                    onClick={() => onSelectStudentProfile(student.id)}
+                    className="p-3 bg-[#f8faf9] rounded-xl border border-black/[0.04] hover:bg-white hover:shadow-md transition-all cursor-pointer flex items-center gap-3"
+                  >
+                    <img
+                      src={student.avatar}
+                      alt={student.name}
+                      className="w-10 h-10 rounded-full object-cover shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-xs text-[#173a35] truncate">
+                        {student.name}
+                      </p>
+                      <p className="text-[10px] text-[#62736b] truncate">
+                        {student.institution}
+                      </p>
+                      <p className="text-[10px] text-[#728078] truncate">
+                        {student.headline}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
+          </div>
+        )}
 
-          {/* Opportunities section */}
-          {(category === "all" || category === "opportunities") &&
-            matchingOpportunities.length > 0 && (
-              <div className="card-linkedin p-6">
-                <h2 className="font-semibold text-xs text-[#173a35] mb-3.5 flex items-center justify-between">
-                  <span>Opportunities ({matchingOpportunities.length})</span>
-                  {category === "all" && (
-                    <button
-                      type="button"
-                      onClick={() => setCategory("opportunities")}
-                      className="text-[#c46b4b] hover:underline cursor-pointer font-semibold"
-                    >
-                      View all opportunities →
-                    </button>
-                  )}
-                </h2>
+        {/* ACCESS CENTERS SECTION */}
+        {(category === "all" || category === "centers") && (
+          <div className="card-linkedin p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-black/[0.04] pb-3">
+              <h2 className="font-bold text-sm text-[#173a35] flex items-center gap-2">
+                <Building className="w-4 h-4 text-[#173a35]" />
+                <span>
+                  Access Centers & Free Services ({matchingCenters.length})
+                </span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => onNavigateToTab("access_center")}
+                className="text-xs text-[#c46b4b] hover:underline font-semibold"
+              >
+                Browse All Access Centers →
+              </button>
+            </div>
 
-                <div className="space-y-3">
-                  {matchingOpportunities
-                    .slice(0, category === "all" ? 3 : 20)
-                    .map((opp) => (
-                      <div
-                        key={opp.id}
-                        onClick={() => onSelectOpportunity(opp)}
-                        className="p-4 bg-[#f8faf9] rounded-2xl border border-black/[0.04] hover:bg-white hover:shadow-md cursor-pointer transition-all"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <OpportunityCategoryBadge
-                                category={opp.category}
-                              />
-                              <span className="text-[10px] font-mono text-[#62736b] px-2 py-0.5 bg-white rounded-full shadow-2xs">
-                                {opp.mode}
-                              </span>
-                            </div>
-                            <h3 className="font-bold text-sm text-[#173a35]">
-                              {opp.title}
-                            </h3>
-                            <p className="text-[11px] text-[#62736b] mt-0.5">
-                              {opp.provider} • {opp.location}
-                            </p>
-                          </div>
-
-                          <div className="text-right shrink-0">
-                            <span className="text-[10px] text-[#a33e32] font-mono block font-semibold">
-                              Deadline: {opp.deadline}
-                            </span>
-                            <span className="text-xs font-semibold text-[#173a35] hover:underline mt-1 inline-flex items-center gap-0.5">
-                              <span>View Details</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
-
-          {/* Posts section */}
-          {(category === "all" || category === "posts") &&
-            matchingPosts.length > 0 && (
-              <div className="card-linkedin p-6">
-                <h2 className="font-semibold text-xs text-[#173a35] mb-3.5 flex items-center justify-between">
-                  <span>Posts & Discussions ({matchingPosts.length})</span>
-                  {category === "all" && (
-                    <button
-                      type="button"
-                      onClick={() => setCategory("posts")}
-                      className="text-[#c46b4b] hover:underline cursor-pointer font-semibold"
-                    >
-                      View all posts →
-                    </button>
-                  )}
-                </h2>
-
-                <div className="space-y-3">
-                  {matchingPosts
-                    .slice(0, category === "all" ? 3 : 20)
-                    .map((post) => (
-                      <div
-                        key={post.id}
-                        className="p-4 bg-[#f8faf9] rounded-2xl border border-black/[0.04] shadow-xs"
-                      >
-                        <div className="flex items-center gap-2.5 mb-2">
-                          <img
-                            src={post.authorAvatar}
-                            alt={post.authorName}
-                            className="w-7 h-7 rounded-full object-cover shadow-2xs"
-                          />
-                          <span className="font-semibold text-xs text-[#173a35]">
-                            {post.authorName}
-                          </span>
-                          <span className="text-[10px] text-[#728078]">
-                            • {post.createdAt}
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#242b29] line-clamp-3 leading-relaxed">
-                          {post.content}
+            {matchingCenters.length === 0 ? (
+              <p className="text-xs text-[#62736b] py-2">
+                No Access Centers matched "{query}".
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {matchingCenters.map((center) => (
+                  <div
+                    key={center.id}
+                    onClick={() => {
+                      if (onSelectAccessCenter) onSelectAccessCenter(center)
+                      else onNavigateToTab("access_center")
+                    }}
+                    className="p-4 bg-[#f8faf9] rounded-xl border border-black/[0.04] hover:bg-white hover:shadow-md transition-all cursor-pointer space-y-2"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <img
+                        src={center.logo}
+                        alt={center.name}
+                        className="w-9 h-9 rounded-lg object-cover p-0.5 bg-white border border-black/10"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-bold text-xs text-[#173a35] truncate">
+                          {center.name}
                         </p>
-                        <button
-                          type="button"
-                          onClick={() => onNavigateToTab("feed")}
-                          className="mt-2 text-xs text-[#173a35] font-semibold hover:underline cursor-pointer"
-                        >
-                          View on Home Feed →
-                        </button>
+                        <p className="text-[10px] text-[#c46b4b] truncate">
+                          {center.tagline}
+                        </p>
                       </div>
-                    ))}
-                </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {center.services.slice(0, 2).map((s) => (
+                        <span
+                          key={s.id}
+                          className="px-2 py-0.5 bg-white text-[10px] text-[#173a35] font-medium rounded border border-black/5"
+                        >
+                          Free: {s.title}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* OPPORTUNITIES SECTION */}
+        {(category === "all" || category === "opportunities") && (
+          <div className="card-linkedin p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-black/[0.04] pb-3">
+              <h2 className="font-bold text-sm text-[#173a35] flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-[#173a35]" />
+                <span>
+                  Opportunities & Fellowships ({matchingOpportunities.length})
+                </span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => onNavigateToTab("opportunities")}
+                className="text-xs text-[#c46b4b] hover:underline font-semibold"
+              >
+                View Opportunities Portal →
+              </button>
+            </div>
+
+            {matchingOpportunities.length === 0 ? (
+              <p className="text-xs text-[#62736b] py-2">
+                No opportunities matched "{query}".
+              </p>
+            ) : (
+              <div className="space-y-2.5">
+                {matchingOpportunities.slice(0, 4).map((opp) => (
+                  <div
+                    key={opp.id}
+                    onClick={() => onSelectOpportunity(opp)}
+                    className="p-3.5 bg-[#f8faf9] rounded-xl border border-black/[0.04] hover:bg-white hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-3"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-xs text-[#173a35]">
+                          {opp.title}
+                        </h4>
+                        <OpportunityCategoryBadge category={opp.category} />
+                      </div>
+                      <p className="text-[11px] text-[#62736b] mt-0.5">
+                        {opp.provider} • {opp.location} • Deadline:{" "}
+                        {opp.deadline}
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-[#62736b] shrink-0" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* POSTS SECTION */}
+        {(category === "all" || category === "posts") && (
+          <div className="card-linkedin p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-black/[0.04] pb-3">
+              <h2 className="font-bold text-sm text-[#173a35] flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#173a35]" />
+                <span>
+                  Academic Posts & Discussions ({matchingPosts.length})
+                </span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => onNavigateToTab("feed")}
+                className="text-xs text-[#c46b4b] hover:underline font-semibold"
+              >
+                Go to Academic Feed →
+              </button>
+            </div>
+
+            {matchingPosts.length === 0 ? (
+              <p className="text-xs text-[#62736b] py-2">
+                No posts matched "{query}".
+              </p>
+            ) : (
+              <div className="space-y-2.5">
+                {matchingPosts.slice(0, 3).map((post) => (
+                  <div
+                    key={post.id}
+                    onClick={() => onNavigateToTab("feed")}
+                    className="p-3.5 bg-[#f8faf9] rounded-xl border border-black/[0.04] hover:bg-white hover:shadow-md transition-all cursor-pointer space-y-1"
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={post.authorAvatar}
+                        alt={post.authorName}
+                        className="w-5 h-5 rounded-full object-cover"
+                      />
+                      <span className="font-bold text-xs text-[#173a35]">
+                        {post.authorName}
+                      </span>
+                      <span className="text-[10px] text-[#728078]">
+                        ({post.authorInstitution})
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#4d5b54] line-clamp-2">
+                      {post.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

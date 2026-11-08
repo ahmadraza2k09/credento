@@ -302,7 +302,18 @@ export function FeedView({
           </div>
 
           {/* Post list */}
-          {filteredAndSortedPosts.length === 0 ? (
+          {posts.length === 0 ? (
+            <div className="card-linkedin p-10 text-center text-[#62736b]">
+              <Sparkles className="w-10 h-10 text-[#c46b4b] mx-auto mb-3" />
+              <h3 className="font-bold text-base text-[#173a35]">
+                No posts in the academic feed yet.
+              </h3>
+              <p className="text-xs mt-1 max-w-md mx-auto leading-relaxed">
+                Be the first to share an academic paper, research update, or
+                project breakthrough with your collegiate network!
+              </p>
+            </div>
+          ) : filteredAndSortedPosts.length === 0 ? (
             <div className="card-linkedin p-8 text-center text-[#62736b]">
               <p className="font-semibold text-sm text-[#173a35]">
                 {selectedTopic === "saved"
@@ -358,44 +369,51 @@ export function FeedView({
             </div>
 
             <div className="space-y-3.5">
-              {recommendedStudents.map((student) => (
-                <div
-                  key={student.id}
-                  className="flex items-start gap-3 pb-3.5 border-b border-black/[0.04] last:border-0 last:pb-0"
-                >
-                  <button
-                    type="button"
-                    onClick={() => onSelectStudentProfile(student.id)}
-                    className="shrink-0 focus:outline-none cursor-pointer"
+              {recommendedStudents.length === 0 ? (
+                <p className="text-[11px] text-[#728078] py-2">
+                  No new student suggestions right now. As more university peers
+                  join Credento, they will appear here.
+                </p>
+              ) : (
+                recommendedStudents.map((student) => (
+                  <div
+                    key={student.id}
+                    className="flex items-start gap-3 pb-3.5 border-b border-black/[0.04] last:border-0 last:pb-0"
                   >
-                    <img
-                      src={student.avatar}
-                      alt={student.name}
-                      className="w-10 h-10 rounded-full object-cover shadow-sm ring-1 ring-black/5"
-                    />
-                  </button>
-                  <div className="min-w-0 flex-1">
                     <button
                       type="button"
                       onClick={() => onSelectStudentProfile(student.id)}
-                      className="font-bold text-xs text-[#173a35] hover:underline truncate block text-left cursor-pointer"
+                      className="shrink-0 focus:outline-none cursor-pointer"
                     >
-                      {student.name}
+                      <img
+                        src={student.avatar}
+                        alt={student.name}
+                        className="w-10 h-10 rounded-full object-cover shadow-sm ring-1 ring-black/5"
+                      />
                     </button>
-                    <p className="text-[10px] text-[#62736b] truncate">
-                      {student.institution.split(" ")[0]} •{" "}
-                      {student.degree.split("in ")[1] || student.degree}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => onConnectStudent(student.id)}
-                      className="btn-3d-secondary mt-2 inline-flex items-center gap-1 px-3 py-1 text-[11px] font-semibold cursor-pointer"
-                    >
-                      <span>Connect</span>
-                    </button>
+                    <div className="min-w-0 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => onSelectStudentProfile(student.id)}
+                        className="font-bold text-xs text-[#173a35] hover:underline truncate block text-left cursor-pointer"
+                      >
+                        {student.name}
+                      </button>
+                      <p className="text-[10px] text-[#62736b] truncate">
+                        {student.institution.split(" ")[0]} •{" "}
+                        {student.degree.split("in ")[1] || student.degree}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => onConnectStudent(student.id)}
+                        className="btn-3d-secondary mt-2 inline-flex items-center gap-1 px-3 py-1 text-[11px] font-semibold cursor-pointer"
+                      >
+                        <span>Connect</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

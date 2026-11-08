@@ -1,40 +1,50 @@
 import {
+  AccessCenterOrganization,
+  AccessCenterService,
   AppNotification,
   ApplicationStatus,
+  CenterStatus,
+  ChatMessage,
   Comment,
+  ConnectionRelationship,
+  ConnectionStatus,
   Conversation,
   EducationItem,
+  FollowRelationship,
+  OfficialAnnouncement,
   Opportunity,
-  OpportunityCategory,
   PortfolioItem,
   Post,
   ReactionType,
   ReportItem,
+  ReportStatus,
+  ServiceRequest,
+  ServiceRequestStatus,
   StudentProfile,
-  StudyGroup,
 } from "../types"
-import {
-  INITIAL_CONVERSATIONS,
-  INITIAL_GROUPS,
-  INITIAL_NOTIFICATIONS,
-  INITIAL_OPPORTUNITIES,
-  INITIAL_POSTS,
-  INITIAL_STUDENTS,
-} from "../data/mockData"
+import { INITIAL_ACCESS_CENTERS, INITIAL_OPPORTUNITIES } from "../data/mockData"
+
+const STORAGE_SCHEMA_VERSION = "credento_v2_production_release"
 
 const STORAGE_KEYS = {
+  SCHEMA_VERSION: "credento_schema_version",
   CURRENT_USER_ID: "credento_current_user_id",
   USERS: "credento_users",
+  CONNECTIONS: "credento_connections",
+  FOLLOWS: "credento_follows",
   POSTS: "credento_posts",
+  SAVED_POSTS: "credento_saved_posts",
   OPPORTUNITIES: "credento_opportunities",
   SAVED_OPPORTUNITIES: "credento_saved_opportunities",
-  SAVED_POSTS: "credento_saved_posts",
   APPLICATIONS: "credento_applications",
-  GROUPS: "credento_groups",
   CONVERSATIONS: "credento_conversations",
   NOTIFICATIONS: "credento_notifications",
   BLOCKED_USERS: "credento_blocked_users",
   REPORTS: "credento_reports",
+  ACCESS_CENTERS: "credento_access_centers",
+  SERVICE_REQUESTS: "credento_service_requests",
+  OFFICIAL_ANNOUNCEMENTS: "credento_official_announcements",
+  ADMIN_SESSION: "credento_admin_session",
 }
 
 // Event dispatcher for reactive state updates
@@ -48,12 +58,12 @@ export function subscribeToStore(listener: Listener) {
   }
 }
 
-function notifySubscribers() {
+export function notifySubscribers() {
   listeners.forEach((l) => {
     try {
       l()
     } catch (e) {
-      console.error("Error in subscriber", e)
+      console.error("Error in storage subscriber", e)
     }
   })
 }
@@ -79,92 +89,78 @@ function setItem<T>(key: string, value: T): void {
   }
 }
 
-// Initialize default data if not present
-export function initializeStorage() {
-  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_STUDENTS))
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.CURRENT_USER_ID)) {
-    localStorage.setItem(
-      STORAGE_KEYS.CURRENT_USER_ID,
-      JSON.stringify("user-marcus"),
-    )
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.POSTS)) {
-    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(INITIAL_POSTS))
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.OPPORTUNITIES)) {
+// Reset and initialize storage for true production experience
+export function initializeStorage(): void {
+  const currentVersion = localStorage.getItem(STORAGE_KEYS.SCHEMA_VERSION)
+
+  if (currentVersion !== STORAGE_SCHEMA_VERSION) {
+    // Migrate to clean production schema: Wipe out old mock students/demo model profiles
+    localStorage.removeItem("credento_demo-name")
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER_ID)
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]))
+    localStorage.setItem(STORAGE_KEYS.CONNECTIONS, JSON.stringify([]))
+    localStorage.setItem(STORAGE_KEYS.FOLLOWS, JSON.stringify([]))
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify([]))
+    localStorage.setItem(STORAGE_KEYS.SAVED_POSTS, JSON.stringify([]))
     localStorage.setItem(
       STORAGE_KEYS.OPPORTUNITIES,
       JSON.stringify(INITIAL_OPPORTUNITIES),
     )
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.SAVED_OPPORTUNITIES)) {
-    localStorage.setItem(
-      STORAGE_KEYS.SAVED_OPPORTUNITIES,
-      JSON.stringify(["opp-1", "opp-2"]),
-    )
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.CONVERSATIONS)) {
-    localStorage.setItem(
-      STORAGE_KEYS.CONVERSATIONS,
-      JSON.stringify(INITIAL_CONVERSATIONS),
-    )
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS)) {
-    localStorage.setItem(
-      STORAGE_KEYS.NOTIFICATIONS,
-      JSON.stringify(INITIAL_NOTIFICATIONS),
-    )
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.BLOCKED_USERS)) {
+    localStorage.setItem(STORAGE_KEYS.SAVED_OPPORTUNITIES, JSON.stringify([]))
+    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify({}))
+    localStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify([]))
+    localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]))
     localStorage.setItem(STORAGE_KEYS.BLOCKED_USERS, JSON.stringify([]))
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.REPORTS)) {
     localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify([]))
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.GROUPS)) {
-    localStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(INITIAL_GROUPS))
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.SAVED_POSTS)) {
-    localStorage.setItem(STORAGE_KEYS.SAVED_POSTS, JSON.stringify(["post-1"]))
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.APPLICATIONS)) {
     localStorage.setItem(
-      STORAGE_KEYS.APPLICATIONS,
-      JSON.stringify({
-        "opp-4": {
-          status: "interviewing",
-          appliedDate: "2026-02-14",
-          notes: "Round 2 technical coding interview scheduled for next week",
-        },
-      }),
+      STORAGE_KEYS.ACCESS_CENTERS,
+      JSON.stringify(INITIAL_ACCESS_CENTERS),
     )
+    localStorage.setItem(STORAGE_KEYS.SERVICE_REQUESTS, JSON.stringify([]))
+    localStorage.setItem(
+      STORAGE_KEYS.OFFICIAL_ANNOUNCEMENTS,
+      JSON.stringify([
+        {
+          id: "ann-welcome",
+          title: "Welcome to Credento — The Student Academic Network",
+          content:
+            "Credento is officially live! Build your verified scholar profile, connect with fellow students across universities, explore verified fellowships & grants, and access free organizational services via Credento Access Center.",
+          type: "announcement",
+          targetType: "all",
+          createdAt: "2026-02-01",
+          readBy: [],
+          authorTitle: "Credento Team",
+        },
+      ]),
+    )
+    localStorage.setItem(STORAGE_KEYS.SCHEMA_VERSION, STORAGE_SCHEMA_VERSION)
   }
 }
 
-// --- USER & PROFILE API ---
+// Call initialization immediately on module load
+initializeStorage()
 
-export function getCurrentUserId(): string {
-  initializeStorage()
-  return getItem<string>(STORAGE_KEYS.CURRENT_USER_ID, "user-marcus")
+// ==========================================
+// 1. AUTHENTICATION & USER MANAGEMENT
+// ==========================================
+
+export function getCurrentUserId(): string | null {
+  return getItem<string | null>(STORAGE_KEYS.CURRENT_USER_ID, null)
 }
 
-export function setCurrentUserId(userId: string): void {
-  setItem(STORAGE_KEYS.CURRENT_USER_ID, userId)
+export function setCurrentUserId(userId: string | null): void {
+  if (userId === null) {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER_ID)
+    sessionStorage.removeItem("credento_current_session")
+  } else {
+    setItem(STORAGE_KEYS.CURRENT_USER_ID, userId)
+    sessionStorage.setItem("credento_current_session", userId)
+  }
+  notifySubscribers()
 }
 
 export function getAllUsers(): StudentProfile[] {
-  initializeStorage()
-  return getItem<StudentProfile[]>(STORAGE_KEYS.USERS, INITIAL_STUDENTS)
-}
-
-export function getCurrentUser(): StudentProfile {
-  const currentId = getCurrentUserId()
-  const users = getAllUsers()
-  const found = users.find((u) => u.id === currentId)
-  if (found) return found
-  return users[0] || INITIAL_STUDENTS[0]
+  return getItem<StudentProfile[]>(STORAGE_KEYS.USERS, [])
 }
 
 export function getUserById(userId: string): StudentProfile | undefined {
@@ -172,40 +168,304 @@ export function getUserById(userId: string): StudentProfile | undefined {
   return users.find((u) => u.id === userId)
 }
 
+export function getUserByUsername(
+  username: string,
+): StudentProfile | undefined {
+  const clean = username.replace(/^@/, "").toLowerCase()
+  return getAllUsers().find((u) => u.username?.toLowerCase() === clean)
+}
+
+export function getCurrentUser(): StudentProfile | null {
+  const currentId = getCurrentUserId()
+  if (!currentId) return null
+  const user = getUserById(currentId)
+  return user || null
+}
+
+export function registerStudent(params: {
+  name: string
+  username: string
+  email: string
+  password?: string
+  institution: string
+  facultyOrDepartment?: string
+  degree?: string
+  graduationYear?: number | string
+  headline?: string
+  location?: string
+}): StudentProfile {
+  const users = getAllUsers()
+  const cleanUsername = params.username.replace(/^@/, "").trim().toLowerCase()
+
+  // Generate unique ID
+  const newId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
+
+  // Default initials avatar
+  const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+    params.name,
+  )}&backgroundColor=173a35&textColor=ffffff`
+
+  const newStudent: StudentProfile = {
+    id: newId,
+    name: params.name.trim(),
+    username: cleanUsername,
+    email: params.email.trim().toLowerCase(),
+    password: params.password || "student123",
+    role: "student",
+    headline:
+      params.headline?.trim() || `Student @ ${params.institution.trim()}`,
+    institution: params.institution.trim(),
+    facultyOrDepartment:
+      params.facultyOrDepartment?.trim() || "Academic Studies",
+    degree: params.degree?.trim() || "Undergraduate Degree",
+    graduationYear: params.graduationYear || 2027,
+    location: params.location?.trim() || "Campus",
+    avatar,
+    coverImage:
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
+    about: `Hello, I'm ${params.name.trim()} at ${params.institution.trim()}. I'm on Credento to connect with students, share research projects, and discover academic opportunities.`,
+    isPublic: true,
+    visibility: "public",
+    skills: ["Academic Research", "Collaboration", "Critical Thinking"],
+    interests: ["Higher Education", "Technology & Society"],
+    education: [
+      {
+        id: `edu-${Date.now()}`,
+        institution: params.institution.trim(),
+        degree: params.degree?.trim() || "Undergraduate Degree",
+        fieldOfStudy: params.facultyOrDepartment?.trim() || "Academic Focus",
+        startYear: 2023,
+        endYear: params.graduationYear || 2027,
+      },
+    ],
+    portfolioItems: [],
+    connectionsCount: 0,
+    followersCount: 0,
+    createdAt: new Date().toISOString(),
+  }
+
+  const updatedUsers = [...users, newStudent]
+  setItem(STORAGE_KEYS.USERS, updatedUsers)
+  setCurrentUserId(newId)
+
+  // Create welcome notification
+  createNotification({
+    targetUserId: newId,
+    type: "announcement",
+    title: "Welcome to Credento!",
+    description:
+      "Your genuine student profile is created. Add your projects, skills, and connect with peers.",
+    targetTab: "profile",
+  })
+
+  return newStudent
+}
+
+export function loginStudent(
+  emailOrUsername: string,
+  password?: string,
+): { success: boolean user?: StudentProfile error?: string } {
+  const users = getAllUsers()
+  const q = emailOrUsername.trim().toLowerCase().replace(/^@/, "")
+
+  const found = users.find(
+    (u) =>
+      u.email?.toLowerCase() === q ||
+      u.username?.toLowerCase() === q ||
+      u.name.toLowerCase() === q,
+  )
+
+  if (!found) {
+    return {
+      success: false,
+      error:
+        "No student account matches that email or username. Please check your credentials or register a new account.",
+    }
+  }
+
+  if (found.isSuspended) {
+    return {
+      success: false,
+      error: `This account has been suspended by Credento Administration: ${
+        found.suspendedReason || "Terms violation."
+      }`,
+    }
+  }
+
+  // Password check (simple verification for local auth)
+  if (password && found.password && found.password !== password) {
+    return {
+      success: false,
+      error: "Incorrect password. Please verify and try again.",
+    }
+  }
+
+  setCurrentUserId(found.id)
+  return { success: true, user: found }
+}
+
 export function updateCurrentUserProfile(
   updates: Partial<StudentProfile>,
-): StudentProfile {
+): StudentProfile | null {
+  const current = getCurrentUser()
+  if (!current) return null
+
   const users = getAllUsers()
-  const currentId = getCurrentUserId()
   const updatedUsers = users.map((u) => {
-    if (u.id === currentId) {
+    if (u.id === current.id) {
       return { ...u, ...updates }
     }
     return u
   })
+
   setItem(STORAGE_KEYS.USERS, updatedUsers)
-  return getUserById(currentId)!
+  return getUserById(current.id) || null
 }
+
+export function suspendUser(userId: string, reason: string): void {
+  const users = getAllUsers()
+  const updatedUsers = users.map((u) => {
+    if (u.id === userId) {
+      return {
+        ...u,
+        isSuspended: true,
+        suspendedReason: reason,
+      }
+    }
+    return u
+  })
+  setItem(STORAGE_KEYS.USERS, updatedUsers)
+}
+
+export function reactivateUser(userId: string): void {
+  const users = getAllUsers()
+  const updatedUsers = users.map((u) => {
+    if (u.id === userId) {
+      return {
+        ...u,
+        isSuspended: false,
+        suspendedReason: undefined,
+      }
+    }
+    return u
+  })
+  setItem(STORAGE_KEYS.USERS, updatedUsers)
+}
+
+export function deleteUserAccount(userId: string): void {
+  // Remove user from users
+  const users = getAllUsers().filter((u) => u.id !== userId)
+  setItem(STORAGE_KEYS.USERS, users)
+
+  // Clean up connections
+  const connections = getConnections().filter(
+    (c) => c.requesterId !== userId && c.receiverId !== userId,
+  )
+  setItem(STORAGE_KEYS.CONNECTIONS, connections)
+
+  // Clean up follows
+  const follows = getFollows().filter(
+    (f) => f.followerId !== userId && f.followedId !== userId,
+  )
+  setItem(STORAGE_KEYS.FOLLOWS, follows)
+
+  // Clean up posts by user
+  const posts = getPosts().filter((p) => p.authorId !== userId)
+  setItem(STORAGE_KEYS.POSTS, posts)
+
+  // Clean up conversations
+  const conversations = getConversations().filter(
+    (c) => !c.participantIds.includes(userId),
+  )
+  setItem(STORAGE_KEYS.CONVERSATIONS, conversations)
+
+  // Clean up notifications
+  const notifs = getNotifications().filter(
+    (n) => n.actorId !== userId && n.targetId !== userId,
+  )
+  setItem(STORAGE_KEYS.NOTIFICATIONS, notifs)
+
+  // If deleted user was current user, sign out
+  if (getCurrentUserId() === userId) {
+    setCurrentUserId(null)
+  }
+}
+
+// ==========================================
+// 2. PROFILE COMPLETENESS GUIDANCE
+// ==========================================
+
+export function calculateProfileCompleteness(
+  profile: StudentProfile,
+): {
+  percentage: number
+  missingFields: string[]
+  completedFields: string[]
+} {
+  let score = 0
+  const missing: string[] = []
+  const completed: string[] = []
+
+  if (profile.name?.trim()) {
+    score += 15
+    completed.push("Full Name")
+  } else missing.push("Full Name")
+
+  if (profile.headline?.trim()) {
+    score += 15
+    completed.push("Headline")
+  } else missing.push("Professional headline")
+
+  if (profile.about?.trim() && profile.about.length >= 30) {
+    score += 15
+    completed.push("About & Biography")
+  } else missing.push("About section (30+ characters)")
+
+  if (profile.avatar?.trim()) {
+    score += 10
+    completed.push("Profile Photo")
+  } else missing.push("Profile photo")
+
+  if (profile.institution?.trim() && profile.degree?.trim()) {
+    score += 15
+    completed.push("Current Education")
+  } else missing.push("Current university & degree")
+
+  if (profile.skills && profile.skills.length >= 3) {
+    score += 15
+    completed.push("3+ Academic Skills")
+  } else missing.push("Add at least 3 skills")
+
+  if (profile.portfolioItems && profile.portfolioItems.length >= 1) {
+    score += 15
+    completed.push("Project or Achievement")
+  } else missing.push("Add at least 1 project, publication, or award")
+
+  return {
+    percentage: Math.min(score, 100),
+    missingFields: missing,
+    completedFields: completed,
+  }
+}
+
+// ==========================================
+// 3. PROFILE SUB-ITEMS (EDUCATION, PORTFOLIO, SKILLS)
+// ==========================================
 
 export function addPortfolioItem(
   item: Omit<PortfolioItem, "id">,
-): PortfolioItem {
+): PortfolioItem | null {
+  const current = getCurrentUser()
+  if (!current) return null
+
   const newItem: PortfolioItem = {
     ...item,
-    id: `port-${Date.now()}`,
+    id: `port-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
   }
-  const current = getCurrentUser()
+
   const updatedItems = [newItem, ...(current.portfolioItems || [])]
   updateCurrentUserProfile({ portfolioItems: updatedItems })
   return newItem
-}
-
-export function removePortfolioItem(itemId: string): void {
-  const current = getCurrentUser()
-  const updatedItems = (current.portfolioItems || []).filter(
-    (item) => item.id !== itemId,
-  )
-  updateCurrentUserProfile({ portfolioItems: updatedItems })
 }
 
 export function updatePortfolioItem(
@@ -213,18 +473,35 @@ export function updatePortfolioItem(
   updates: Partial<PortfolioItem>,
 ): void {
   const current = getCurrentUser()
+  if (!current) return
+
   const updatedItems = (current.portfolioItems || []).map((item) =>
     item.id === itemId ? { ...item, ...updates } : item,
   )
   updateCurrentUserProfile({ portfolioItems: updatedItems })
 }
 
-export function addEducation(edu: Omit<EducationItem, "id">): EducationItem {
+export function removePortfolioItem(itemId: string): void {
   const current = getCurrentUser()
+  if (!current) return
+
+  const updatedItems = (current.portfolioItems || []).filter(
+    (item) => item.id !== itemId,
+  )
+  updateCurrentUserProfile({ portfolioItems: updatedItems })
+}
+
+export function addEducation(
+  edu: Omit<EducationItem, "id">,
+): EducationItem | null {
+  const current = getCurrentUser()
+  if (!current) return null
+
   const newEdu: EducationItem = {
     ...edu,
-    id: `edu-${Date.now()}`,
+    id: `edu-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
   }
+
   const updatedEdu = [newEdu, ...(current.education || [])]
   updateCurrentUserProfile({ education: updatedEdu })
   return newEdu
@@ -235,6 +512,8 @@ export function updateEducation(
   updates: Partial<EducationItem>,
 ): void {
   const current = getCurrentUser()
+  if (!current) return
+
   const updatedEdu = (current.education || []).map((e) =>
     e.id === eduId ? { ...e, ...updates } : e,
   )
@@ -243,28 +522,55 @@ export function updateEducation(
 
 export function deleteEducation(eduId: string): void {
   const current = getCurrentUser()
+  if (!current) return
+
   const updatedEdu = (current.education || []).filter((e) => e.id !== eduId)
   updateCurrentUserProfile({ education: updatedEdu })
 }
 
 export function addSkill(skill: string): void {
   const current = getCurrentUser()
+  if (!current) return
   const trimmed = skill.trim()
   if (!trimmed || current.skills?.includes(trimmed)) return
+
   updateCurrentUserProfile({ skills: [...(current.skills || []), trimmed] })
 }
 
 export function removeSkill(skill: string): void {
   const current = getCurrentUser()
+  if (!current) return
+
   updateCurrentUserProfile({
     skills: (current.skills || []).filter((s) => s !== skill),
   })
 }
 
+export function endorseSkill(targetUserId: string, skillName: string): void {
+  const current = getCurrentUser()
+  if (!current || current.id === targetUserId) return
+
+  const users = getAllUsers()
+  const updatedUsers = users.map((u) => {
+    if (u.id !== targetUserId) return u
+    const endorsements = u.skillEndorsements ? { ...u.skillEndorsements } : {}
+    const existing = endorsements[skillName] || []
+    if (existing.includes(current.id)) {
+      endorsements[skillName] = existing.filter((id) => id !== current.id)
+    } else {
+      endorsements[skillName] = [...existing, current.id]
+    }
+    return { ...u, skillEndorsements: endorsements }
+  })
+  setItem(STORAGE_KEYS.USERS, updatedUsers)
+}
+
 export function addInterest(interest: string): void {
   const current = getCurrentUser()
+  if (!current) return
   const trimmed = interest.trim()
   if (!trimmed || current.interests?.includes(trimmed)) return
+
   updateCurrentUserProfile({
     interests: [...(current.interests || []), trimmed],
   })
@@ -272,62 +578,249 @@ export function addInterest(interest: string): void {
 
 export function removeInterest(interest: string): void {
   const current = getCurrentUser()
+  if (!current) return
+
   updateCurrentUserProfile({
     interests: (current.interests || []).filter((i) => i !== interest),
   })
 }
 
-export function calculateProfileCompleteness(
-  profile: StudentProfile,
-): {
-  percentage: number
-  missingFields: string[]
-} {
-  let score = 0
-  const missing: string[] = []
+// ==========================================
+// 4. REAL RELATIONAL NETWORKING & CONNECTIONS
+// ==========================================
 
-  if (profile.name?.trim()) score += 15
-  else missing.push("Full name")
-
-  if (profile.headline?.trim()) score += 15
-  else missing.push("Professional headline")
-
-  if (profile.about?.trim() && profile.about.length > 30) score += 15
-  else missing.push("Detailed about section (30+ characters)")
-
-  if (profile.avatar?.trim()) score += 15
-  else missing.push("Profile photo")
-
-  if (profile.institution?.trim() && profile.degree?.trim()) score += 15
-  else missing.push("Education details")
-
-  if (profile.skills && profile.skills.length >= 3) score += 15
-  else missing.push("At least 3 core skills")
-
-  if (profile.portfolioItems && profile.portfolioItems.length >= 1) score += 10
-  else missing.push("At least 1 project, publication, or award")
-
-  return { percentage: Math.min(score, 100), missingFields: missing }
+export function getConnections(): ConnectionRelationship[] {
+  return getItem<ConnectionRelationship[]>(STORAGE_KEYS.CONNECTIONS, [])
 }
 
-export function endorseSkill(targetUserId: string, skillName: string): void {
-  const current = getCurrentUser()
-  const users = getAllUsers()
-  const updatedUsers = users.map((u) => {
-    if (u.id !== targetUserId) return u
-    const endorsements = u.skillEndorsements ? { ...u.skillEndorsements } : {}
-    const existingVotes = endorsements[skillName] || []
-    if (existingVotes.includes(current.id)) {
-      endorsements[skillName] = existingVotes.filter((id) => id !== current.id)
-    } else {
-      endorsements[skillName] = [...existingVotes, current.id]
+export function getFollows(): FollowRelationship[] {
+  return getItem<FollowRelationship[]>(STORAGE_KEYS.FOLLOWS, [])
+}
+
+export function getConnectionStatus(
+  viewerId: string,
+  targetUserId: string,
+): ConnectionStatus {
+  if (viewerId === targetUserId) return "self"
+
+  const connections = getConnections()
+  const rel = connections.find(
+    (c) =>
+      (c.requesterId === viewerId && c.receiverId === targetUserId) ||
+      (c.requesterId === targetUserId && c.receiverId === viewerId),
+  )
+
+  if (!rel) return "none"
+  if (rel.status === "connected") return "connected"
+  if (rel.status === "pending") {
+    return rel.requesterId === viewerId ? "pending_sent" : "pending_received"
+  }
+  return "none"
+}
+
+export function isFollowingUser(
+  viewerId: string,
+  targetUserId: string,
+): boolean {
+  if (viewerId === targetUserId) return false
+  const follows = getFollows()
+  return follows.some(
+    (f) => f.followerId === viewerId && f.followedId === targetUserId,
+  )
+}
+
+export function getStudentWithNetworkStatus(
+  student: StudentProfile,
+  viewerId?: string,
+): StudentProfile {
+  const activeViewerId = viewerId || getCurrentUserId()
+  if (!activeViewerId) {
+    return {
+      ...student,
+      connectionStatus: "none",
+      isFollowing: false,
     }
-    return { ...u, skillEndorsements: endorsements }
-  })
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
+  }
+
+  const connStatus = getConnectionStatus(activeViewerId, student.id)
+  const isFollowing = isFollowingUser(activeViewerId, student.id)
+
+  // Calculate actual connections count from database
+  const connections = getConnections()
+  const mutualCount = connections.filter(
+    (c) =>
+      c.status === "connected" &&
+      (c.requesterId === student.id || c.receiverId === student.id),
+  ).length
+
+  // Calculate actual followers count
+  const follows = getFollows()
+  const followersCount = follows.filter(
+    (f) => f.followedId === student.id,
+  ).length
+
+  return {
+    ...student,
+    connectionStatus: connStatus,
+    isFollowing,
+    connectionsCount: mutualCount,
+    followersCount,
+  }
 }
 
-// --- NETWORKING & CONNECTIONS API ---
+export function sendConnectionRequest(targetUserId: string): void {
+  const current = getCurrentUser()
+  if (!current || current.id === targetUserId) return
+
+  const connections = getConnections()
+  // Check if relation already exists
+  const existing = connections.find(
+    (c) =>
+      (c.requesterId === current.id && c.receiverId === targetUserId) ||
+      (c.requesterId === targetUserId && c.receiverId === current.id),
+  )
+
+  if (existing) {
+    if (existing.status === "declined") {
+      // Re-open
+      const updated = connections.map((c) =>
+        c.id === existing.id
+          ? {
+              ...c,
+              requesterId: current.id,
+              receiverId: targetUserId,
+              status: "pending" as const,
+            }
+          : c,
+      )
+      setItem(STORAGE_KEYS.CONNECTIONS, updated)
+    }
+    return
+  }
+
+  const newRel: ConnectionRelationship = {
+    id: `conn-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    requesterId: current.id,
+    receiverId: targetUserId,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  }
+
+  setItem(STORAGE_KEYS.CONNECTIONS, [...connections, newRel])
+
+  // Create notification for target user
+  createNotification({
+    targetUserId,
+    actorId: current.id,
+    actorName: current.name,
+    actorAvatar: current.avatar,
+    type: "connection_request",
+    title: "New Connection Request",
+    description: `${current.name} (${current.institution}) sent you a connection request.`,
+    targetTab: "network",
+  })
+}
+
+export function acceptConnectionRequest(targetUserId: string): void {
+  const current = getCurrentUser()
+  if (!current) return
+
+  const connections = getConnections()
+  const rel = connections.find(
+    (c) =>
+      (c.requesterId === targetUserId && c.receiverId === current.id) ||
+      (c.requesterId === current.id && c.receiverId === targetUserId),
+  )
+
+  if (!rel) return
+
+  const updated = connections.map((c) =>
+    c.id === rel.id ? { ...c, status: "connected" as const } : c,
+  )
+  setItem(STORAGE_KEYS.CONNECTIONS, updated)
+
+  // Notify requester
+  const targetUser = getUserById(targetUserId)
+  createNotification({
+    targetUserId: targetUserId,
+    actorId: current.id,
+    actorName: current.name,
+    actorAvatar: current.avatar,
+    type: "connection_accepted",
+    title: "Connection Accepted",
+    description: `You and ${current.name} are now connected on Credento.`,
+    targetTab: "network",
+  })
+}
+
+export function declineConnectionRequest(targetUserId: string): void {
+  const current = getCurrentUser()
+  if (!current) return
+
+  const connections = getConnections()
+  const updated = connections.filter(
+    (c) =>
+      !(
+        (c.requesterId === targetUserId && c.receiverId === current.id) ||
+        (c.requesterId === current.id && c.receiverId === targetUserId)
+      ),
+  )
+  setItem(STORAGE_KEYS.CONNECTIONS, updated)
+}
+
+export function withdrawConnectionRequest(targetUserId: string): void {
+  const current = getCurrentUser()
+  if (!current) return
+
+  const connections = getConnections()
+  const updated = connections.filter(
+    (c) =>
+      !(
+        c.requesterId === current.id &&
+        c.receiverId === targetUserId &&
+        c.status === "pending"
+      ),
+  )
+  setItem(STORAGE_KEYS.CONNECTIONS, updated)
+}
+
+export function removeConnection(targetUserId: string): void {
+  const current = getCurrentUser()
+  if (!current) return
+
+  const connections = getConnections()
+  const updated = connections.filter(
+    (c) =>
+      !(
+        (c.requesterId === current.id && c.receiverId === targetUserId) ||
+        (c.requesterId === targetUserId && c.receiverId === current.id)
+      ),
+  )
+  setItem(STORAGE_KEYS.CONNECTIONS, updated)
+}
+
+export function toggleFollowUser(targetUserId: string): void {
+  const current = getCurrentUser()
+  if (!current || current.id === targetUserId) return
+
+  const follows = getFollows()
+  const exists = follows.some(
+    (f) => f.followerId === current.id && f.followedId === targetUserId,
+  )
+
+  if (exists) {
+    const updated = follows.filter(
+      (f) => !(f.followerId === current.id && f.followedId === targetUserId),
+    )
+    setItem(STORAGE_KEYS.FOLLOWS, updated)
+  } else {
+    const newFollow: FollowRelationship = {
+      followerId: current.id,
+      followedId: targetUserId,
+    }
+    setItem(STORAGE_KEYS.FOLLOWS, [...follows, newFollow])
+  }
+}
 
 export function getBlockedUserIds(): string[] {
   return getItem<string[]>(STORAGE_KEYS.BLOCKED_USERS, [])
@@ -336,138 +829,35 @@ export function getBlockedUserIds(): string[] {
 export function blockUser(targetUserId: string): void {
   const blocked = getBlockedUserIds()
   if (!blocked.includes(targetUserId)) {
-    const updated = [...blocked, targetUserId]
-    setItem(STORAGE_KEYS.BLOCKED_USERS, updated)
+    setItem(STORAGE_KEYS.BLOCKED_USERS, [...blocked, targetUserId])
+    // Also sever any connection
+    removeConnection(targetUserId)
   }
 }
 
 export function unblockUser(targetUserId: string): void {
   const blocked = getBlockedUserIds()
-  const updated = blocked.filter((id) => id !== targetUserId)
-  setItem(STORAGE_KEYS.BLOCKED_USERS, updated)
+  setItem(
+    STORAGE_KEYS.BLOCKED_USERS,
+    blocked.filter((id) => id !== targetUserId),
+  )
 }
 
-export function sendConnectionRequest(targetUserId: string): void {
-  const users = getAllUsers()
-  const current = getCurrentUser()
+// ==========================================
+// 5. POSTS & FEED
+// ==========================================
 
-  const updatedUsers = users.map((u) => {
-    if (u.id === targetUserId) {
-      return {
-        ...u,
-        connectionStatus: "pending_received" as const,
-      }
-    }
-    return u
-  })
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
-
-  // Add notification to target user
-  const notifs = getNotifications()
-  const newNotif: AppNotification = {
-    id: `notif-${Date.now()}`,
-    type: "connection_request",
-    actorId: current.id,
-    actorName: current.name,
-    actorAvatar: current.avatar,
-    title: "New Connection Request",
-    description: `${current.name} (${current.institution}) sent you a connection request.`,
-    createdAt: "Just now",
-    isRead: false,
-    requestId: `req-${Date.now()}`,
-  }
-  setItem(STORAGE_KEYS.NOTIFICATIONS, [newNotif, ...notifs])
+export function getPosts(): Post[] {
+  const posts = getItem<Post[]>(STORAGE_KEYS.POSTS, [])
+  const savedIds = getSavedPostIds()
+  return posts.map((p) => ({
+    ...p,
+    isSaved: savedIds.includes(p.id),
+  }))
 }
-
-export function acceptConnectionRequest(targetUserId: string): void {
-  const users = getAllUsers()
-  const current = getCurrentUser()
-
-  const updatedUsers = users.map((u) => {
-    if (u.id === targetUserId) {
-      return {
-        ...u,
-        connectionStatus: "connected" as const,
-        connectionsCount: u.connectionsCount + 1,
-      }
-    }
-    if (u.id === current.id) {
-      return {
-        ...u,
-        connectionsCount: u.connectionsCount + 1,
-      }
-    }
-    return u
-  })
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
-
-  // Add notification
-  const notifs = getNotifications()
-  const targetUser = users.find((u) => u.id === targetUserId)
-  const newNotif: AppNotification = {
-    id: `notif-${Date.now()}`,
-    type: "connection_accepted",
-    actorId: targetUserId,
-    actorName: targetUser?.name || "A student",
-    actorAvatar: targetUser?.avatar,
-    title: "Connection Accepted",
-    description: `You and ${targetUser?.name || "student"} are now connected on Credento.`,
-    createdAt: "Just now",
-    isRead: false,
-  }
-  setItem(STORAGE_KEYS.NOTIFICATIONS, [newNotif, ...notifs])
-}
-
-export function declineConnectionRequest(targetUserId: string): void {
-  const users = getAllUsers()
-  const updatedUsers = users.map((u) => {
-    if (u.id === targetUserId) {
-      return {
-        ...u,
-        connectionStatus: "none" as const,
-      }
-    }
-    return u
-  })
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
-}
-
-export function withdrawConnectionRequest(targetUserId: string): void {
-  const users = getAllUsers()
-  const updatedUsers = users.map((u) => {
-    if (u.id === targetUserId) {
-      return {
-        ...u,
-        connectionStatus: "none" as const,
-      }
-    }
-    return u
-  })
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
-}
-
-export function toggleFollowUser(targetUserId: string): void {
-  const users = getAllUsers()
-  const updatedUsers = users.map((u) => {
-    if (u.id === targetUserId) {
-      const willFollow = !u.isFollowing
-      return {
-        ...u,
-        isFollowing: willFollow,
-        followersCount: willFollow
-          ? u.followersCount + 1
-          : Math.max(0, u.followersCount - 1),
-      }
-    }
-    return u
-  })
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
-}
-
-// --- POSTS & FEED API ---
 
 export function getSavedPostIds(): string[] {
-  return getItem<string[]>(STORAGE_KEYS.SAVED_POSTS, ["post-1"])
+  return getItem<string[]>(STORAGE_KEYS.SAVED_POSTS, [])
 }
 
 export function toggleSavePost(postId: string): boolean {
@@ -480,9 +870,250 @@ export function toggleSavePost(postId: string): boolean {
   return !exists
 }
 
+export function createPost(params: {
+  content: string
+  imageUrl?: string
+  linkPreview?: Post["linkPreview"]
+  topic?: Post["topic"]
+  poll?: Post["poll"]
+}): Post | null {
+  const current = getCurrentUser()
+  if (!current) return null
+
+  const posts = getPosts()
+  const newPost: Post = {
+    id: `post-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    authorId: current.id,
+    authorName: current.name,
+    authorHeadline: current.headline,
+    authorInstitution: current.institution,
+    authorAvatar: current.avatar,
+    content: params.content.trim(),
+    imageUrl: params.imageUrl,
+    linkPreview: params.linkPreview,
+    topic: params.topic || "General",
+    poll: params.poll,
+    createdAt: "Just now",
+    likes: [],
+    sharesCount: 0,
+    comments: [],
+  }
+
+  setItem(STORAGE_KEYS.POSTS, [newPost, ...posts])
+  return newPost
+}
+
+export function sharePost(originalPost: Post, thoughts?: string): Post | null {
+  const current = getCurrentUser()
+  if (!current) return null
+
+  const posts = getPosts()
+  const newPost: Post = {
+    id: `post-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    authorId: current.id,
+    authorName: current.name,
+    authorHeadline: current.headline,
+    authorInstitution: current.institution,
+    authorAvatar: current.avatar,
+    content: thoughts?.trim() || `Reposted from ${originalPost.authorName}`,
+    createdAt: "Just now",
+    likes: [],
+    sharesCount: 0,
+    comments: [],
+    topic: originalPost.topic || "General",
+    sharedPost: {
+      id: originalPost.id,
+      authorName: originalPost.authorName,
+      authorHeadline: originalPost.authorHeadline,
+      authorAvatar: originalPost.authorAvatar,
+      content: originalPost.content,
+      createdAt: originalPost.createdAt,
+    },
+  }
+
+  const updatedPosts = [
+    newPost,
+    ...posts.map((p) =>
+      p.id === originalPost.id
+        ? { ...p, sharesCount: (p.sharesCount || 0) + 1 }
+        : p,
+    ),
+  ]
+
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+  return newPost
+}
+
+export function editPost(postId: string, newContent: string): void {
+  const posts = getPosts()
+  const updated = posts.map((p) =>
+    p.id === postId ? { ...p, content: newContent.trim(), isEdited: true } : p,
+  )
+  setItem(STORAGE_KEYS.POSTS, updated)
+}
+
+export function deletePost(postId: string): void {
+  const posts = getPosts().filter((p) => p.id !== postId)
+  setItem(STORAGE_KEYS.POSTS, posts)
+}
+
+export function setPostReaction(postId: string, reaction: ReactionType): void {
+  const current = getCurrentUser()
+  if (!current) return
+
+  const posts = getPosts()
+  const updated = posts.map((p) => {
+    if (p.id !== postId) return p
+    const reactions = p.reactions ? { ...p.reactions } : {}
+    let nextLikes = [...p.likes]
+
+    if (reactions[current.id] === reaction) {
+      delete reactions[current.id]
+      nextLikes = nextLikes.filter((id) => id !== current.id)
+    } else {
+      reactions[current.id] = reaction
+      if (!nextLikes.includes(current.id)) {
+        nextLikes.push(current.id)
+      }
+    }
+
+    return { ...p, reactions, likes: nextLikes }
+  })
+
+  setItem(STORAGE_KEYS.POSTS, updated)
+
+  // Notify post author if not self
+  const post = posts.find((p) => p.id === postId)
+  if (
+    post &&
+    post.authorId !== current.id &&
+    !post.likes.includes(current.id)
+  ) {
+    createNotification({
+      targetUserId: post.authorId,
+      actorId: current.id,
+      actorName: current.name,
+      actorAvatar: current.avatar,
+      type: "like",
+      title: "Post Interaction",
+      description: `${current.name} reacted to your post: "${post.content.slice(0, 40)}..."`,
+      targetTab: "feed",
+    })
+  }
+}
+
+export function togglePostLike(postId: string): void {
+  setPostReaction(postId, "like")
+}
+
+export function addComment(postId: string, content: string): Comment | null {
+  const current = getCurrentUser()
+  if (!current || !content.trim()) return null
+
+  const posts = getPosts()
+  const newComment: Comment = {
+    id: `comm-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    postId,
+    authorId: current.id,
+    authorName: current.name,
+    authorHeadline: current.headline,
+    authorAvatar: current.avatar,
+    content: content.trim(),
+    createdAt: "Just now",
+    likes: [],
+    replies: [],
+  }
+
+  const updatedPosts = posts.map((p) =>
+    p.id === postId ? { ...p, comments: [...p.comments, newComment] } : p,
+  )
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+
+  // Notify post author
+  const post = posts.find((p) => p.id === postId)
+  if (post && post.authorId !== current.id) {
+    createNotification({
+      targetUserId: post.authorId,
+      actorId: current.id,
+      actorName: current.name,
+      actorAvatar: current.avatar,
+      type: "comment",
+      title: "New Comment",
+      description: `${current.name} commented on your post: "${content.trim().slice(0, 40)}..."`,
+      targetTab: "feed",
+    })
+  }
+
+  return newComment
+}
+
+export function addCommentReply(
+  postId: string,
+  commentId: string,
+  content: string,
+): void {
+  const current = getCurrentUser()
+  if (!current || !content.trim()) return
+
+  const posts = getPosts()
+  const newReply = {
+    id: `reply-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    authorId: current.id,
+    authorName: current.name,
+    authorHeadline: current.headline,
+    authorAvatar: current.avatar,
+    content: content.trim(),
+    createdAt: "Just now",
+    likes: [],
+  }
+
+  const updatedPosts = posts.map((p) => {
+    if (p.id !== postId) return p
+    const updatedComments = p.comments.map((c) => {
+      if (c.id === commentId) {
+        return { ...c, replies: [...c.replies, newReply] }
+      }
+      return c
+    })
+    return { ...p, comments: updatedComments }
+  })
+
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+}
+
+export function editComment(
+  postId: string,
+  commentId: string,
+  newContent: string,
+): void {
+  const posts = getPosts()
+  const updatedPosts = posts.map((p) => {
+    if (p.id !== postId) return p
+    const updatedComments = p.comments.map((c) =>
+      c.id === commentId ? { ...c, content: newContent.trim() } : c,
+    )
+    return { ...p, comments: updatedComments }
+  })
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+}
+
+export function deleteComment(postId: string, commentId: string): void {
+  const posts = getPosts()
+  const updatedPosts = posts.map((p) => {
+    if (p.id !== postId) return p
+    return {
+      ...p,
+      comments: p.comments.filter((c) => c.id !== commentId),
+    }
+  })
+  setItem(STORAGE_KEYS.POSTS, updatedPosts)
+}
+
 export function votePostPoll(postId: string, optionId: string): void {
   const current = getCurrentUser()
-  const posts = getItem<Post[]>(STORAGE_KEYS.POSTS, INITIAL_POSTS)
+  if (!current) return
+
+  const posts = getPosts()
   const updated = posts.map((post) => {
     if (post.id !== postId || !post.poll) return post
     const updatedOptions = post.poll.options.map((opt) => {
@@ -497,224 +1128,225 @@ export function votePostPoll(postId: string, optionId: string): void {
   setItem(STORAGE_KEYS.POSTS, updated)
 }
 
-export function getPosts(): Post[] {
-  initializeStorage()
-  const posts = getItem<Post[]>(STORAGE_KEYS.POSTS, INITIAL_POSTS)
-  const savedIds = getSavedPostIds()
-  return posts.map((p) => ({
-    ...p,
-    isSaved: savedIds.includes(p.id),
+// ==========================================
+// 6. MESSAGING
+// ==========================================
+
+export function getConversations(): Conversation[] {
+  const currentId = getCurrentUserId()
+  const allConversations = getItem<Conversation[]>(
+    STORAGE_KEYS.CONVERSATIONS,
+    [],
+  )
+  if (!currentId) return []
+
+  // Only return conversations where current user is a participant
+  return allConversations.filter((c) => c.participantIds.includes(currentId))
+}
+
+export function getOrCreateConversation(targetUserId: string): Conversation {
+  const current = getCurrentUser()
+  if (!current) throw new Error("Must be logged in to message")
+
+  const allConversations = getItem<Conversation[]>(
+    STORAGE_KEYS.CONVERSATIONS,
+    [],
+  )
+  const existing = allConversations.find(
+    (c) =>
+      c.participantIds.includes(targetUserId) &&
+      c.participantIds.includes(current.id),
+  )
+
+  if (existing) return existing
+
+  const targetUser = getUserById(targetUserId)
+  const newConv: Conversation = {
+    id: `conv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    participantIds: [current.id, targetUserId],
+    otherUser: {
+      id: targetUserId,
+      name: targetUser?.name || "Student",
+      headline: targetUser?.headline || "Credento Scholar",
+      avatar: targetUser?.avatar || "",
+      institution: targetUser?.institution || "University",
+      isOnline: false,
+    },
+    lastMessage: "Conversation initiated",
+    lastMessageAt: "Just now",
+    unreadCount: 0,
+    messages: [],
+  }
+
+  setItem(STORAGE_KEYS.CONVERSATIONS, [newConv, ...allConversations])
+  return newConv
+}
+
+export function sendMessage(conversationId: string, text: string): void {
+  const current = getCurrentUser()
+  if (!current || !text.trim()) return
+
+  const allConversations = getItem<Conversation[]>(
+    STORAGE_KEYS.CONVERSATIONS,
+    [],
+  )
+
+  const updated = allConversations.map((conv) => {
+    if (conv.id === conversationId) {
+      const newMsg: ChatMessage = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        senderId: current.id,
+        text: text.trim(),
+        sentAt: "Just now",
+      }
+
+      // Find recipient
+      const recipientId = conv.participantIds.find((id) => id !== current.id)
+      if (recipientId) {
+        createNotification({
+          targetUserId: recipientId,
+          actorId: current.id,
+          actorName: current.name,
+          actorAvatar: current.avatar,
+          type: "message",
+          title: "New Message",
+          description: `${current.name}: ${text.trim().slice(0, 45)}...`,
+          targetTab: "messages",
+        })
+      }
+
+      return {
+        ...conv,
+        lastMessage: text.trim(),
+        lastMessageAt: "Just now",
+        messages: [...conv.messages, newMsg],
+      }
+    }
+    return conv
+  })
+
+  setItem(STORAGE_KEYS.CONVERSATIONS, updated)
+}
+
+export function markConversationAsRead(conversationId: string): void {
+  const allConversations = getItem<Conversation[]>(
+    STORAGE_KEYS.CONVERSATIONS,
+    [],
+  )
+  const updated = allConversations.map((c) =>
+    c.id === conversationId ? { ...c, unreadCount: 0 } : c,
+  )
+  setItem(STORAGE_KEYS.CONVERSATIONS, updated)
+}
+
+export function deleteConversation(conversationId: string): void {
+  const allConversations = getItem<Conversation[]>(
+    STORAGE_KEYS.CONVERSATIONS,
+    [],
+  )
+  const updated = allConversations.filter((c) => c.id !== conversationId)
+  setItem(STORAGE_KEYS.CONVERSATIONS, updated)
+}
+
+// ==========================================
+// 7. NOTIFICATIONS
+// ==========================================
+
+export function getNotifications(): AppNotification[] {
+  const currentId = getCurrentUserId()
+  const allNotifs = getItem<AppNotification[]>(STORAGE_KEYS.NOTIFICATIONS, [])
+  if (!currentId) return []
+
+  // Only return notifications targeted to current user (or broadcast 'all')
+  return allNotifs.filter(
+    (n) => n.targetId === currentId || n.targetId === undefined,
+  )
+}
+
+export function createNotification(params: {
+  targetUserId?: string
+  actorId?: string
+  actorName?: string
+  actorAvatar?: string
+  type: AppNotification["type"]
+  title: string
+  description: string
+  targetTab?: string
+}): AppNotification {
+  const allNotifs = getItem<AppNotification[]>(STORAGE_KEYS.NOTIFICATIONS, [])
+
+  const newNotif: AppNotification = {
+    id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    type: params.type,
+    actorId: params.actorId,
+    actorName: params.actorName,
+    actorAvatar: params.actorAvatar,
+    targetId: params.targetUserId,
+    title: params.title,
+    description: params.description,
+    targetTab: params.targetTab,
+    createdAt: "Just now",
+    isRead: false,
+  }
+
+  setItem(STORAGE_KEYS.NOTIFICATIONS, [newNotif, ...allNotifs])
+  return newNotif
+}
+
+export function markNotificationAsRead(notifId: string): void {
+  const allNotifs = getItem<AppNotification[]>(STORAGE_KEYS.NOTIFICATIONS, [])
+  const updated = allNotifs.map((n) =>
+    n.id === notifId ? { ...n, isRead: true } : n,
+  )
+  setItem(STORAGE_KEYS.NOTIFICATIONS, updated)
+}
+
+export function markAllNotificationsAsRead(): void {
+  const allNotifs = getItem<AppNotification[]>(STORAGE_KEYS.NOTIFICATIONS, [])
+  const currentId = getCurrentUserId()
+  const updated = allNotifs.map((n) => {
+    if (n.targetId === currentId || n.targetId === undefined) {
+      return { ...n, isRead: true }
+    }
+    return n
+  })
+  setItem(STORAGE_KEYS.NOTIFICATIONS, updated)
+}
+
+// ==========================================
+// 8. OPPORTUNITIES & APPLICATION TRACKER
+// ==========================================
+
+export function getOpportunities(): Opportunity[] {
+  const opps = getItem<Opportunity[]>(
+    STORAGE_KEYS.OPPORTUNITIES,
+    INITIAL_OPPORTUNITIES,
+  )
+  const savedIds = getSavedOpportunityIds()
+  const applications = getAllApplications()
+
+  return opps.map((o) => ({
+    ...o,
+    isSaved: savedIds.includes(o.id),
+    applicationStatus: applications[o.id]?.status,
+    applicationNotes: applications[o.id]?.notes,
+    appliedDate: applications[o.id]?.appliedDate,
   }))
 }
 
-export function createPost(params: {
-  content: string
-  imageUrl?: string
-  linkPreview?: Post["linkPreview"]
-}): Post {
-  const current = getCurrentUser()
-  const posts = getPosts()
-
-  const newPost: Post = {
-    id: `post-${Date.now()}`,
-    authorId: current.id,
-    authorName: current.name,
-    authorHeadline: current.headline,
-    authorInstitution: current.institution,
-    authorAvatar: current.avatar,
-    content: params.content,
-    imageUrl: params.imageUrl,
-    linkPreview: params.linkPreview,
-    createdAt: "Just now",
-    likes: [],
-    sharesCount: 0,
-    comments: [],
-  }
-
-  const updatedPosts = [newPost, ...posts]
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-  return newPost
+export function getSavedOpportunityIds(): string[] {
+  return getItem<string[]>(STORAGE_KEYS.SAVED_OPPORTUNITIES, [])
 }
 
-export function sharePost(originalPost: Post, thoughts?: string): Post {
-  const current = getCurrentUser()
-  const posts = getPosts()
-
-  const newPost: Post = {
-    id: `post-${Date.now()}`,
-    authorId: current.id,
-    authorName: current.name,
-    authorHeadline: current.headline,
-    authorInstitution: current.institution,
-    authorAvatar: current.avatar,
-    content: thoughts || `Reposted from ${originalPost.authorName}`,
-    createdAt: "Just now",
-    likes: [],
-    sharesCount: 0,
-    comments: [],
-    sharedPost: {
-      id: originalPost.id,
-      authorName: originalPost.authorName,
-      authorHeadline: originalPost.authorHeadline,
-      authorAvatar: originalPost.authorAvatar,
-      content: originalPost.content,
-      createdAt: originalPost.createdAt,
-    },
-  }
-
-  // Increment original post share count
-  const updatedPosts = [
-    newPost,
-    ...posts.map((p) => {
-      if (p.id === originalPost.id) {
-        return { ...p, sharesCount: p.sharesCount + 1 }
-      }
-      return p
-    }),
-  ]
-
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-  return newPost
+export function toggleSaveOpportunity(oppId: string): boolean {
+  const saved = getSavedOpportunityIds()
+  const exists = saved.includes(oppId)
+  const updated = exists
+    ? saved.filter((id) => id !== oppId)
+    : [...saved, oppId]
+  setItem(STORAGE_KEYS.SAVED_OPPORTUNITIES, updated)
+  return !exists
 }
-
-export function editPost(postId: string, newContent: string): void {
-  const posts = getPosts()
-  const updatedPosts = posts.map((p) => {
-    if (p.id === postId) {
-      return { ...p, content: newContent }
-    }
-    return p
-  })
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-}
-
-export function deletePost(postId: string): void {
-  const posts = getPosts()
-  const updatedPosts = posts.filter((p) => p.id !== postId)
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-}
-
-export function setPostReaction(postId: string, reaction: ReactionType): void {
-  const currentId = getCurrentUserId()
-  const posts = getPosts()
-
-  const updatedPosts = posts.map((p) => {
-    if (p.id === postId) {
-      const reactions = p.reactions ? { ...p.reactions } : {}
-      let nextLikes = [...p.likes]
-
-      if (reactions[currentId] === reaction) {
-        delete reactions[currentId]
-        nextLikes = nextLikes.filter((id) => id !== currentId)
-      } else {
-        reactions[currentId] = reaction
-        if (!nextLikes.includes(currentId)) {
-          nextLikes.push(currentId)
-        }
-      }
-
-      return { ...p, reactions, likes: nextLikes }
-    }
-    return p
-  })
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-}
-
-export function togglePostLike(postId: string): void {
-  setPostReaction(postId, "like")
-}
-
-export function editComment(
-  postId: string,
-  commentId: string,
-  newContent: string,
-): void {
-  const posts = getPosts()
-  const updatedPosts = posts.map((p) => {
-    if (p.id === postId) {
-      const updatedComments = p.comments.map((c) =>
-        c.id === commentId ? { ...c, content: newContent } : c,
-      )
-      return { ...p, comments: updatedComments }
-    }
-    return p
-  })
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-}
-
-export function deleteComment(postId: string, commentId: string): void {
-  const posts = getPosts()
-  const updatedPosts = posts.map((p) => {
-    if (p.id === postId) {
-      const filtered = p.comments.filter((c) => c.id !== commentId)
-      return { ...p, comments: filtered }
-    }
-    return p
-  })
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-}
-
-export function addComment(postId: string, content: string): Comment {
-  const current = getCurrentUser()
-  const posts = getPosts()
-
-  const newComment: Comment = {
-    id: `comm-${Date.now()}`,
-    postId,
-    authorId: current.id,
-    authorName: current.name,
-    authorHeadline: current.headline,
-    authorAvatar: current.avatar,
-    content,
-    createdAt: "Just now",
-    likes: [],
-    replies: [],
-  }
-
-  const updatedPosts = posts.map((p) => {
-    if (p.id === postId) {
-      return { ...p, comments: [...p.comments, newComment] }
-    }
-    return p
-  })
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-  return newComment
-}
-
-export function addCommentReply(
-  postId: string,
-  commentId: string,
-  content: string,
-): void {
-  const current = getCurrentUser()
-  const posts = getPosts()
-
-  const newReply = {
-    id: `reply-${Date.now()}`,
-    authorId: current.id,
-    authorName: current.name,
-    authorAvatar: current.avatar,
-    content,
-    createdAt: "Just now",
-    likes: [],
-  }
-
-  const updatedPosts = posts.map((p) => {
-    if (p.id === postId) {
-      const updatedComments = p.comments.map((c) => {
-        if (c.id === commentId) {
-          return { ...c, replies: [...c.replies, newReply] }
-        }
-        return c
-      })
-      return { ...p, comments: updatedComments }
-    }
-    return p
-  })
-  setItem(STORAGE_KEYS.POSTS, updatedPosts)
-}
-
-// --- OPPORTUNITIES & APPLICATION TRACKING API ---
 
 export function getAllApplications(): {
   [oppId: string]: {
@@ -741,230 +1373,528 @@ export function updateApplicationStatus(
   setItem(STORAGE_KEYS.APPLICATIONS, apps)
 }
 
-export function removeApplication(oppId: string): void {
-  const apps = getAllApplications()
-  delete apps[oppId]
-  setItem(STORAGE_KEYS.APPLICATIONS, apps)
-}
-
-export function getOpportunities(): Opportunity[] {
-  initializeStorage()
+export function createOpportunity(
+  opp: Omit<Opportunity, "id" | "createdAt">,
+): Opportunity {
   const opps = getItem<Opportunity[]>(
     STORAGE_KEYS.OPPORTUNITIES,
     INITIAL_OPPORTUNITIES,
   )
-  const savedIds = getSavedOpportunityIds()
-  const applications = getAllApplications()
-  return opps.map((o) => ({
-    ...o,
-    isSaved: savedIds.includes(o.id),
-    applicationStatus: applications[o.id]?.status,
-    applicationNotes: applications[o.id]?.notes,
-    appliedDate: applications[o.id]?.appliedDate,
-  }))
-}
-
-export function getSavedOpportunityIds(): string[] {
-  return getItem<string[]>(STORAGE_KEYS.SAVED_OPPORTUNITIES, ["opp-1", "opp-2"])
-}
-
-export function toggleSaveOpportunity(oppId: string): boolean {
-  const saved = getSavedOpportunityIds()
-  const exists = saved.includes(oppId)
-  const updated = exists
-    ? saved.filter((id) => id !== oppId)
-    : [...saved, oppId]
-  setItem(STORAGE_KEYS.SAVED_OPPORTUNITIES, updated)
-  return !exists
-}
-
-export function createOpportunity(
-  opp: Omit<Opportunity, "id" | "createdAt">,
-): Opportunity {
-  const opps = getOpportunities()
   const newOpp: Opportunity = {
     ...opp,
-    id: `opp-${Date.now()}`,
+    id: `opp-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     createdAt: new Date().toISOString().split("T")[0],
   }
-  const updated = [newOpp, ...opps]
-  setItem(STORAGE_KEYS.OPPORTUNITIES, updated)
+  setItem(STORAGE_KEYS.OPPORTUNITIES, [newOpp, ...opps])
   return newOpp
 }
 
-// --- MESSAGING API ---
+export function deleteOpportunity(oppId: string): void {
+  const opps = getItem<Opportunity[]>(
+    STORAGE_KEYS.OPPORTUNITIES,
+    INITIAL_OPPORTUNITIES,
+  ).filter((o) => o.id !== oppId)
+  setItem(STORAGE_KEYS.OPPORTUNITIES, opps)
+}
 
-export function getConversations(): Conversation[] {
-  initializeStorage()
-  return getItem<Conversation[]>(
-    STORAGE_KEYS.CONVERSATIONS,
-    INITIAL_CONVERSATIONS,
+// ==========================================
+// 9. CREDENTO ACCESS CENTER (CORE ECOSYSTEM)
+// ==========================================
+
+export function getAllAccessCenters(): AccessCenterOrganization[] {
+  return getItem<AccessCenterOrganization[]>(
+    STORAGE_KEYS.ACCESS_CENTERS,
+    INITIAL_ACCESS_CENTERS,
   )
 }
 
-export function getOrCreateConversation(targetUserId: string): Conversation {
-  const currentId = getCurrentUserId()
-  const conversations = getConversations()
-  const existing = conversations.find(
-    (c) =>
-      c.participantIds.includes(targetUserId) &&
-      c.participantIds.includes(currentId),
+export function getApprovedAccessCenters(): AccessCenterOrganization[] {
+  return getAllAccessCenters().filter((c) => c.status === "approved")
+}
+
+export function getAccessCenterById(
+  centerId: string,
+): AccessCenterOrganization | undefined {
+  return getAllAccessCenters().find((c) => c.id === centerId)
+}
+
+export function submitOrganizationApplication(params: {
+  name: string
+  tagline: string
+  logo?: string
+  type: AccessCenterOrganization["type"]
+  description: string
+  mission: string
+  website: string
+  email: string
+  phone: string
+  location: string
+  targetBeneficiaries: string[]
+  serviceDeliveryMode: "online" | "in_person" | "hybrid"
+  applicantName: string
+  applicantEmail: string
+  supportingInfo?: string
+  services: Array<Omit<AccessCenterService, "id" | "centerId">>
+}): AccessCenterOrganization {
+  const centers = getAllAccessCenters()
+  const centerId = `center-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`
+
+  const formattedServices: AccessCenterService[] = params.services.map(
+    (svc, idx) => ({
+      ...svc,
+      id: `svc-${centerId}-${idx + 1}`,
+      centerId,
+      active: true,
+    }),
   )
 
-  if (existing) return existing
-
-  const targetUser = getUserById(targetUserId)
-  const newConv: Conversation = {
-    id: `conv-${Date.now()}`,
-    participantIds: [currentId, targetUserId],
-    otherUser: {
-      id: targetUserId,
-      name: targetUser?.name || "Student",
-      headline: targetUser?.headline || "Credento Member",
-      avatar: targetUser?.avatar || "",
-      institution: targetUser?.institution || "University",
-      isOnline: false,
-    },
-    lastMessage: "Started a new conversation",
-    lastMessageAt: "Just now",
-    unreadCount: 0,
-    messages: [],
+  const newCenter: AccessCenterOrganization = {
+    id: centerId,
+    name: params.name.trim(),
+    tagline: params.tagline.trim(),
+    logo:
+      params.logo?.trim() ||
+      `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(
+        params.name,
+      )}&backgroundColor=173a35`,
+    coverImage:
+      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+    type: params.type,
+    description: params.description.trim(),
+    mission: params.mission.trim(),
+    website: params.website.trim(),
+    email: params.email.trim(),
+    phone: params.phone.trim(),
+    location: params.location.trim(),
+    targetBeneficiaries: params.targetBeneficiaries,
+    serviceDeliveryMode: params.serviceDeliveryMode,
+    applicantName: params.applicantName.trim(),
+    applicantEmail: params.applicantEmail.trim(),
+    managerEmail: params.applicantEmail.trim().toLowerCase(),
+    supportingInfo: params.supportingInfo?.trim(),
+    status: "pending", // Enters Credento Admin review
+    verified: false,
+    createdAt: new Date().toISOString().split("T")[0],
+    services: formattedServices,
   }
 
-  const updated = [newConv, ...conversations]
-  setItem(STORAGE_KEYS.CONVERSATIONS, updated)
-  return newConv
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, [newCenter, ...centers])
+  return newCenter
 }
 
-export function sendMessage(conversationId: string, text: string): void {
-  const currentId = getCurrentUserId()
-  const conversations = getConversations()
-
-  const updated = conversations.map((conv) => {
-    if (conv.id === conversationId) {
-      const newMsg = {
-        id: `msg-${Date.now()}`,
-        senderId: currentId,
-        text,
-        sentAt: "Just now",
-      }
-      return {
-        ...conv,
-        lastMessage: text,
-        lastMessageAt: "Just now",
-        messages: [...conv.messages, newMsg],
-      }
-    }
-    return conv
-  })
-  setItem(STORAGE_KEYS.CONVERSATIONS, updated)
-}
-
-export function markConversationAsRead(conversationId: string): void {
-  const conversations = getConversations()
-  const updated = conversations.map((conv) => {
-    if (conv.id === conversationId) {
-      return { ...conv, unreadCount: 0 }
-    }
-    return conv
-  })
-  setItem(STORAGE_KEYS.CONVERSATIONS, updated)
-}
-
-// --- NOTIFICATIONS API ---
-
-export function getNotifications(): AppNotification[] {
-  initializeStorage()
-  return getItem<AppNotification[]>(
-    STORAGE_KEYS.NOTIFICATIONS,
-    INITIAL_NOTIFICATIONS,
-  )
-}
-
-export function markNotificationAsRead(notifId: string): void {
-  const notifs = getNotifications()
-  const updated = notifs.map((n) =>
-    n.id === notifId ? { ...n, isRead: true } : n,
-  )
-  setItem(STORAGE_KEYS.NOTIFICATIONS, updated)
-}
-
-export function markAllNotificationsAsRead(): void {
-  const notifs = getNotifications()
-  const updated = notifs.map((n) => ({ ...n, isRead: true }))
-  setItem(STORAGE_KEYS.NOTIFICATIONS, updated)
-}
-
-// --- REPORTING API ---
-
-export function submitReport(
-  report: Omit<ReportItem, "id" | "createdAt" | "reporterId">,
+export function approveAccessCenter(
+  centerId: string,
+  adminNotes?: string,
 ): void {
-  const currentId = getCurrentUserId()
-  const reports = getItem<ReportItem[]>(STORAGE_KEYS.REPORTS, [])
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) =>
+    c.id === centerId
+      ? {
+          ...c,
+          status: "approved" as CenterStatus,
+          verified: true,
+          adminNotes: adminNotes || c.adminNotes,
+        }
+      : c,
+  )
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+export function rejectAccessCenter(centerId: string, reason: string): void {
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) =>
+    c.id === centerId
+      ? {
+          ...c,
+          status: "rejected" as CenterStatus,
+          rejectionReason: reason,
+        }
+      : c,
+  )
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+export function suspendAccessCenter(centerId: string, reason?: string): void {
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) =>
+    c.id === centerId
+      ? {
+          ...c,
+          status: "suspended" as CenterStatus,
+          adminNotes: reason || c.adminNotes,
+        }
+      : c,
+  )
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+export function reactivateAccessCenter(centerId: string): void {
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) =>
+    c.id === centerId
+      ? {
+          ...c,
+          status: "approved" as CenterStatus,
+        }
+      : c,
+  )
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+export function deleteAccessCenter(centerId: string): void {
+  const centers = getAllAccessCenters().filter((c) => c.id !== centerId)
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, centers)
+
+  // Remove corresponding service requests
+  const requests = getAllServiceRequests().filter(
+    (r) => r.centerId !== centerId,
+  )
+  setItem(STORAGE_KEYS.SERVICE_REQUESTS, requests)
+}
+
+export function updateCenterProfile(
+  centerId: string,
+  updates: Partial<AccessCenterOrganization>,
+): void {
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) =>
+    c.id === centerId ? { ...c, ...updates } : c,
+  )
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+export function addCenterService(
+  centerId: string,
+  service: Omit<AccessCenterService, "id" | "centerId">,
+): AccessCenterService {
+  const centers = getAllAccessCenters()
+  const newService: AccessCenterService = {
+    ...service,
+    id: `svc-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    centerId,
+    active: true,
+  }
+
+  const updated = centers.map((c) => {
+    if (c.id === centerId) {
+      return {
+        ...c,
+        services: [...(c.services || []), newService],
+      }
+    }
+    return c
+  })
+
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+  return newService
+}
+
+export function updateCenterService(
+  centerId: string,
+  serviceId: string,
+  updates: Partial<AccessCenterService>,
+): void {
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) => {
+    if (c.id === centerId) {
+      const updatedServices = (c.services || []).map((s) =>
+        s.id === serviceId ? { ...s, ...updates } : s,
+      )
+      return { ...c, services: updatedServices }
+    }
+    return c
+  })
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+export function deleteCenterService(centerId: string, serviceId: string): void {
+  const centers = getAllAccessCenters()
+  const updated = centers.map((c) => {
+    if (c.id === centerId) {
+      return {
+        ...c,
+        services: (c.services || []).filter((s) => s.id !== serviceId),
+      }
+    }
+    return c
+  })
+  setItem(STORAGE_KEYS.ACCESS_CENTERS, updated)
+}
+
+// ==========================================
+// 10. ACCESS CENTER SERVICE REQUEST SYSTEM
+// ==========================================
+
+export function getAllServiceRequests(): ServiceRequest[] {
+  return getItem<ServiceRequest[]>(STORAGE_KEYS.SERVICE_REQUESTS, [])
+}
+
+export function getUserServiceRequests(userId: string): ServiceRequest[] {
+  return getAllServiceRequests().filter((r) => r.requesterId === userId)
+}
+
+export function getCenterServiceRequests(centerId: string): ServiceRequest[] {
+  return getAllServiceRequests().filter((r) => r.centerId === centerId)
+}
+
+export function submitServiceRequest(params: {
+  serviceId: string
+  serviceTitle: string
+  centerId: string
+  centerName: string
+  requesterName: string
+  requesterEmail: string
+  requesterPhone: string
+  organizationOrSchool?: string
+  beneficiaryType: string
+  description: string
+  supportingLinks?: string
+}): ServiceRequest | null {
+  const current = getCurrentUser()
+  const requests = getAllServiceRequests()
+
+  const newRequest: ServiceRequest = {
+    id: `req-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    serviceId: params.serviceId,
+    serviceTitle: params.serviceTitle,
+    centerId: params.centerId,
+    centerName: params.centerName,
+    requesterId: current ? current.id : `guest-${Date.now()}`,
+    requesterName: params.requesterName.trim(),
+    requesterEmail: params.requesterEmail.trim(),
+    requesterPhone: params.requesterPhone.trim(),
+    organizationOrSchool: params.organizationOrSchool?.trim(),
+    beneficiaryType: params.beneficiaryType,
+    description: params.description.trim(),
+    supportingLinks: params.supportingLinks?.trim(),
+    status: "submitted",
+    submittedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+
+  setItem(STORAGE_KEYS.SERVICE_REQUESTS, [newRequest, ...requests])
+
+  // If user is registered, create notification
+  if (current) {
+    createNotification({
+      targetUserId: current.id,
+      type: "service_request_update",
+      title: "Service Request Submitted",
+      description: `Your request for "${params.serviceTitle}" from ${params.centerName} is now under review.`,
+      targetTab: "access_center",
+    })
+  }
+
+  return newRequest
+}
+
+export function updateServiceRequestStatus(
+  requestId: string,
+  status: ServiceRequestStatus,
+  orgNotes?: string,
+): void {
+  const requests = getAllServiceRequests()
+  const updated = requests.map((r) => {
+    if (r.id === requestId) {
+      // Notify requester
+      if (r.requesterId && !r.requesterId.startsWith("guest-")) {
+        createNotification({
+          targetUserId: r.requesterId,
+          type: "service_request_update",
+          title: `Service Request: ${status.replace("_", " ").toUpperCase()}`,
+          description: `${r.centerName} updated your request for "${r.serviceTitle}" to ${status.replace("_", " ")}.`,
+          targetTab: "access_center",
+        })
+      }
+
+      return {
+        ...r,
+        status,
+        orgNotes: orgNotes !== undefined ? orgNotes : r.orgNotes,
+        updatedAt: new Date().toISOString(),
+      }
+    }
+    return r
+  })
+
+  setItem(STORAGE_KEYS.SERVICE_REQUESTS, updated)
+}
+
+// ==========================================
+// 11. CREDENTO ADMIN & MODERATION SYSTEM
+// ==========================================
+
+export function isUserAdmin(): boolean {
+  return sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === "active"
+}
+
+export function setAdminSession(active: boolean): void {
+  if (active) {
+    sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, "active")
+  } else {
+    sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION)
+  }
+  notifySubscribers()
+}
+
+export function verifyAdminCredential(passkey: string): boolean {
+  // Secure administrator secret check
+  const validSecret = "credento-admin-2026"
+  const isCorrect = passkey.trim() === validSecret
+  if (isCorrect) {
+    setAdminSession(true)
+  }
+  return isCorrect
+}
+
+export function getAdminPlatformStats() {
+  const users = getAllUsers()
+  const connections = getConnections().filter((c) => c.status === "connected")
+  const posts = getPosts()
+  const opps = getOpportunities()
+  const centers = getAllAccessCenters()
+  const reports = getReports()
+  const requests = getAllServiceRequests()
+
+  const completedProfiles = users.filter(
+    (u) => calculateProfileCompleteness(u).percentage >= 70,
+  ).length
+
+  return {
+    totalRegisteredUsers: users.length,
+    totalCompletedProfiles: completedProfiles,
+    activeUsers: users.filter((u) => !u.isSuspended).length,
+    suspendedUsers: users.filter((u) => u.isSuspended).length,
+    totalConnections: connections.length,
+    totalPosts: posts.length,
+    totalOpportunities: opps.length,
+    totalAccessCenters: centers.filter((c) => c.status === "approved").length,
+    pendingAccessCenters: centers.filter((c) => c.status === "pending").length,
+    pendingReports: reports.filter((r) => r.status === "pending").length,
+    totalServiceRequests: requests.length,
+  }
+}
+
+// Reports
+export function getReports(): ReportItem[] {
+  return getItem<ReportItem[]>(STORAGE_KEYS.REPORTS, [])
+}
+
+export function submitReport(report: {
+  targetType: ReportItem["targetType"]
+  targetId: string
+  targetName?: string
+  reason: string
+  details: string
+}): ReportItem {
+  const current = getCurrentUser()
+  const reports = getReports()
   const newReport: ReportItem = {
-    ...report,
-    id: `rep-${Date.now()}`,
-    reporterId: currentId,
+    id: `rep-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    reporterId: current ? current.id : "anonymous",
+    reporterName: current ? current.name : "Anonymous Student",
+    targetType: report.targetType,
+    targetId: report.targetId,
+    targetName: report.targetName,
+    reason: report.reason,
+    details: report.details,
+    status: "pending",
     createdAt: new Date().toISOString(),
   }
+
   setItem(STORAGE_KEYS.REPORTS, [newReport, ...reports])
+  return newReport
 }
 
-// --- ACCOUNT REGISTRATION / AUTH HELPERS ---
+export function updateReportStatus(
+  reportId: string,
+  status: ReportStatus,
+  resolutionNotes?: string,
+): void {
+  const reports = getReports()
+  const updated = reports.map((r) =>
+    r.id === reportId
+      ? {
+          ...r,
+          status,
+          resolutionNotes: resolutionNotes || r.resolutionNotes,
+        }
+      : r,
+  )
+  setItem(STORAGE_KEYS.REPORTS, updated)
+}
 
-export function registerStudent(
-  name: string,
-  institution: string,
-  email: string,
-): StudentProfile {
-  const users = getAllUsers()
-  const newId = `user-${Date.now()}`
-  const newStudent: StudentProfile = {
-    id: newId,
-    name,
-    email,
-    institution,
-    facultyOrDepartment: "General Studies",
-    degree: "Undergraduate Degree",
-    graduationYear: 2027,
-    headline: `Student @ ${institution}`,
-    location: "Campus",
-    avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=173a35`,
-    coverImage:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
-    about: `Hello! I am a student at ${institution} exploring opportunities and connecting with peers across different academic disciplines on Credento.`,
-    isPublic: true,
-    skills: ["Critical Thinking", "Academic Research", "Team Collaboration"],
-    interests: ["Higher Education", "Student Leadership"],
-    education: [
-      {
-        id: `edu-${Date.now()}`,
-        institution,
-        degree: "Bachelor of Science / Arts",
-        fieldOfStudy: "Academic Major",
-        startYear: 2023,
-        endYear: 2027,
-      },
-    ],
-    portfolioItems: [],
-    connectionsCount: 0,
-    followersCount: 0,
-    connectionStatus: "self",
-    isFollowing: false,
+// Official Credento Team Messages
+export function getOfficialAnnouncements(): OfficialAnnouncement[] {
+  return getItem<OfficialAnnouncement[]>(
+    STORAGE_KEYS.OFFICIAL_ANNOUNCEMENTS,
+    [],
+  )
+}
+
+export function broadcastOfficialAnnouncement(params: {
+  title: string
+  content: string
+  type: OfficialAnnouncement["type"]
+  targetType: "all" | "user"
+  targetUserId?: string
+}): OfficialAnnouncement {
+  const list = getOfficialAnnouncements()
+  const newAnnouncement: OfficialAnnouncement = {
+    id: `ann-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    title: params.title.trim(),
+    content: params.content.trim(),
+    type: params.type,
+    targetType: params.targetType,
+    targetUserId: params.targetUserId,
+    createdAt: new Date().toISOString().split("T")[0],
+    readBy: [],
+    authorTitle: "Credento Team",
   }
 
-  const updatedUsers = [...users, newStudent]
-  setItem(STORAGE_KEYS.USERS, updatedUsers)
-  setCurrentUserId(newId)
-  return newStudent
+  setItem(STORAGE_KEYS.OFFICIAL_ANNOUNCEMENTS, [newAnnouncement, ...list])
+
+  // Generate notifications for targeted users
+  if (params.targetType === "all") {
+    const allUsers = getAllUsers()
+    allUsers.forEach((u) => {
+      createNotification({
+        targetUserId: u.id,
+        type: "announcement",
+        title: `Official Credento Notice: ${params.title}`,
+        description: params.content.slice(0, 70) + "...",
+        targetTab: "notifications",
+      })
+    })
+  } else if (params.targetUserId) {
+    createNotification({
+      targetUserId: params.targetUserId,
+      type: "announcement",
+      title: `Notice from Credento Team: ${params.title}`,
+      description: params.content.slice(0, 70) + "...",
+      targetTab: "notifications",
+    })
+  }
+
+  return newAnnouncement
 }
 
-// --- STUDY GROUPS & COMMUNITIES API ---
+// Study Groups compatibility
+export interface StudyGroup {
+  id: string
+  name: string
+  category: string
+  description: string
+  institution: string
+  memberCount: number
+  avatar: string
+  coverImage?: string
+  tags: string[]
+  isJoined?: boolean
+}
 
 export function getGroups(): StudyGroup[] {
-  initializeStorage()
-  return getItem<StudyGroup[]>(STORAGE_KEYS.GROUPS, INITIAL_GROUPS)
+  return getItem<StudyGroup[]>("credento_groups", [])
 }
 
 export function toggleJoinGroup(groupId: string): void {
@@ -982,20 +1912,17 @@ export function toggleJoinGroup(groupId: string): void {
     }
     return g
   })
-  setItem(STORAGE_KEYS.GROUPS, updated)
+  setItem("credento_groups", updated)
 }
 
-export function createGroup(
-  group: Omit<StudyGroup, "id" | "memberCount" | "isJoined">,
-): StudyGroup {
+export function createGroup(group: any): any {
   const groups = getGroups()
-  const newGroup: StudyGroup = {
+  const newGroup = {
     ...group,
     id: `grp-${Date.now()}`,
     memberCount: 1,
     isJoined: true,
   }
-  const updated = [newGroup, ...groups]
-  setItem(STORAGE_KEYS.GROUPS, updated)
+  setItem("credento_groups", [newGroup, ...groups])
   return newGroup
 }

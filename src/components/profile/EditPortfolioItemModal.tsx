@@ -99,7 +99,9 @@ export function EditPortfolioItemModal({
             <option value="publication">Academic Publication</option>
             <option value="award">Honor or Award</option>
             <option value="leadership">Leadership & Campus Service</option>
+            <option value="volunteer">Volunteering & Community Impact</option>
             <option value="certificate">Verified Certificate</option>
+            <option value="work">Internship / Work Experience</option>
           </select>
         </div>
 

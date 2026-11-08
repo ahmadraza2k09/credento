@@ -65,6 +65,7 @@ export function AddPortfolioItemModal({
     { value: "award", label: "Honors, Award & Hackathon Prize" },
     { value: "leadership", label: "Student Leadership & Society Role" },
     { value: "volunteer", label: "Volunteering & Community Impact" },
+    { value: "work", label: "Internship / Professional Experience" },
   ]
 
   return (
