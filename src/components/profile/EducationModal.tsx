@@ -20,7 +20,7 @@ export function EducationModal({
   const [institution, setInstitution] = useState("")
   const [degree, setDegree] = useState("")
   const [fieldOfStudy, setFieldOfStudy] = useState("")
-  const [startYear, setStartYear] = useState(2022)
+  const [startYear, setStartYear] = useState<number | string>(2022)
   const [endYear, setEndYear] = useState<string>("2026")
   const [gradeOrGpa, setGradeOrGpa] = useState("")
   const [activities, setActivities] = useState("")

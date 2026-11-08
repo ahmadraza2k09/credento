@@ -52,6 +52,7 @@ import {
   getBlockedUserIds,
   getConversations,
   getCurrentUser,
+  getCurrentUserId,
   getNotifications,
   getOfficialAnnouncements,
   getOpportunities,

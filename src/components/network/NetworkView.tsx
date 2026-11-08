@@ -35,6 +35,7 @@ export function NetworkView({
   onAcceptConnection,
   onDeclineConnection,
   onWithdrawConnection,
+  onRemoveConnection,
   onToggleFollow,
   onStartMessage,
   onSelectStudentProfile,

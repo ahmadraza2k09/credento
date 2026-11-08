@@ -23,7 +23,7 @@ interface PostCreatorProps {
     }
     poll?: {
       question: string
-      options: { id: string text: string votes: string[] }[]
+      options: { id: string; text: string; votes: string[] }[]
     }
   }) => void
 }

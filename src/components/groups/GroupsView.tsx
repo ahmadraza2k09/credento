@@ -46,7 +46,7 @@ export function GroupsView({
   const [newGroupTags, setNewGroupTags] = useState("")
   const [newGroupMeeting, setNewGroupMeeting] = useState("")
 
-  const categories: { id: string label: string }[] = [
+  const categories: { id: string; label: string }[] = [
     { id: "all", label: "All Communities" },
     { id: "my-groups", label: "My Communities" },
     { id: "Research Lab", label: "Research Labs" },
@@ -61,7 +61,7 @@ export function GroupsView({
         !searchQuery ||
         g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         g.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        g.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
+        g.tags.some((t: string) => t.toLowerCase().includes(searchQuery.toLowerCase()))
 
       const matchesCategory =
         selectedCategory === "all"
@@ -242,7 +242,7 @@ export function GroupsView({
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5 mt-3">
-                    {group.tags.slice(0, 3).map((tag, i) => (
+                    {group.tags.slice(0, 3).map((tag: string, i: number) => (
                       <span
                         key={i}
                         className="text-[10px] font-medium px-2 py-0.5 bg-[#f4f6f5] text-[#52635b] rounded-full"
@@ -329,7 +329,7 @@ export function GroupsView({
                   type="button"
                   onClick={() => {
                     onToggleJoinGroup(selectedGroup.id)
-                    setSelectedGroup((prev) =>
+                    setSelectedGroup((prev: StudyGroup | null) =>
                       prev
                         ? {
                             ...prev,

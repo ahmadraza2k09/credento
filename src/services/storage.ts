@@ -91,73 +91,90 @@ function setItem<T>(key: string, value: T): void {
 
 // Reset and initialize storage for true production experience
 export function initializeStorage(): void {
-  const currentVersion = localStorage.getItem(STORAGE_KEYS.SCHEMA_VERSION)
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return
 
-  if (currentVersion !== STORAGE_SCHEMA_VERSION) {
-    // Migrate to clean production schema: Wipe out old mock students/demo model profiles
-    localStorage.removeItem("credento_demo-name")
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER_ID)
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.CONNECTIONS, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.FOLLOWS, JSON.stringify([]))
-    const initialPosts: Post[] = [
-      {
-        id: "post-welcome-team",
-        authorId: "credento-admin",
-        authorName: "Credento Team",
-        authorHeadline: "Official Platform Administration",
-        authorInstitution: "Credento Global Administration",
-        authorAvatar:
-          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><rect width='128' height='128' fill='%23173a35'/><text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='bold' font-size='36' fill='%23ffffff'>TEAM</text></svg>",
-        content:
-          "Welcome to Credento — The student-only academic and professional networking platform. Connect with fellow university scholars, build your verified profile, and access free organizational support through the Credento Access Center.",
-        topic: "General",
-        createdAt: "Just now",
-        likes: [],
-        sharesCount: 0,
-        comments: [],
-      },
-    ]
+    const currentVersion = localStorage.getItem(STORAGE_KEYS.SCHEMA_VERSION)
 
-    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(initialPosts))
-    localStorage.setItem(STORAGE_KEYS.SAVED_POSTS, JSON.stringify([]))
-    localStorage.setItem(
-      STORAGE_KEYS.OPPORTUNITIES,
-      JSON.stringify(INITIAL_OPPORTUNITIES),
-    )
-    localStorage.setItem(STORAGE_KEYS.SAVED_OPPORTUNITIES, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify({}))
-    localStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.BLOCKED_USERS, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify([]))
-    localStorage.setItem(
-      STORAGE_KEYS.ACCESS_CENTERS,
-      JSON.stringify(INITIAL_ACCESS_CENTERS),
-    )
-    localStorage.setItem(STORAGE_KEYS.SERVICE_REQUESTS, JSON.stringify([]))
-    localStorage.setItem(
-      STORAGE_KEYS.OFFICIAL_ANNOUNCEMENTS,
-      JSON.stringify([
+    if (currentVersion !== STORAGE_SCHEMA_VERSION) {
+      // Migrate to clean production schema: Wipe out old mock students/demo model profiles
+      try {
+        localStorage.removeItem("credento_demo-name")
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER_ID)
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]))
+        localStorage.setItem(STORAGE_KEYS.CONNECTIONS, JSON.stringify([]))
+        localStorage.setItem(STORAGE_KEYS.FOLLOWS, JSON.stringify([]))
+      } catch {}
+
+      const initialPosts: Post[] = [
         {
-          id: "ann-welcome",
-          title: "Welcome to Credento — The Student Academic Network",
+          id: "post-welcome-team",
+          authorId: "credento-admin",
+          authorName: "Credento Team",
+          authorHeadline: "Official Platform Administration",
+          authorInstitution: "Credento Global Administration",
+          authorAvatar:
+            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><rect width='128' height='128' fill='%23173a35'/><text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='bold' font-size='36' fill='%23ffffff'>TEAM</text></svg>",
           content:
-            "Credento is officially live! Build your verified scholar profile, connect with fellow students across universities, explore verified fellowships & grants, and access free organizational services via Credento Access Center.",
-          type: "announcement",
-          targetType: "all",
-          createdAt: "2026-02-01",
-          readBy: [],
-          authorTitle: "Credento Team",
+            "Welcome to Credento — The student-only academic and professional networking platform. Connect with fellow university scholars, build your verified profile, and access free organizational support through the Credento Access Center.",
+          topic: "General",
+          createdAt: "Just now",
+          likes: [],
+          sharesCount: 0,
+          comments: [],
         },
-      ]),
-    )
-    localStorage.setItem(STORAGE_KEYS.SCHEMA_VERSION, STORAGE_SCHEMA_VERSION)
+      ]
+
+      try {
+        localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(initialPosts))
+        localStorage.setItem(STORAGE_KEYS.SAVED_POSTS, JSON.stringify([]))
+        localStorage.setItem(
+          STORAGE_KEYS.OPPORTUNITIES,
+          JSON.stringify(INITIAL_OPPORTUNITIES),
+        )
+        localStorage.setItem(STORAGE_KEYS.SAVED_OPPORTUNITIES, JSON.stringify([]))
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify({}))
+        localStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify([]))
+        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]))
+        localStorage.setItem(STORAGE_KEYS.BLOCKED_USERS, JSON.stringify([]))
+        localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify([]))
+        localStorage.setItem(
+          STORAGE_KEYS.ACCESS_CENTERS,
+          JSON.stringify(INITIAL_ACCESS_CENTERS),
+        )
+        localStorage.setItem(STORAGE_KEYS.SERVICE_REQUESTS, JSON.stringify([]))
+        localStorage.setItem(
+          STORAGE_KEYS.OFFICIAL_ANNOUNCEMENTS,
+          JSON.stringify([
+            {
+              id: "ann-welcome",
+              title: "Welcome to Credento — The Student Academic Network",
+              content:
+                "Credento is officially live! Build your verified scholar profile, connect with fellow students across universities, explore verified fellowships & grants, and access free organizational services via Credento Access Center.",
+              type: "announcement",
+              targetType: "all",
+              createdAt: "2026-02-01",
+              readBy: [],
+              authorTitle: "Credento Team",
+            },
+          ]),
+        )
+        localStorage.setItem(STORAGE_KEYS.SCHEMA_VERSION, STORAGE_SCHEMA_VERSION)
+      } catch (err) {
+        console.warn("Error saving initial seed data to storage:", err)
+      }
+    }
+  } catch (outerErr) {
+    console.warn("Storage initialization bypassed:", outerErr)
   }
 }
 
-// Call initialization immediately on module load
-initializeStorage()
+// Call initialization safely on module load
+try {
+  initializeStorage()
+} catch (e) {
+  console.warn("Initial storage load caught:", e)
+}
 
 // ==========================================
 // 1. AUTHENTICATION & USER MANAGEMENT
@@ -306,6 +323,9 @@ export function getAdminUserProfile(): StudentProfile {
       password: "badabdcad786",
       headline: "Credento Platform Administration & Academic Standards",
       institution: "Credento Global Administration",
+      facultyOrDepartment: "Platform Operations",
+      degree: "Academic Governance",
+      graduationYear: "Ongoing",
       location: "San Francisco, CA & Global",
       about:
         "Official platform administration and community standards verification team for Credento. Ensuring authentic student identity, safety oath adherence, and Access Center ecosystem governance.",
@@ -314,6 +334,8 @@ export function getAdminUserProfile(): StudentProfile {
       coverImage:
         "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80",
       connectionsCount: 0,
+      followersCount: 0,
+      isPublic: true,
       skills: [
         "Platform Governance",
         "Academic Verification",
@@ -325,19 +347,18 @@ export function getAdminUserProfile(): StudentProfile {
         "Collegiate Enablement",
         "Digital Access",
       ],
-      portfolio: [],
+      portfolioItems: [],
       education: [
         {
           id: "edu-admin",
           institution: "Credento Administration",
           degree: "Platform Moderation & Security",
+          fieldOfStudy: "Platform Operations",
           startYear: "2024",
           endYear: "Present",
         },
       ],
-      isPrivate: false,
-      isVerified: true,
-      registeredAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     }
     setItem(STORAGE_KEYS.USERS, [admin, ...users])
   } else {
@@ -352,13 +373,18 @@ export function getAdminUserProfile(): StudentProfile {
     }
   }
 
-  return admin
+  return admin!
 }
 
 export function loginStudent(
   emailOrUsername: string,
   password?: string,
-): { success: boolean user?: StudentProfile error?: string isAdmin?: boolean } {
+): {
+  success: boolean
+  user?: StudentProfile
+  error?: string
+  isAdmin?: boolean
+} {
   const users = getAllUsers()
   const q = emailOrUsername.trim().toLowerCase().replace(/^@/, "")
   const pwd = password ? password.trim() : ""

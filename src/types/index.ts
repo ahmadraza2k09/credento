@@ -28,6 +28,26 @@ export interface PortfolioItem {
 
 export type ConnectionStatus = "self" | "connected" | "pending_sent" | "pending_received" | "none"
 
+export type GroupCategory = "Research Lab" | "Study Circle" | "Student Chapter" | "Competition Team" | "Special Interest"
+
+export interface StudyGroup {
+  id: string
+  name: string
+  description: string
+  category: GroupCategory
+  memberCount: number
+  isJoined?: boolean
+  tags: string[]
+  meetingTime?: string
+  meetingSchedule?: string
+  leaderName?: string
+  leadName?: string
+  recentDiscussion?: string
+  institution?: string
+  avatar?: string
+  coverImage?: string
+}
+
 export type ProfileVisibility = "public" | "network" | "private"
 
 export interface SocialLinks {
