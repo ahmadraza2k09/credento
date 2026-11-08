@@ -103,6 +103,14 @@ import {
 } from "./services/storage"
 
 export default function App() {
+  // Direct Session State ensuring instantaneous UI loading upon student signup/login
+  const [sessionUserId, setSessionUserId] = useState<string | null>(() =>
+    getCurrentUserId(),
+  )
+  const [adminSessionState, setAdminSessionState] = useState<boolean>(() =>
+    isUserAdmin(),
+  )
+
   // Navigation State
   const [currentTab, setCurrentTab] = useState<NavTab>("feed")
 
@@ -140,6 +148,14 @@ export default function App() {
     document.title = "Credento — Student Academic Network & Access Center"
   }, [])
 
+  // Keep session state in sync with local storage updates
+  useEffect(() => {
+    return subscribeToStore(() => {
+      setSessionUserId(getCurrentUserId())
+      setAdminSessionState(isUserAdmin())
+    })
+  }, [])
+
   // Subscribe to storage store for real-time reactivity
   useSyncExternalStore(
     subscribeToStore,
@@ -168,8 +184,10 @@ export default function App() {
   )
 
   // Current session & user data
-  const currentUser = getCurrentUser()
-  const isAdmin = isUserAdmin()
+  const currentUser = sessionUserId
+    ? getUserById(sessionUserId) || getCurrentUser()
+    : getCurrentUser()
+  const isAdmin = adminSessionState || isUserAdmin()
   const rawUsers = getAllUsers()
   const rawPosts = getPosts()
   const opportunities = getOpportunities()
@@ -211,29 +229,36 @@ export default function App() {
   // Handlers
   const handleLoginSuccess = (user: StudentProfile) => {
     setCurrentUserId(user.id)
+    setSessionUserId(user.id)
     setInspectedStudentId(null)
     if (
       user.email?.toLowerCase() === "team@credento.world" ||
       user.role === "admin"
     ) {
       setAdminSession(true)
+      setAdminSessionState(true)
       setCurrentTab("admin")
     } else {
+      setAdminSessionState(false)
       setCurrentTab("feed")
     }
   }
 
   const handleAdminLoginSuccess = () => {
     setAdminSession(true)
+    setAdminSessionState(true)
     const adminUser = getAdminUserProfile()
     setCurrentUserId(adminUser.id)
+    setSessionUserId(adminUser.id)
     setInspectedStudentId(null)
     setCurrentTab("admin")
   }
 
   const handleSignOut = () => {
     setCurrentUserId(null)
+    setSessionUserId(null)
     setAdminSession(false)
+    setAdminSessionState(false)
     setInspectedStudentId(null)
   }
 

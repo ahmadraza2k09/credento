@@ -58,15 +58,19 @@ export function GlobalSearchView({
     if (!normalizedQuery) return allStudents
     return allStudents.filter(
       (s) =>
-        s.name.toLowerCase().includes(normalizedQuery) ||
-        s.username?.toLowerCase().includes(normalizedQuery) ||
-        s.headline.toLowerCase().includes(normalizedQuery) ||
-        s.institution.toLowerCase().includes(normalizedQuery) ||
-        s.location.toLowerCase().includes(normalizedQuery) ||
-        s.skills?.some((sk) => sk.toLowerCase().includes(normalizedQuery)) ||
-        s.interests?.some((i) => i.toLowerCase().includes(normalizedQuery)) ||
+        (s.name || "").toLowerCase().includes(normalizedQuery) ||
+        (s.username || "").toLowerCase().includes(normalizedQuery) ||
+        (s.headline || "").toLowerCase().includes(normalizedQuery) ||
+        (s.institution || "").toLowerCase().includes(normalizedQuery) ||
+        (s.location || "").toLowerCase().includes(normalizedQuery) ||
+        s.skills?.some((sk) =>
+          (sk || "").toLowerCase().includes(normalizedQuery),
+        ) ||
+        s.interests?.some((i) =>
+          (i || "").toLowerCase().includes(normalizedQuery),
+        ) ||
         s.portfolioItems?.some((p) =>
-          p.title.toLowerCase().includes(normalizedQuery),
+          (p.title || "").toLowerCase().includes(normalizedQuery),
         ),
     )
   }, [allStudents, normalizedQuery])
@@ -76,11 +80,11 @@ export function GlobalSearchView({
     if (!normalizedQuery) return allOpportunities
     return allOpportunities.filter(
       (o) =>
-        o.title.toLowerCase().includes(normalizedQuery) ||
-        o.provider.toLowerCase().includes(normalizedQuery) ||
-        o.description.toLowerCase().includes(normalizedQuery) ||
-        o.location.toLowerCase().includes(normalizedQuery) ||
-        o.category.toLowerCase().includes(normalizedQuery),
+        (o.title || "").toLowerCase().includes(normalizedQuery) ||
+        (o.provider || "").toLowerCase().includes(normalizedQuery) ||
+        (o.description || "").toLowerCase().includes(normalizedQuery) ||
+        (o.location || "").toLowerCase().includes(normalizedQuery) ||
+        (o.category || "").toLowerCase().includes(normalizedQuery),
     )
   }, [allOpportunities, normalizedQuery])
 
@@ -90,13 +94,13 @@ export function GlobalSearchView({
     if (!normalizedQuery) return approved
     return approved.filter(
       (c) =>
-        c.name.toLowerCase().includes(normalizedQuery) ||
-        c.tagline.toLowerCase().includes(normalizedQuery) ||
-        c.description.toLowerCase().includes(normalizedQuery) ||
-        c.services.some(
+        (c.name || "").toLowerCase().includes(normalizedQuery) ||
+        (c.tagline || "").toLowerCase().includes(normalizedQuery) ||
+        (c.description || "").toLowerCase().includes(normalizedQuery) ||
+        c.services?.some(
           (s) =>
-            s.title.toLowerCase().includes(normalizedQuery) ||
-            s.description.toLowerCase().includes(normalizedQuery),
+            (s.title || "").toLowerCase().includes(normalizedQuery) ||
+            (s.description || "").toLowerCase().includes(normalizedQuery),
         ),
     )
   }, [allCenters, normalizedQuery])
@@ -106,9 +110,9 @@ export function GlobalSearchView({
     if (!normalizedQuery) return allPosts
     return allPosts.filter(
       (p) =>
-        p.content.toLowerCase().includes(normalizedQuery) ||
-        p.authorName.toLowerCase().includes(normalizedQuery) ||
-        p.authorInstitution.toLowerCase().includes(normalizedQuery),
+        (p.content || "").toLowerCase().includes(normalizedQuery) ||
+        (p.authorName || "").toLowerCase().includes(normalizedQuery) ||
+        (p.authorInstitution || "").toLowerCase().includes(normalizedQuery),
     )
   }, [allPosts, normalizedQuery])
 

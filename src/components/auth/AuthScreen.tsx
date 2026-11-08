@@ -4,7 +4,6 @@ import {
   EyeOff,
   ShieldCheck,
   ArrowRight,
-  Lock,
   UserCheck,
   CheckCircle2,
 } from "lucide-react"
@@ -16,7 +15,6 @@ import {
   loginStudent,
   registerStudent,
   setCurrentUserId,
-  verifyAdminCredential,
 } from "../../services/storage"
 import { StudentProfile } from "../../types"
 
@@ -39,7 +37,7 @@ export function AuthScreen({
   const [institution, setInstitution] = useState("")
   const [degree, setDegree] = useState("")
   const [graduationYear, setGraduationYear] = useState("2027")
-  const [agreedToRules, setAgreedToRules] = useState(false)
+  const [agreedToRules, setAgreedToRules] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
 
   // Modals & UI states
@@ -49,11 +47,6 @@ export function AuthScreen({
   const [showForgotModal, setShowForgotModal] = useState(false)
   const [recoveryEmail, setRecoveryEmail] = useState("")
   const [recoverySent, setRecoverySent] = useState(false)
-
-  // Admin access modal
-  const [showAdminModal, setShowAdminModal] = useState(false)
-  const [adminPasskey, setAdminPasskey] = useState("")
-  const [adminError, setAdminError] = useState("")
 
   // Check existing registered users in the database
   const registeredUsers = getAllUsers().filter(
@@ -97,15 +90,11 @@ export function AuthScreen({
       nextErrors.institution = "Enter your current university or college."
     }
 
-    if (!agreedToRules) {
-      nextErrors.rules = "You must agree to the Credento Rules & Standards."
-    }
-
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
     setIsSubmitting(true)
-    setTimeout(() => {
+    try {
       const newStudent = registerStudent({
         name: name.trim(),
         username: username.trim(),
@@ -118,7 +107,10 @@ export function AuthScreen({
 
       setIsSubmitting(false)
       onLoginSuccess(newStudent)
-    }, 400)
+    } catch (err: any) {
+      setIsSubmitting(false)
+      setErrors({ form: err?.message || "Failed to register account." })
+    }
   }
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -133,23 +125,22 @@ export function AuthScreen({
     if (Object.keys(nextErrors).length > 0) return
 
     setIsSubmitting(true)
-    setTimeout(() => {
-      setIsSubmitting(false)
-      const res = loginStudent(email.trim(), password)
-      if (res.success && res.user) {
-        if (
-          res.isAdmin ||
-          email.trim().toLowerCase() === "team@credento.world" ||
-          email.trim().toLowerCase() === "team"
-        ) {
-          onAdminLoginSuccess()
-        } else {
-          onLoginSuccess(res.user)
-        }
+    const res = loginStudent(email.trim(), password)
+    setIsSubmitting(false)
+
+    if (res.success && res.user) {
+      if (
+        res.isAdmin ||
+        email.trim().toLowerCase() === "team@credento.world" ||
+        email.trim().toLowerCase() === "team"
+      ) {
+        onAdminLoginSuccess()
       } else {
-        setErrors({ form: res.error || "Authentication failed." })
+        onLoginSuccess(res.user)
       }
-    }, 350)
+    } else {
+      setErrors({ form: res.error || "Authentication failed." })
+    }
   }
 
   const handleQuickSwitchUser = (userId: string) => {
@@ -157,18 +148,6 @@ export function AuthScreen({
     const user = registeredUsers.find((u) => u.id === userId)
     if (user) {
       onLoginSuccess(user)
-    }
-  }
-
-  const handleAdminLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setAdminError("")
-    const isValid = verifyAdminCredential(adminPasskey)
-    if (isValid) {
-      setShowAdminModal(false)
-      onAdminLoginSuccess()
-    } else {
-      setAdminError("Invalid administrator passkey.")
     }
   }
 
@@ -214,17 +193,7 @@ export function AuthScreen({
 
           <div className="pt-8 text-[11px] text-white/50 flex items-center justify-between">
             <span>© 2026 Credento</span>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("team@credento.world")
-                setPassword("badabdcad786")
-                setShowAdminModal(true)
-              }}
-              className="text-white/60 hover:text-white underline cursor-pointer"
-            >
-              Staff Portal
-            </button>
+            <span>Student Academic Network</span>
           </div>
         </section>
 
@@ -636,22 +605,13 @@ export function AuthScreen({
               </div>
             )}
 
-            {/* Platform Admin Login Hint */}
-            <div className="mt-6 pt-3 border-t border-black/[0.06] flex items-center justify-between text-[11px] text-[#728078]">
+            <div className="mt-6 pt-3 border-t border-black/[0.06] text-center text-[11px] text-[#728078]">
               <button
                 type="button"
                 onClick={() => setShowRulesModal(true)}
                 className="hover:text-[#173a35] underline"
               >
-                Community Standards
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAdminModal(true)}
-                className="hover:text-[#173a35] flex items-center gap-1 text-[#173a35] font-medium"
-              >
-                <Lock className="w-3 h-3" />
-                <span>Admin Login</span>
+                Community Standards & Safety Oath
               </button>
             </div>
           </div>
@@ -724,72 +684,6 @@ export function AuthScreen({
             </p>
           </div>
         )}
-      </Modal>
-
-      {/* Credento Admin Login Modal */}
-      <Modal
-        isOpen={showAdminModal}
-        onClose={() => {
-          setShowAdminModal(false)
-          setAdminError("")
-          setAdminPasskey("")
-        }}
-        title="Administrator Access"
-        subtitle="Sign in with your administrator email (team@credento.world) or passkey."
-        maxWidth="sm"
-        footer={
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setShowAdminModal(false)}
-              className="px-3 py-1.5 text-xs font-medium text-[#62736b] hover:text-[#242b29] rounded-lg"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleAdminLoginSubmit}
-              className="btn-3d-primary px-4 py-1.5 text-xs font-medium rounded-lg"
-            >
-              Access Dashboard
-            </button>
-          </div>
-        }
-      >
-        <form onSubmit={handleAdminLoginSubmit} className="space-y-3 text-xs">
-          <div className="p-3 bg-[#f0f4f2] border border-[#cbd3ce] rounded-lg text-xs text-[#242b29]">
-            <p className="font-semibold text-[#173a35] mb-1">
-              Platform Administration
-            </p>
-            Enter the authorized admin passkey (or sign in using{" "}
-            <code className="font-mono bg-white px-1 py-0.5 rounded text-[#173a35]">
-              team@credento.world
-            </code>{" "}
-            on the main sign-in screen).
-          </div>
-
-          <div>
-            <label className="block font-semibold text-[#173a35] mb-1">
-              Admin Passkey / Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter admin password / passkey"
-              value={adminPasskey}
-              onChange={(e) => {
-                setAdminPasskey(e.target.value)
-                setAdminError("")
-              }}
-              className="w-full p-2.5 bg-white rounded-lg focus:outline-none focus:border-[#173a35] focus:ring-2 focus:ring-[#173a35]/15 border border-black/15 text-xs"
-              autoFocus
-            />
-            {adminError && (
-              <p className="text-[11px] text-[#a33e32] mt-1 font-semibold">
-                {adminError}
-              </p>
-            )}
-          </div>
-        </form>
       </Modal>
     </main>
   )

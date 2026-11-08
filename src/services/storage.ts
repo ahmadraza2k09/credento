@@ -100,7 +100,26 @@ export function initializeStorage(): void {
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]))
     localStorage.setItem(STORAGE_KEYS.CONNECTIONS, JSON.stringify([]))
     localStorage.setItem(STORAGE_KEYS.FOLLOWS, JSON.stringify([]))
-    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify([]))
+    const initialPosts: Post[] = [
+      {
+        id: "post-welcome-team",
+        authorId: "credento-admin",
+        authorName: "Credento Team",
+        authorHeadline: "Official Platform Administration",
+        authorInstitution: "Credento Global Administration",
+        authorAvatar:
+          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><rect width='128' height='128' fill='%23173a35'/><text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='bold' font-size='36' fill='%23ffffff'>TEAM</text></svg>",
+        content:
+          "Welcome to Credento — The student-only academic and professional networking platform. Connect with fellow university scholars, build your verified profile, and access free organizational support through the Credento Access Center.",
+        topic: "General",
+        createdAt: "Just now",
+        likes: [],
+        sharesCount: 0,
+        comments: [],
+      },
+    ]
+
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(initialPosts))
     localStorage.setItem(STORAGE_KEYS.SAVED_POSTS, JSON.stringify([]))
     localStorage.setItem(
       STORAGE_KEYS.OPPORTUNITIES,
@@ -200,10 +219,17 @@ export function registerStudent(params: {
   // Generate unique ID
   const newId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
 
-  // Default initials avatar
-  const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-    params.name,
-  )}&backgroundColor=173a35&textColor=ffffff`
+  // Instant reliable initials SVG avatar (no external dependency)
+  const initials =
+    params.name
+      .split(" ")
+      .map((w) => w[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "ST"
+
+  const avatar = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" fill="%23173a35"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-weight="bold" font-size="44" fill="%23ffffff">${encodeURIComponent(initials)}</text></svg>`
 
   const newStudent: StudentProfile = {
     id: newId,
@@ -938,7 +964,28 @@ export function unblockUser(targetUserId: string): void {
 // ==========================================
 
 export function getPosts(): Post[] {
-  const posts = getItem<Post[]>(STORAGE_KEYS.POSTS, [])
+  let posts = getItem<Post[]>(STORAGE_KEYS.POSTS, [])
+  if (posts.length === 0) {
+    posts = [
+      {
+        id: "post-welcome-team",
+        authorId: "credento-admin",
+        authorName: "Credento Team",
+        authorHeadline: "Official Platform Administration",
+        authorInstitution: "Credento Global Administration",
+        authorAvatar:
+          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><rect width='128' height='128' fill='%23173a35'/><text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='bold' font-size='36' fill='%23ffffff'>TEAM</text></svg>",
+        content:
+          "Welcome to Credento — The student-only academic and professional networking platform. Connect with fellow university scholars, build your verified profile, and access free organizational support through the Credento Access Center.",
+        topic: "General",
+        createdAt: "Just now",
+        likes: [],
+        sharesCount: 0,
+        comments: [],
+      },
+    ]
+    setItem(STORAGE_KEYS.POSTS, posts)
+  }
   const savedIds = getSavedPostIds()
   return posts.map((p) => ({
     ...p,

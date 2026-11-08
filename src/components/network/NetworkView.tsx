@@ -92,18 +92,15 @@ export function NetworkView({
     else if (activeTab === "following") baseList = followingStudents
 
     return baseList.filter((student) => {
+      const q = searchQuery.toLowerCase().trim()
       const matchesSearch =
-        searchQuery === "" ||
-        student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.institution.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.skills?.some((sk) =>
-          sk.toLowerCase().includes(searchQuery.toLowerCase()),
-        ) ||
-        student.interests?.some((int) =>
-          int.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
+        q === "" ||
+        (student.name || "").toLowerCase().includes(q) ||
+        (student.headline || "").toLowerCase().includes(q) ||
+        (student.institution || "").toLowerCase().includes(q) ||
+        (student.location || "").toLowerCase().includes(q) ||
+        student.skills?.some((sk) => (sk || "").toLowerCase().includes(q)) ||
+        student.interests?.some((int) => (int || "").toLowerCase().includes(q))
 
       const matchesInst =
         selectedInstitution === "all" ||

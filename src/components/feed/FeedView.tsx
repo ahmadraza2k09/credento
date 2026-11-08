@@ -28,6 +28,8 @@ interface FeedViewProps {
     content: string
     imageUrl?: string
     linkPreview?: Post["linkPreview"]
+    topic?: Post["topic"]
+    poll?: Post["poll"]
   }) => void
   onSharePost: (originalPost: Post, thoughts?: string) => void
   onEditPost: (postId: string, newContent: string) => void
